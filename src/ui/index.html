@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'self'" />
+    <title>CraftLive</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span class="cube cube-a"></span>
+            <span class="cube cube-b"></span>
+          </div>
+          <div>
+            <strong>CraftLive</strong>
+            <span>Minecraft × TikTok</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Főmenü">
+          <button class="nav-item active" data-view="interactions">
+            <span class="nav-icon">▦</span>
+            Interakciók
+            <span class="nav-count" id="navActiveCount">0</span>
+          </button>
+          <button class="nav-item" id="openSettingsButton">
+            <span class="nav-icon">⚙</span>
+            Beállítások
+          </button>
+          <button class="nav-item" id="sidebarUpdateButton" data-status="idle">
+            <span class="nav-icon">↻</span>
+            Frissítés
+            <span class="nav-update-badge" id="sidebarUpdateBadge" aria-live="polite"></span>
+          </button>
+        </nav>
+
+        <div class="sidebar-version-picker">
+          <label for="minecraftVersion">Minecraft Java-verzió</label>
+          <input id="minecraftVersion" list="minecraftVersionList" value="1.20.1" placeholder="Pl. 1.20.1 vagy 26.1" autocomplete="off" spellcheck="false" />
+          <datalist id="minecraftVersionList">
+            <option value="1.7.10"></option><option value="1.8.9"></option>
+            <option value="1.12.2"></option><option value="1.16.5"></option>
+            <option value="1.18.2"></option><option value="1.19.2"></option>
+            <option value="1.20.1"></option><option value="1.20.4"></option>
+            <option value="1.20.6"></option><option value="1.21.1"></option>
+            <option value="1.21.4"></option><option value="1.21.5"></option>
+            <option value="1.21.8"></option><option value="1.21.11"></option>
+            <option value="26.1"></option><option value="latest"></option>
+          </datalist>
+          <small>A mobok és sablonok ehhez igazodnak.</small>
+        </div>
+
+        <div class="sidebar-status">
+          <p class="eyebrow">KAPCSOLATOK</p>
+          <div class="connection-row">
+            <span class="status-dot" id="sideTikTokDot"></span>
+            <div><strong>TikTok LIVE</strong><span id="sideTikTokText">Nincs kapcsolat</span></div>
+          </div>
+          <div class="connection-row">
+            <span class="status-dot" id="sideMinecraftDot"></span>
+            <div><strong>Minecraft</strong><span id="sideMinecraftText">Játékablakra vár</span></div>
+          </div>
+        </div>
+
+        <div class="sidebar-foot">
+          <span id="sidebarVersion">0.6.3</span>
+          <span>Mod nélkül</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">VEZÉRLŐPULT</p>
+            <h1>Interakciók</h1>
+          </div>
+          <div class="top-actions">
+            <label class="username-field" for="usernameInput">
+              <span>@</span>
+              <input id="usernameInput" autocomplete="off" spellcheck="false" placeholder="TikTok felhasználónév" />
+            </label>
+            <button class="button primary" id="connectButton">LIVE figyelése</button>
+          </div>
+        </header>
+
+        <section class="setup-strip" id="setupStrip" aria-label="Beállítás állapota">
+          <div class="setup-step done">
+            <span>1</span>
+            <div><strong>CraftLive</strong><small>Az alkalmazás fut</small></div>
+          </div>
+          <i></i>
+          <div class="setup-step" id="minecraftSetupStep">
+            <span>2</span>
+            <div><strong>Minecraft ablak</strong><small id="minecraftSetupText">Indítsd el a játékot</small></div>
+          </div>
+          <i></i>
+          <div class="setup-step" id="tiktokSetupStep">
+            <span>3</span>
+            <div><strong>TikTok LIVE</strong><small id="tiktokSetupText">Csatlakozz a LIVE-hoz</small></div>
+          </div>
+        </section>
+
+        <section class="overview-grid" aria-label="Áttekintés">
+          <article class="metric-card">
+            <div class="metric-icon lime">✓</div>
+            <div><span>Aktív interakció</span><strong id="activeMetric">0 / 20</strong></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon cyan">↯</div>
+            <div><span>Várakozó interakció</span><strong id="queueMetric">0</strong></div>
+          </article>
+          <article class="metric-card wide">
+            <div class="metric-icon violet">⌁</div>
+            <div><span>Legutóbbi esemény</span><strong id="lastEventMetric">Még nincs esemény</strong></div>
+          </article>
+        </section>
+
+        <section class="workspace-grid">
+          <div class="interaction-panel">
+            <div class="section-head">
+              <div>
+                <h2>A 20 interakciós helyed</h2>
+                <p>Minden hely külön eseményt és tetszőleges Minecraft-parancsokat kezel.</p>
+                <p class="fixed-interval-note"><b>Fix túlterhelés-védelem:</b> két interakció között mindig legalább 5 másodperc telik el.</p>
+              </div>
+              <div class="filter-group">
+                <label class="search-field">
+                  <span>⌕</span>
+                  <input id="searchInput" placeholder="Keresés…" />
+                </label>
+                <select id="filterSelect" aria-label="Interakciók szűrése">
+                  <option value="all">Mind</option>
+                  <option value="enabled">Csak aktív</option>
+                  <option value="gift">Ajándék</option>
+                  <option value="like">Like</option>
+                  <option value="social">Közösségi</option>
+                  <option value="chat">Komment</option>
+                </select>
+              </div>
+            </div>
+            <div class="slots-grid" id="slotsGrid"></div>
+            <div class="empty-state hidden" id="emptyState">
+              <strong>Nincs találat</strong>
+              <span>Próbálj másik keresést vagy szűrőt.</span>
+            </div>
+          </div>
+
+          <aside class="activity-panel">
+            <div class="activity-head">
+              <div><h2>Élő napló</h2><span class="live-badge"><i></i> ÉLŐ</span></div>
+              <button class="icon-button" id="clearLogButton" title="Napló törlése">⌫</button>
+            </div>
+            <div class="supporter-monitor hidden" id="supporterMonitor">
+              <div class="supporter-monitor-head"><span>★</span><div><strong>Támogatói feliratkozások</strong><small id="supporterAccount">@venom_hun_</small></div></div>
+              <div class="supporter-monitor-stats"><strong id="supporterSubscriptionCount">0</strong><span>feliratkozás ebben a munkamenetben</span></div>
+              <p id="lastSupporterSubscriber">Még nincs új támogatói feliratkozás.</p>
+              <button type="button" id="supporterSubscribeLink">Itt szeretnék feliratkozni</button>
+            </div>
+            <div class="activity-list" id="activityList"></div>
+            <div class="activity-empty" id="activityEmpty">
+              <span class="radar-icon">⌁</span>
+              <strong>Itt jelennek meg az események</strong>
+              <p>Kapcsolódás után látni fogod az ajándékokat, like-okat és a Minecraft-műveleteket.</p>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="modal" id="editorDialog">
+      <form method="dialog" id="editorForm">
+        <header class="modal-head">
+          <div>
+            <p class="eyebrow" id="editorSlotNumber">INTERAKCIÓ 01</p>
+            <h2>Interakció szerkesztése</h2>
+          </div>
+          <button class="close-button" value="cancel" aria-label="Bezárás">×</button>
+        </header>
+        <div class="modal-body">
+          <div class="editor-main">
+            <section class="form-section">
+              <div class="form-section-title"><span>1</span><div><strong>Elnevezés</strong><small>Így találod meg gyorsan a listában.</small></div></div>
+              <div class="form-grid two">
+                <label class="field"><span>Név</span><input id="slotName" maxlength="60" required /></label>
+                <label class="field"><span>Szín</span><select id="slotAccent"><option value="lime">Zöld</option><option value="cyan">Kék</option><option value="violet">Lila</option><option value="amber">Narancs</option><option value="rose">Piros</option></select></label>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <div class="form-section-title"><span>2</span><div><strong>Mi indítsa el?</strong><small>Válassz TikTok LIVE-eseményt.</small></div></div>
+              <div class="trigger-picker" id="triggerPicker">
+                <button type="button" data-trigger="gift"><b>🎁</b><span>Ajándék</span></button>
+                <button type="button" data-trigger="like"><b>♥</b><span>Like</span></button>
+                <button type="button" data-trigger="follow"><b>＋</b><span>Követés</span></button>
+                <button type="button" data-trigger="share"><b>↗</b><span>Megosztás</span></button>
+                <button type="button" data-trigger="chat"><b>☵</b><span>Komment</span></button>
+                <button type="button" data-trigger="member"><b>→</b><span>Belépés</span></button>
+                <button type="button" data-trigger="subscribe"><b>★</b><span>Feliratkozás</span></button>
+              </div>
+              <div class="form-grid three trigger-options">
+                <label class="field" id="triggerValueField"><span id="triggerValueLabel">Ajándék neve vagy ID-ja</span><input id="triggerValue" placeholder="Pl. Rose" /></label>
+                <label class="field" id="triggerModeField"><span>Egyezés</span><select id="triggerMode"><option value="exact">Pontosan ez</option><option value="contains">Tartalmazza</option></select></label>
+                <label class="field"><span id="minCountLabel">Minimum darab</span><input id="triggerMinCount" type="number" min="1" max="100000" /></label>
+              </div>
+              <div class="recent-gifts hidden" id="recentGiftsBox">
+                <span>LIVE-ban legutóbb látott ajándékok</span>
+                <div id="recentGiftsList"></div>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <div class="form-section-title"><span>3</span><div><strong>Mi történjen a játékban?</strong><small>Válassz sablont, aztán módosítsd szabadon.</small></div></div>
+              <div class="preset-row" id="presetRow">
+                <button type="button" data-preset="zombie">Zombi</button>
+                <button type="button" data-preset="creeper">Creeper</button>
+                <button type="button" data-preset="lightning">Villám</button>
+                <button type="button" data-preset="tnt">TNT</button>
+                <button type="button" data-preset="heal">Gyógyítás</button>
+                <button type="button" data-preset="blindness">Vakság</button>
+                <button type="button" data-preset="diamond">Gyémánt</button>
+                <button type="button" data-preset="storm">Vihar</button>
+                <button type="button" data-preset="night">Éjszaka</button>
+                <button type="button" data-preset="teleport">Teleport</button>
+              </div>
+              <div class="mob-builder">
+                <div class="mob-builder-head">
+                  <div><strong>Mob kiválasztása parancs nélkül</strong><small id="mobCatalogVersion">Minecraft 1.20.1</small></div>
+                  <span id="mobResultCount">0 mob</span>
+                </div>
+                <div class="form-grid two">
+                  <label class="field"><span>Mob keresése</span><input id="mobSearch" placeholder="Pl. Warden, Zombie, Creeper" /></label>
+                  <label class="field"><span>Kategória</span><select id="mobCategory"><option value="all">Összes mob</option><option value="hostile">Ellenséges</option><option value="passive">Békés / semleges</option><option value="water">Vízi</option><option value="boss">Főellenség</option></select></label>
+                </div>
+                <label class="field"><span>A kiválasztott verzióban elérhető mobok</span><select id="mobSelect" size="8"></select></label>
+                <div class="mob-insert-row">
+                  <label class="field"><span>Darabszám</span><input id="mobCount" type="number" min="1" max="20" value="1" /></label>
+                  <label class="field"><span>Megjelenés helye</span><select id="mobPosition"><option value="near">A játékos körül</option><option value="above">A játékos felett</option><option value="exact">A játékos helyén</option></select></label>
+                  <button type="button" class="button secondary" id="insertMobButton">Mob használata</button>
+                </div>
+                <p class="field-help" id="mobEmptyHelp">Csak azok a mobok jelennek meg, amelyek a kiválasztott Minecraft-verzióban már léteznek.</p>
+              </div>
+              <details class="advanced-commands">
+                <summary>Haladó: nyers Minecraft-parancsok</summary>
+                <label class="field command-field">
+                  <span>Minecraft-parancsok <small>egy sor = egy parancs, / jel nélkül</small></span>
+                  <textarea id="slotCommands" rows="7" spellcheck="false" required></textarea>
+                </label>
+              </details>
+              <div class="placeholder-row">
+                <span>Beilleszthető adatok:</span>
+                <button type="button" data-placeholder="{user}">{user}</button>
+                <button type="button" data-placeholder="{gift}">{gift}</button>
+                <button type="button" data-placeholder="{amount}">{amount}</button>
+                <button type="button" data-placeholder="{coins}">{coins}</button>
+                <button type="button" data-placeholder="{comment}">{comment}</button>
+              </div>
+            </section>
+
+            <section class="form-section compact">
+              <div class="form-section-title"><span>4</span><div><strong>Finomhangolás</strong><small>Védelem a túl sok egyidejű esemény ellen.</small></div></div>
+              <div class="form-grid three">
+                <label class="field"><span>Várakozás (ms)</span><input id="slotCooldown" type="number" min="0" max="3600000" step="100" /></label>
+                <label class="field"><span>Parancsok között (ms)</span><input id="slotDelay" type="number" min="0" max="60000" step="50" /></label>
+                <label class="field"><span>Esély (%)</span><input id="slotChance" type="number" min="1" max="100" /></label>
+              </div>
+            </section>
+          </div>
+          <aside class="editor-side">
+            <div class="test-card">
+              <span class="test-icon">▶</span>
+              <h3>Próbáld ki éles LIVE nélkül</h3>
+              <p>A teszt sorba állítja a parancsokat; az 5 másodperces fix védelem itt is érvényes. Kiválasztott verzió: <b id="testMinecraftVersion">1.20.1</b>.</p>
+              <button type="button" class="button secondary full" id="editorTestButton">Teszt indítása</button>
+            </div>
+            <div class="tip-card">
+              <strong>Mod nélküli működés</strong>
+              <p>A játékban engedélyezd a parancsokat. Az app röviden megnyitja a chatet, majd automatikusan beírja a műveletet.</p>
+            </div>
+          </aside>
+        </div>
+        <footer class="modal-foot">
+          <label class="switch-row"><input id="slotEnabled" type="checkbox" /><span></span><b>Interakció bekapcsolva</b></label>
+          <div>
+            <button type="button" class="button danger-ghost" id="resetSlotButton">Hely ürítése</button>
+            <button value="cancel" class="button ghost">Mégse</button>
+            <button type="submit" value="default" class="button primary">Mentés</button>
+          </div>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog class="modal settings-modal" id="settingsDialog">
+      <form method="dialog" id="settingsForm">
+        <header class="modal-head">
+          <div><p class="eyebrow">CRAFTLIVE</p><h2>Beállítások</h2></div>
+          <button class="close-button" value="cancel" aria-label="Bezárás">×</button>
+        </header>
+        <div class="settings-body">
+          <section class="form-section">
+            <h3>TikTok LIVE</h3>
+            <p class="field-help" id="appLanguageText">Alkalmazás nyelve: magyar, a Windows beállítása alapján.</p>
+            <label class="field"><span>Felhasználónév</span><input id="settingsUsername" placeholder="@felhasználónév" /></label>
+            <label class="check-row"><input id="autoConnect" type="checkbox" /><span>Automatikus LIVE-figyelés az alkalmazás indításakor</span></label>
+            <p class="field-help">A figyelés akkor is elindítható, ha még nem fut a LIVE. A CraftLive 15 másodpercenként ellenőrzi, és automatikusan kapcsolódik az indulásakor.</p>
+          </section>
+          <section class="form-section">
+            <h3>Minecraft – mod nélkül</h3>
+            <p class="field-help large" id="noModExplanation">A CraftLive automatikusan megkeresi a futó Minecraft Java ablakát. Eseménynél előtérbe hozza, megnyitja a chatet a <b>T</b> billentyűvel, beilleszti a parancsot és elküldi. Nem szükséges Forge mod vagy JAR.</p>
+            <p class="field-help large">A beépített sablonok a kiválasztott, 1.7.10 vagy újabb Java-verzió parancsformátumához igazodnak. A saját, már elmentett nyers parancsokat az alkalmazás nem írja át automatikusan.</p>
+            <div class="warning-card"><strong>Szükséges</strong><span>A világban legyenek engedélyezve a csalások/parancsok, és a chat billentyűje maradjon T.</span></div>
+          </section>
+          <section class="form-section">
+            <h3>Opcionális funkciók</h3>
+            <label class="check-row"><input id="supporterSubscriptionsEnabled" type="checkbox" /><span>Támogatói feliratkozás-figyelő</span></label>
+            <p class="field-help">Élőben jelzi és számolja, ha valaki fizetős támogatói feliratkozást indít a beállított TikTok-fióknál. Ez a funkció kihagyható, és később is bármikor módosítható.</p>
+          </section>
+          <section class="form-section">
+            <h3>CraftLive-frissítések</h3>
+            <div class="update-status-card" id="updateStatusCard">
+              <div><strong id="updateVersionText">Jelenlegi verzió: 0.6.3</strong><span id="updateStatusText">Automatikus ellenőrzés indításkor és 10 percenként.</span></div>
+              <button type="button" class="button primary hidden" id="showUpdateButton">Frissítés</button>
+            </div>
+            <label class="field"><span>Frissítési csatorna</span><input id="updateManifestUrl" type="url" readonly /></label>
+            <p class="field-help">A hivatalos CraftLive GitHub-kiadások ellenőrzése automatikus: indításkor, majd 10 percenként megtörténik.</p>
+            <p class="field-help">Ha új verzió érhető el, annak telepítése kötelező; csak az új opcionális funkciók bekapcsolásáról dönt a felhasználó.</p>
+            <div class="backup-actions update-actions">
+              <button type="button" class="button secondary" id="checkUpdateButton">Frissítés keresése</button>
+            </div>
+          </section>
+          <section class="form-section">
+            <h3>Biztonsági mentés</h3>
+            <div class="backup-actions">
+              <button type="button" class="button secondary" id="exportButton">Beállítások mentése</button>
+              <button type="button" class="button ghost" id="importButton">Beállítások betöltése</button>
+            </div>
+          </section>
+          <section class="notice-card">
+            <strong>Egyetlen alkalmazás, JAR nélkül</strong>
+            <p>A beállításaid a saját gépeden maradnak. A TikTok-fiókod jelszavát nem kéri és nem tárolja az alkalmazás.</p>
+          </section>
+        </div>
+        <footer class="modal-foot"><span></span><div><button value="cancel" class="button ghost">Mégse</button><button type="submit" class="button primary">Mentés</button></div></footer>
+      </form>
+    </dialog>
+
+    <dialog class="modal update-modal" id="updateDialog">
+      <form method="dialog">
+        <header class="modal-head">
+          <div><p class="eyebrow">CRAFTLIVE UPDATE</p><h2>Új frissítés érhető el</h2></div>
+        </header>
+        <div class="update-dialog-body">
+          <div class="update-version-badge"><span id="updateFromVersion">0.6.3</span><b>→</b><strong id="updateToVersion">0.6.4</strong></div>
+          <div class="update-notes" id="updateNotes">Új funkciók és javítások.</div>
+          <section class="update-features hidden" id="updateFeaturesSection">
+            <h3>Melyik új funkciót szeretnéd engedélyezni?</h3>
+            <p>A választásaid az újraindítás után lépnek életbe.</p>
+            <div id="updateFeatureList"></div>
+          </section>
+          <div class="warning-card"><strong>Újraindítás</strong><span>Az új verzió telepítése kötelező. A gomb megnyomásakor a CraftLive bezárul, majd automatikusan újraindul.</span></div>
+        </div>
+        <footer class="modal-foot">
+          <span id="updateDownloadStatus"></span>
+          <div>
+            <button type="button" class="button primary" id="installUpdateButton">Frissítés és újraindítás</button>
+          </div>
+        </footer>
+      </form>
+    </dialog>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

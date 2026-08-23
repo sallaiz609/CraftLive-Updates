@@ -1,0 +1,83 @@
+{
+  "name": "craftlive",
+  "version": "0.6.3",
+  "productName": "CraftLive",
+  "description": "JAR nélküli TikTok LIVE–Minecraft interakciós alkalmazás 20 szabad hellyel",
+  "author": "CraftLive",
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sallaiz609/CraftLive-Updates.git"
+  },
+  "type": "module",
+  "main": "src/main.js",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check src/main.js && node --check src/preload.cjs && node --check src/ui/app.js && node --test tests/*.test.mjs && node tests/connector-import.mjs",
+    "build:input-helper": "dotnet publish native/CraftLive.InputHelper.csproj -c Release -r win-x64 -o native/bin",
+    "dist:win": "npm run check && npm run build:input-helper && electron-builder --win nsis --x64",
+    "dist:portable": "npm run check && npm run build:input-helper && node scripts/package-win.mjs"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.9",
+    "tiktok-live-connector": "2.4.4"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "43.4.1",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "hu.craftlive.app",
+    "productName": "CraftLive",
+    "artifactName": "CraftLive-Setup-${version}.${ext}",
+    "directories": {
+      "output": "KESZ"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md"
+    ],
+    "extraResources": [
+      {
+        "from": "native/bin/CraftLive.InputHelper.exe",
+        "to": "input/CraftLive.InputHelper.exe"
+      }
+    ],
+    "asar": true,
+    "compression": "maximum",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CraftLive",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "sallaiz609",
+        "repo": "CraftLive-Updates",
+        "releaseType": "release"
+      }
+    ]
+  }
+}

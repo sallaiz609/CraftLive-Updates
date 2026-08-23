@@ -1,0 +1,27 @@
+CRAFTLIVE 0.6.3 – GITHUB-KIADÁS
+================================
+
+A 0.6.3 kizárólag a GitHub Actions által Windows rendszeren elkészített
+szabványos telepítőből adható ki. A natív Minecraft-vezérlőt a munkafolyamat
+automatikusan lefordítja és a telepítőbe csomagolja.
+
+1. A forrásfájlokat töltsd fel a CraftLive-Updates tárház main ágába.
+2. Nyisd meg az Actions lapot, válaszd a „CraftLive Windows installer”
+   munkafolyamatot, majd kattints a Run workflow gombra.
+3. A munkafolyamat automatikusan:
+   - lefuttatja a teszteket;
+   - elkészíti a natív Windows-vezérlőt;
+   - elkészíti a szabványos NSIS telepítőt;
+   - létrehozza a v0.6.3 címkét és kiadást;
+   - feltölti a három frissítési fájlt.
+4. A kiadás Assets részében ennek a három fájlnak kell megjelennie:
+
+   CraftLive-Setup-0.6.3.exe
+   CraftLive-Setup-0.6.3.exe.blockmap
+   latest.yml
+
+Ne tölts fel kézzel korábbi vagy helyben készített 0.6.2-es telepítőt. A három
+fájlnak ugyanabból a GitHub Actions futásból kell származnia.
+
+A telepített 0.6.1-es CraftLive a v0.6.3 kiadást automatikusan érzékeli,
+letölti, telepíti, majd újraindítja az alkalmazást.

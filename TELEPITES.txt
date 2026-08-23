@@ -1,0 +1,84 @@
+CRAFTLIVE – TELEPÍTÉS
+=====================
+
+1. Indítsd el a CraftLive-Setup-0.6.3.exe telepítőt. A telepítő létrehozhat
+   asztali és Start menü parancsikont, majd a végén elindítja a CraftLive-ot.
+
+   Ha korábban a ZIP-es 0.5.x változatot használtad, azt előtte zárd be. A
+   beállításaid megmaradnak. A sikeres telepítés után a régi kicsomagolt
+   CraftLive mappát törölheted, és ezentúl a telepített parancsikont használd.
+
+2. Indítsd el a Minecraft Java Editiont, és lépj be egy világba.
+   JAR, Forge mod vagy plugin nem szükséges.
+
+3. A világban legyenek engedélyezve a csalások/parancsok.
+   Egyjátékos világban szükség esetén: ESC → Megnyitás LAN-ra →
+   Csalások engedélyezése: BE → LAN-világ indítása.
+
+4. A Minecraft chat billentyűje maradjon az alapértelmezett T.
+
+5. A CraftLive Minecraft jelzője zöldre vált, amikor megtalálja a játékablakot.
+
+6. Írd be a TikTok felhasználónevedet, majd nyomd meg a LIVE figyelése gombot.
+   Ezt a LIVE elindítása előtt is bekapcsolhatod: az alkalmazás automatikusan
+   kapcsolódik, amikor elindul a közvetítés.
+
+7. Nyisd meg bármelyik interakciót, válassz sablont vagy mobot, és nyomd meg a
+   Teszt gombot. Ehhez nem kell TikTok LIVE. Ha működik, kapcsold be az
+   interakciót.
+
+8. A bal oldalsáv fix Minecraft-verzió mezőjében add meg a használt Java-verziót. A CraftLive
+   1.7.x-től a legújabb kiadásig elfogad verziószámot, és az újonnan
+   kiválasztott sablonokat a megfelelő parancsformátummal illeszti be.
+
+9. A moblista csak a kiválasztott kiadásban már létező vanilla mobokat mutatja.
+   Például a Warden 1.19-től választható. Nincs szükség a summon parancs kézi
+   beírására.
+
+10. A CraftLive a Windows nyelvét követi. Magyar Windows esetén magyar, más
+    nyelvű Windows esetén angol felülettel indul.
+
+11. A CraftLive a hivatalos GitHub-kiadásokat minden indításkor, majd 10
+    percenként automatikusan ellenőrzi. A bal oldalon, közvetlenül a
+    Beállítások alatt mindig látható Frissítés gombbal kézzel is indítható
+    ellenőrzés. Ez a gomb fix, a felhasználó nem kapcsolhatja ki.
+
+12. Új CraftLive-verziónál kötelező frissítési ablak jelenik meg. A program a
+    telepítőt letölti és ellenőrzi, bezárul, csendben frissül, majd automatikusan
+    újraindul. Ugyanazt a verziót csak akkor tekinti telepítettnek, ha már az új
+    verzió fut; így nem kerül végtelen frissítési körbe. Az új opcionális
+    funkciókat külön-külön engedélyezheted vagy letilthatod.
+
+13. Minden interakció közös sorba kerül, és két interakció között kötelezően
+    legalább 5 másodperc telik el. Ez fix túlterhelés-védelem: nem kapcsolható
+    ki és nem állítható át. Egy interakció több összetartozó parancsa együtt
+    lefut, csak utána indul az 5 másodperces szünet.
+
+14. A Támogatói feliratkozás-figyelő opcionális. Bekapcsolva az aktív LIVE alatt
+    számolja az új fizetős feliratkozásokat, megmutatja a legutóbbi támogatót,
+    és egy gombbal megnyitja a beállított TikTok-profilt. A korábbi támogatók
+    teljes listáját nem kérdezi le.
+
+Fontos:
+- A CraftLive-nak és a Minecraftnak ugyanazon a Windows gépen kell futnia.
+- Minden parancsnál egy pillanatra megnyílik a Minecraft chatje. Ez szükséges,
+  mert mod nélkül a játék csak billentyűzeten keresztül vezérelhető.
+- A CraftLive a Minecraft vezérlésére beépített natív Windows-összetevőt
+  használ; futás közben nem indít PowerShellt és nem használ kódolt parancsot.
+- Az alkalmazás nem kéri a TikTok-jelszavadat.
+- A normál frissítést mindig az alkalmazás saját frissítőablakából indítsd. A
+  kiadási metaadat és a telepítő ellenőrzőösszege együtt védi a letöltést.
+- A TikTok LIVE-eseménykapcsolat közösségi, nem hivatalos megoldást használ;
+  a TikTok változtatásai miatt később frissítés válhat szükségessé.
+
+Hibaelhárítás:
+- Ha a build megszakad, küldd el a projekt gyökerében létrejött
+  build-install.log vagy build-package.log fájlt.
+- Minecraft piros: lépj be egy világba, és ellenőrizd, hogy az ablak címében
+  szerepel-e a Minecraft szó.
+- TikTok piros: ellenőrizd a felhasználónevet és hogy valóban fut-e a LIVE.
+- A parancs megjelenik, de nem fut le: engedélyezd a csalásokat/parancsokat.
+- Nem nyílik meg a chat: állítsd vissza a chat billentyűjét T-re.
+- A régi ZIP-es app újra kéri ugyanazt a frissítést: zárd be, futtasd egyszer a
+  CraftLive-Setup-0.6.3.exe telepítőt, majd kizárólag a telepített parancsikont
+  indítsd. A régi, kicsomagolt EXE továbbra is a régi verzió maradna.

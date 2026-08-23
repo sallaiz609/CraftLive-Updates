@@ -1,0 +1,10 @@
+[
+  {
+    "id": "example-new-feature",
+    "nameHu": "Példa új funkció",
+    "nameEn": "Example new feature",
+    "descriptionHu": "A felhasználó a frissítési ablakban dönthet a bekapcsolásáról.",
+    "descriptionEn": "The user can choose whether to enable it in the update window.",
+    "defaultEnabled": false
+  }
+]

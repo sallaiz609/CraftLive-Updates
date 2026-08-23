@@ -1,0 +1,10 @@
+[
+  {
+    "id": "supporter-subscriptions",
+    "nameHu": "Támogatói feliratkozás-figyelő",
+    "nameEn": "Supporter subscription monitor",
+    "descriptionHu": "Élőben számolja a fizetős támogatói feliratkozásokat, megmutatja a legutóbbi támogatót, és elvezet a @venom_hun_ TikTok-profilra. A funkció kihagyható.",
+    "descriptionEn": "Counts paid supporter subscriptions in real time, shows the latest supporter, and links to the @venom_hun_ TikTok profile. This feature is optional.",
+    "defaultEnabled": false
+  }
+]
