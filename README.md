@@ -53,8 +53,8 @@ npm run dist:win
 A buildhez .NET 8 SDK szükséges, mert a Minecraft vezérlését végző kis natív
 Windows-összetevő is ekkor készül el. A futó CraftLive nem indít PowerShellt.
 
-A kész `CraftLive-Setup-0.6.3.exe`, `latest.yml` és
-`CraftLive-Setup-0.6.3.exe.blockmap` a `KESZ` mappába kerül. A Setup EXE-t csak
+A kész `CraftLive-Setup-0.6.4.exe`, `latest.yml` és
+`CraftLive-Setup-0.6.4.exe.blockmap` a `KESZ` mappába kerül. A Setup EXE-t csak
 egyszer kell lefuttatni; ezután a CraftLive telepített alkalmazásként, asztali
 és Start menü parancsikonnal használható. Ha nincs megfelelő Node.js a gépen,
 a script egy hordozható példányt tölt le. Java, Gradle vagy Git nem szükséges a

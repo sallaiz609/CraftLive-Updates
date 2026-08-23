@@ -1,7 +1,7 @@
 CRAFTLIVE – TELEPÍTÉS
 =====================
 
-1. Indítsd el a CraftLive-Setup-0.6.3.exe telepítőt. A telepítő létrehozhat
+1. Indítsd el a CraftLive-Setup-0.6.4.exe telepítőt. A telepítő létrehozhat
    asztali és Start menü parancsikont, majd a végén elindítja a CraftLive-ot.
 
    Ha korábban a ZIP-es 0.5.x változatot használtad, azt előtte zárd be. A
@@ -80,5 +80,5 @@ Hibaelhárítás:
 - A parancs megjelenik, de nem fut le: engedélyezd a csalásokat/parancsokat.
 - Nem nyílik meg a chat: állítsd vissza a chat billentyűjét T-re.
 - A régi ZIP-es app újra kéri ugyanazt a frissítést: zárd be, futtasd egyszer a
-  CraftLive-Setup-0.6.3.exe telepítőt, majd kizárólag a telepített parancsikont
+  CraftLive-Setup-0.6.4.exe telepítőt, majd kizárólag a telepített parancsikont
   indítsd. A régi, kicsomagolt EXE továbbra is a régi verzió maradna.

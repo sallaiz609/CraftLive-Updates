@@ -80,6 +80,16 @@ test("the interface language follows the Windows application locale", async () =
   assert.match(renderer, /based on Windows settings/);
 });
 
+test("update release notes follow the Windows application language", async () => {
+  const main = await read("src/main.js");
+  const notes = await read("RELEASE_NOTES_0.6.4.md");
+  assert.match(main, /function localizeUpdateReleaseNotes/);
+  assert.match(main, /appLanguage === "hu" \? "HU" : "EN"/);
+  assert.match(notes, /CRAFTLIVE:HU/);
+  assert.match(notes, /CRAFTLIVE:EN/);
+  assert.match(notes, /What changed/);
+});
+
 test("mandatory app updates and opt-in feature choices are wired", async () => {
   const main = await read("src/main.js");
   const preload = await read("src/preload.cjs");
@@ -104,12 +114,13 @@ test("mandatory app updates and opt-in feature choices are wired", async () => {
 test("the Windows distribution is an installable and auto-updatable NSIS app", async () => {
   const packageJson = JSON.parse(await read("package.json"));
   const workflow = await read(".github/workflows/release-windows.yml");
-  assert.equal(packageJson.version, "0.6.3");
+  assert.equal(packageJson.version, "0.6.4");
   assert.equal(packageJson.build.win.target[0].target, "nsis");
   assert.equal(packageJson.build.nsis.perMachine, false);
   assert.equal(packageJson.build.nsis.runAfterFinish, true);
   assert.equal(packageJson.build.publish[0].provider, "github");
   assert.equal(packageJson.dependencies["electron-updater"], "6.8.9");
+  assert.match(packageJson.scripts["dist:win"], /--publish never/);
   assert.equal(packageJson.build.extraResources[0].to, "input/CraftLive.InputHelper.exe");
   assert.match(workflow, /actions\/setup-dotnet@v4/);
   assert.match(workflow, /gh release upload.*--clobber/);
@@ -127,6 +138,25 @@ test("a fixed update button sits directly below Settings in the sidebar", async 
   assert.doesNotMatch(html.match(/<button class="nav-item" id="sidebarUpdateButton"[^>]*>/)?.[0] || "", /hidden/);
   assert.match(renderer, /sidebarUpdateButton.*addEventListener\("click", checkUpdateFromUi\)/);
   assert.match(renderer, /sidebarUpdateBadge/);
+});
+
+test("the running app version is always visible in the bottom-right corner", async () => {
+  const html = await read("src/ui/index.html");
+  const renderer = await read("src/ui/app.js");
+  const styles = await read("src/ui/styles.css");
+  assert.match(html, /class="app-version-corner"/);
+  assert.match(html, /id="cornerVersion"/);
+  assert.match(renderer, /#cornerVersion.*update\.currentVersion/);
+  assert.match(styles, /\.app-version-corner \{ position: fixed;[^}]*right: 22px;[^}]*bottom: 18px;/);
+});
+
+test("small interaction and settings text uses a fixed readable scale", async () => {
+  const styles = await read("src/ui/styles.css");
+  assert.match(styles, /Fixed readability scale/);
+  assert.match(styles, /\.nav-item \{ font-size: 15px;/);
+  assert.match(styles, /\.section-head p,[\s\S]*font-size: 12px;/);
+  assert.match(styles, /\.field,[\s\S]*font-size: 12px;/);
+  assert.match(styles, /\.slot-actions button \{ min-height: 34px;/);
 });
 
 test("all interactions use a fixed global five-second safety interval", async () => {
@@ -164,6 +194,15 @@ test("new users start with an empty LIVE account while the optional supporter li
   assert.match(main, /username: "",/);
   assert.match(main, /account: SUPPORTER_TIKTOK_ACCOUNT/);
   assert.doesNotMatch(main, /username: "venom_hun_"/);
+});
+
+test("every app version update requires the TikTok username again", async () => {
+  const main = await read("src/main.js");
+  assert.match(main, /lastOpenedAppVersion/);
+  assert.match(main, /config\.lastOpenedAppVersion !== runningAppVersion/);
+  assert.match(main, /config\.username = "";/);
+  assert.match(main, /config\.autoConnect = false;/);
+  assert.match(main, /Add meg újra a TikTok-felhasználónevet/);
 });
 
 test("every catalog contains unique summon-safe mob identifiers", () => {

@@ -128,7 +128,7 @@ const staticEnglish = {
   "Támogatói feliratkozás-figyelő": "Supporter subscription monitor",
   "Élőben jelzi és számolja, ha valaki fizetős támogatói feliratkozást indít a beállított TikTok-fióknál. Ez a funkció kihagyható, és később is bármikor módosítható.": "Shows and counts paid supporter subscriptions for the configured TikTok account in real time. This feature is optional and can be changed later at any time.",
   "CraftLive-frissítések": "CraftLive updates",
-  "Jelenlegi verzió: 0.6.3": "Current version: 0.6.3",
+  "Jelenlegi verzió: 0.6.4": "Current version: 0.6.4",
   "Nincs beállítva frissítési forrás.": "No update source is configured.",
   "Frissítés": "Update",
   "Frissítési csatorna": "Update channel",
@@ -404,6 +404,7 @@ function renderUpdatePanel() {
   if (!state?.update) return;
   const update = state.update;
   $("#sidebarVersion").textContent = update.currentVersion;
+  $("#cornerVersion").textContent = `v${update.currentVersion}`;
   $("#sidebarUpdateButton").dataset.status = update.status;
   $("#sidebarUpdateBadge").textContent = update.status === "available"
     ? tx("ÚJ", "NEW")

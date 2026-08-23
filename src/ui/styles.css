@@ -288,11 +288,109 @@ select { border: 1px solid var(--line); background: #0d1814; color: var(--soft);
 .update-modal .modal-foot > span { max-width: 240px; color: var(--muted); font-size: 8px; }
 .button:disabled { cursor: wait; opacity: .65; transform: none; }
 
-.toast-stack { position: fixed; z-index: 1000; right: 22px; bottom: 22px; display: grid; gap: 8px; width: 320px; }
+.app-version-corner { position: fixed; z-index: 900; right: 22px; bottom: 18px; display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid rgba(155, 246, 53, .42); border-radius: 10px; background: rgba(8, 17, 14, .94); box-shadow: 0 10px 30px rgba(0, 0, 0, .34), 0 0 18px rgba(155, 246, 53, .08); pointer-events: none; user-select: none; }
+.app-version-corner span { color: #9db1a8; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.app-version-corner strong { color: var(--lime); font-size: 12px; letter-spacing: .03em; }
+.toast-stack { position: fixed; z-index: 1000; right: 22px; bottom: 68px; display: grid; gap: 8px; width: 320px; }
 .toast { padding: 12px 14px; border: 1px solid #32493f; border-radius: 10px; background: #102019; box-shadow: var(--shadow); animation: toast-in .2s ease-out; }
 .toast strong { display: block; font-size: 10px; }
 .toast span { display: block; margin-top: 4px; color: var(--muted); font-size: 8px; }
 .toast.error { border-color: rgba(255, 91, 121, .38); }
+
+/* Fixed readability scale: small interface copy is never reduced to tiny text. */
+.nav-item { font-size: 15px; font-weight: 650; }
+.eyebrow,
+.brand span,
+.nav-count,
+.nav-update-badge,
+.sidebar-version-picker label,
+.sidebar-version-picker small,
+.sidebar-foot,
+.slot-index,
+.flow-chip small,
+.supporter-monitor-head small,
+.supporter-monitor-stats span,
+.supporter-monitor > p,
+.live-badge,
+.activity-copy time,
+.form-section-title small,
+.trigger-picker button span,
+.recent-gifts > span,
+.recent-gifts button,
+.preset-row button,
+.placeholder-row button,
+.mob-builder-head small,
+.mob-builder-head > span,
+.placeholder-row > span,
+.tip-card code,
+.field-help,
+.warning-card strong,
+.warning-card span,
+.update-status-card span,
+.notice-card p,
+.update-features > p,
+.update-feature-option small,
+.update-modal .modal-foot > span,
+.app-version-corner span,
+.toast span { font-size: 10px; }
+
+.sidebar-version-picker input,
+.connection-row div span,
+.setup-step small,
+.metric-card span,
+.flow-chip strong,
+.slot-actions button,
+.supporter-monitor-head strong,
+.supporter-monitor > button,
+.activity-copy strong,
+.activity-copy p,
+.activity-empty p,
+.form-section-title > span,
+.form-section-title small,
+.field small,
+.advanced-commands summary,
+.test-card p,
+.tip-card p,
+.tip-card strong,
+.switch-row b,
+.check-row,
+.copy-field button,
+.field-help.large,
+.update-status-card strong,
+.update-notes,
+.update-feature-option strong,
+.toast strong { font-size: 11px; }
+
+.connection-row strong,
+.setup-step strong,
+.section-head p,
+.search-field input,
+.filter-group select,
+.field,
+.field textarea,
+.mob-builder-head strong,
+.activity-empty strong,
+.update-features h3,
+.notice-card strong { font-size: 12px; }
+
+.section-head h2,
+.activity-head h2,
+.slot-card h3,
+.form-section h3 { font-size: 15px; }
+
+.slot-card { min-height: 174px; }
+.flow-chip { padding: 9px; }
+.slot-actions button { min-height: 34px; }
+.supporter-monitor > button { min-height: 36px; }
+.recent-gifts button,
+.preset-row button,
+.placeholder-row button { min-height: 31px; }
+.activity-item { padding-top: 13px; padding-bottom: 13px; }
+.field-help,
+.form-section-title small,
+.activity-copy p,
+.activity-copy time,
+.sidebar-version-picker small { color: #91a69d; }
 
 @keyframes pulse { 50% { opacity: .4; } }
 @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }

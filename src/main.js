@@ -16,7 +16,7 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SLOT_COUNT = 20;
-const CONFIG_VERSION = 3;
+const CONFIG_VERSION = 4;
 const LOG_LIMIT = 250;
 const QUEUE_LIMIT = 1000;
 const GLOBAL_INTERACTION_INTERVAL_MS = 5000;
@@ -70,6 +70,7 @@ let updateState = {
 };
 let supporterSubscriptionCount = 0;
 let lastSupporterSubscriber = null;
+let tiktokUsernameResetForAppUpdate = false;
 
 function mt(hungarian, english) {
   return appLanguage === "en" ? english : hungarian;
@@ -122,6 +123,7 @@ function makeDefaultConfig() {
   examples.forEach((example, index) => Object.assign(slots[index], example));
   return {
     version: CONFIG_VERSION,
+    lastOpenedAppVersion: "",
     username: "",
     autoConnect: false,
     updateManifestUrl: DEFAULT_UPDATE_MANIFEST_URL,
@@ -162,6 +164,7 @@ function normalizeConfig(raw) {
   const rawSlots = Array.isArray(raw?.slots) ? raw.slots : [];
   return {
     version: CONFIG_VERSION,
+    lastOpenedAppVersion: String(raw?.lastOpenedAppVersion || "").trim().slice(0, 40),
     username: String(raw?.username || "").replace(/^@/, "").trim().slice(0, 80),
     autoConnect: Boolean(raw?.autoConnect),
     updateManifestUrl: normalizeUpdateManifestUrl(raw?.updateManifestUrl || DEFAULT_UPDATE_MANIFEST_URL, false),
@@ -212,13 +215,25 @@ function normalizeFeatureFlags(raw) {
 
 async function loadConfig() {
   configPath = path.join(app.getPath("userData"), "config.json");
+  let mustSave = false;
   try {
     const raw = JSON.parse(await readFile(configPath, "utf8"));
     config = normalizeConfig(raw);
   } catch {
     config = makeDefaultConfig();
-    await saveConfig();
+    mustSave = true;
   }
+
+  const runningAppVersion = app.getVersion();
+  if (config.lastOpenedAppVersion !== runningAppVersion) {
+    tiktokUsernameResetForAppUpdate = Boolean(config.username);
+    config.username = "";
+    config.autoConnect = false;
+    config.lastOpenedAppVersion = runningAppVersion;
+    mustSave = true;
+  }
+
+  if (mustSave) await saveConfig();
 }
 
 async function saveConfig() {
@@ -350,14 +365,21 @@ function installerUpdaterAvailable() {
   return process.platform === "win32" && app.isPackaged && existsSync(path.join(process.resourcesPath, "app-update.yml"));
 }
 
+function localizeUpdateReleaseNotes(value) {
+  const rawNotes = String(value || "");
+  const languageMarker = appLanguage === "hu" ? "HU" : "EN";
+  const match = rawNotes.match(new RegExp(`<!--\\s*CRAFTLIVE:${languageMarker}\\s*-->([\\s\\S]*?)<!--\\s*CRAFTLIVE:END-${languageMarker}\\s*-->`, "i"));
+  return String(match?.[1] || rawNotes).trim().slice(0, 3000);
+}
+
 function updateReleaseNotes(info) {
-  if (typeof info?.releaseNotes === "string") return info.releaseNotes.slice(0, 3000);
+  if (typeof info?.releaseNotes === "string") return localizeUpdateReleaseNotes(info.releaseNotes);
   if (!Array.isArray(info?.releaseNotes)) return "";
-  return info.releaseNotes
+  const combinedNotes = info.releaseNotes
     .map((item) => typeof item === "string" ? item : item?.note || "")
     .filter(Boolean)
-    .join("\n\n")
-    .slice(0, 3000);
+    .join("\n\n");
+  return localizeUpdateReleaseNotes(combinedNotes);
 }
 
 async function featureMetadataFor(version) {
@@ -1096,6 +1118,11 @@ function registerIpc() {
     if (result.canceled || !result.filePaths[0]) return { canceled: true, state: publicState() };
     const imported = JSON.parse(await readFile(result.filePaths[0], "utf8"));
     config = normalizeConfig(imported);
+    if (config.lastOpenedAppVersion !== app.getVersion()) {
+      config.username = "";
+      config.autoConnect = false;
+      config.lastOpenedAppVersion = app.getVersion();
+    }
     await saveConfig();
     addLog("status", mt("Beállítások betöltve", "Settings imported"));
     return { canceled: false, state: publicState() };
@@ -1118,6 +1145,13 @@ app.whenReady().then(async () => {
   configureInstallerUpdater();
   registerIpc();
   createWindow();
+  if (tiktokUsernameResetForAppUpdate) {
+    addLog(
+      "status",
+      mt("Új CraftLive-verzió indult", "A new CraftLive version started"),
+      mt("Add meg újra a TikTok-felhasználónevet.", "Enter the TikTok username again.")
+    );
+  }
   setInterval(broadcastState, 2000).unref();
   setInterval(() => checkMinecraftWindow().catch(() => {}), 2500).unref();
   setInterval(() => dispatchKeyboardCommand().catch(() => {}), 90).unref();

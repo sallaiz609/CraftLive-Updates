@@ -1,0 +1,25 @@
+CRAFTLIVE 0.6.4 – GITHUB-KIADÁS
+================================
+
+A 0.6.4-et a GitHub Actions készíti el Windows rendszerre, szabványos
+telepítőként. A natív Minecraft-vezérlőt a munkafolyamat automatikusan
+lefordítja és a telepítőbe csomagolja.
+
+1. A kicsomagolt forrás tartalmát töltsd fel a CraftLive-Updates tárház
+   main ágába, a meglévő fájlok felülírásával.
+2. Nyisd meg az Actions lapot, majd válaszd a „CraftLive Windows installer”
+   munkafolyamatot.
+3. Kattints a Run workflow gombra, hagyd a main ágat kiválasztva, majd indítsd
+   el a futást.
+4. A zöld futás automatikusan létrehozza a v0.6.4 kiadást, és feltölti:
+
+   CraftLive-Setup-0.6.4.exe
+   CraftLive-Setup-0.6.4.exe.blockmap
+   latest.yml
+
+A meglévő, telepített CraftLive automatikusan érzékeli a v0.6.4 kiadást,
+letölti, telepíti, majd újraindítja az alkalmazást. A frissítés utáni első
+indításkor a TikTok-felhasználónevet újra meg kell adni.
+
+A változáslista magyar Windows esetén magyarul, más rendszer-nyelv esetén
+angolul jelenik meg az alkalmazásban.
