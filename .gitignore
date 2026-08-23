@@ -1,0 +1,8 @@
+node_modules/
+.npm-cache/
+.electron-cache/
+.tools/
+release/
+KESZ/
+build-install.log
+build-package.log
