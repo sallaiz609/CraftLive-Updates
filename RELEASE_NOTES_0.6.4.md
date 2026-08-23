@@ -9,6 +9,7 @@
 - Az Interakciók, a Beállítások és a kapcsolódó panelek apró feliratai fixen nagyobbak és kontrasztosabbak lettek.
 - A kártyák és kezelőszervek mérete igazodik a nagyobb betűkhöz; ez a megjelenés nem kapcsolható ki.
 - Minden új CraftLive-verzió első indításakor a LIVE-hoz használt TikTok-felhasználónevet fixen újra meg kell adni; az automatikus csatlakozás addig kikapcsol.
+- Visszakerült a bal oldali, mindig látható Támogatás fül, amely a készítő @venom_hun_ TikTok-profiljára vezet; a követés teljesen önkéntes.
 - Megmaradt a fix 5 másodperces interakcióvédelem, az üres alapértelmezett TikTok-név és a bal oldali Minecraft-verzióválasztó.
 - A PowerShell nélküli natív Minecraft-vezérlés és a GitHubos automatikus frissítés változatlanul működik.
 <!-- CRAFTLIVE:END-HU -->
@@ -22,6 +23,7 @@
 - Small labels throughout Interactions, Settings, and related panels are permanently larger and use improved contrast.
 - Cards and controls now accommodate the larger text; this fixed presentation cannot be disabled.
 - On the first launch of every new CraftLive version, the TikTok username used for LIVE must be entered again; automatic connection remains off until then.
+- The always-visible Support tab is back in the sidebar and opens the creator's @venom_hun_ TikTok profile; following is completely optional.
 - The fixed five-second interaction protection, empty default TikTok username, and sidebar Minecraft version selector remain in place.
 - Native PowerShell-free Minecraft control and automatic updates through GitHub continue to work as before.
 <!-- CRAFTLIVE:END-EN -->

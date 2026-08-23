@@ -1,0 +1,19 @@
+CRAFTLIVE 0.6.6 – GITHUB-KIADÁS
+================================
+
+1. A kicsomagolt forrás teljes tartalmát töltsd fel a CraftLive-Updates
+   tárház main ágába, a meglévő fájlok felülírásával.
+2. Nyisd meg az Actions lapot, majd válaszd a „CraftLive Windows installer”
+   munkafolyamatot.
+3. Kattints a Run workflow gombra, hagyd a main ágat kiválasztva, majd indítsd
+   el a futást.
+4. A zöld futás automatikusan létrehozza a v0.6.6 kiadást, és feltölti:
+
+   CraftLive-Setup-0.6.6.exe
+   CraftLive-Setup-0.6.6.exe.blockmap
+   latest.yml
+
+A telepített CraftLive automatikusan érzékeli a v0.6.6 kiadást, letölti,
+telepíti, majd újraindítja az alkalmazást. A 0.6.6 csak a legújabb Minecraft
+Java 26.2 kiadást tartja meg, és külön Interakciók, illetve Falix Hosting
+főfület ad.

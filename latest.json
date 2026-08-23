@@ -1,17 +1,6 @@
 {
-  "version": "0.5.1",
-  "downloadUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/latest/download/CraftLive-Windows-NO-JAR.zip",
-  "sha256": "c84951b659da1f02322d5a3b59421fd64382b625f636b239b5f2205e85639b40",
-  "notesHu": "Új, opcionális támogatói feliratkozás-figyelő a @venom_hun_ TikTok-fiókhoz.",
-  "notesEn": "New optional supporter subscription monitor for the @venom_hun_ TikTok account.",
-  "features": [
-    {
-      "id": "supporter-subscriptions",
-      "nameHu": "Támogatói feliratkozás-figyelő",
-      "nameEn": "Supporter subscription monitor",
-      "descriptionHu": "Élőben számolja a fizetős támogatói feliratkozásokat, megmutatja a legutóbbi támogatót, és elvezet a @venom_hun_ TikTok-profilra. A funkció kihagyható.",
-      "descriptionEn": "Counts paid supporter subscriptions in real time, shows the latest supporter, and links to the @venom_hun_ TikTok profile. This feature is optional.",
-      "defaultEnabled": false
-    }
-  ]
+  "version": "0.6.6",
+  "notesHu": "Fix Minecraft Java 26.2 támogatás, kizárólag a legújabb moblista, valamint külön Interakciók és Falix Hosting főfül.",
+  "notesEn": "Fixed Minecraft Java 26.2 support, latest-only mob catalog, and separate Interactions and Falix Hosting main tabs.",
+  "features": []
 }

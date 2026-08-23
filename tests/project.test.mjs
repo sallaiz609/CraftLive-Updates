@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { MOB_CATALOGS } from "../src/mob-catalog.js";
+import { LATEST_MINECRAFT_VERSION, MOB_CATALOGS } from "../src/mob-catalog.js";
 
 const read = (relativePath) => readFile(new URL(`../${relativePath}`, import.meta.url), "utf8");
 
@@ -40,33 +40,31 @@ test("LIVE monitoring waits and retries automatically", async () => {
   assert.match(renderer, /Automatikus LIVE-figyelés elindult/);
 });
 
-test("Minecraft version profiles and LIVE-free testing are available", async () => {
+test("only the latest Minecraft release and LIVE-free testing are available", async () => {
   const main = await read("src/main.js");
   const renderer = await read("src/ui/app.js");
   const html = await read("src/ui/index.html");
-  assert.match(main, /minecraftVersion: DEFAULT_MINECRAFT_VERSION/);
-  assert.match(renderer, /function minecraftCommandProfile/);
-  assert.match(renderer, /legacy-1-7/);
-  assert.match(renderer, /modern-snbt/);
-  assert.match(html, /id="minecraftVersion"/);
-  const versionPosition = html.indexOf('id="minecraftVersion"');
+  const catalog = await read("src/mob-catalog.js");
+  assert.match(main, /minecraftVersion: LATEST_MINECRAFT_VERSION/);
+  assert.match(renderer, /function latestPresets/);
+  assert.doesNotMatch(renderer, /legacy-1-7|legacy-caps|legacy-namespaced|modern-json/);
+  assert.match(html, /id="minecraftVersionValue"/);
+  assert.doesNotMatch(html, /id="minecraftVersionList"|<input id="minecraftVersion"/);
+  const versionPosition = html.indexOf('id="minecraftVersionValue"');
   const sidebarStatusPosition = html.indexOf('class="sidebar-status"');
   const settingsPosition = html.indexOf('id="settingsDialog"');
   assert.ok(versionPosition > 0 && versionPosition < sidebarStatusPosition && versionPosition < settingsPosition);
-  assert.doesNotMatch(html.slice(settingsPosition), /id="minecraftVersion"/);
-  assert.match(renderer, /async function saveSidebarMinecraftVersion/);
+  assert.doesNotMatch(catalog, /"1\.7\.10"|"1\.20\.1"|"26\.1"/);
   assert.match(html, /Próbáld ki éles LIVE nélkül/);
 });
 
-test("mob catalogs follow Minecraft release availability", async () => {
+test("the mob picker contains only the latest Minecraft 26.2 catalog", async () => {
   const html = await read("src/ui/index.html");
   const renderer = await read("src/ui/app.js");
-  assert.equal(MOB_CATALOGS["1.18.2"].some((mob) => mob.id === "warden"), false);
-  assert.equal(MOB_CATALOGS["1.19"].some((mob) => mob.id === "warden"), true);
-  assert.equal(MOB_CATALOGS["1.20.5"].some((mob) => mob.id === "breeze"), false);
-  assert.equal(MOB_CATALOGS["1.21"].some((mob) => mob.id === "breeze"), true);
-  assert.equal(MOB_CATALOGS["1.21.3"].some((mob) => mob.id === "creaking"), false);
-  assert.equal(MOB_CATALOGS["1.21.4"].some((mob) => mob.id === "creaking"), true);
+  assert.equal(LATEST_MINECRAFT_VERSION, "26.2");
+  assert.deepEqual(Object.keys(MOB_CATALOGS), ["26.2"]);
+  assert.equal(MOB_CATALOGS["26.2"].some((mob) => mob.id === "warden"), true);
+  assert.equal(MOB_CATALOGS["26.2"].some((mob) => mob.id === "sulfur_cube"), true);
   assert.match(html, /id="mobSelect"/);
   assert.match(renderer, /function useSelectedMob/);
 });
@@ -82,7 +80,7 @@ test("the interface language follows the Windows application locale", async () =
 
 test("update release notes follow the Windows application language", async () => {
   const main = await read("src/main.js");
-  const notes = await read("RELEASE_NOTES_0.6.4.md");
+  const notes = await read("RELEASE_NOTES_0.6.6.md");
   assert.match(main, /function localizeUpdateReleaseNotes/);
   assert.match(main, /appLanguage === "hu" \? "HU" : "EN"/);
   assert.match(notes, /CRAFTLIVE:HU/);
@@ -114,7 +112,7 @@ test("mandatory app updates and opt-in feature choices are wired", async () => {
 test("the Windows distribution is an installable and auto-updatable NSIS app", async () => {
   const packageJson = JSON.parse(await read("package.json"));
   const workflow = await read(".github/workflows/release-windows.yml");
-  assert.equal(packageJson.version, "0.6.4");
+  assert.equal(packageJson.version, "0.6.6");
   assert.equal(packageJson.build.win.target[0].target, "nsis");
   assert.equal(packageJson.build.nsis.perMachine, false);
   assert.equal(packageJson.build.nsis.runAfterFinish, true);
@@ -175,24 +173,45 @@ test("all interactions use a fixed global five-second safety interval", async ()
   assert.doesNotMatch(html, /id="(?:global)?InteractionInterval"/i);
 });
 
-test("optional paid supporter subscriptions are monitored and linked", async () => {
+test("the app does not advertise or monitor paid creator support", async () => {
   const main = await read("src/main.js");
   const renderer = await read("src/ui/app.js");
   const html = await read("src/ui/index.html");
-  assert.match(main, /supporter-subscriptions/);
-  assert.match(main, /supporterSubscriptionCount \+= 1/);
   assert.match(main, /WebcastEvent\.SUB_NOTIFY/);
-  assert.match(html, /id="supporterSubscriptionsEnabled"/);
-  assert.match(html, /id="supporterSubscribeLink"/);
-  assert.match(renderer, /https:\/\/www\.tiktok\.com\/@/);
-  assert.match(renderer, /encodeURIComponent\(username\)/);
+  assert.doesNotMatch(main, /supporterSubscriptionCount|lastSupporterSubscriber/);
+  assert.doesNotMatch(html, /supporterSubscriptionsEnabled|supporterSubscribeLink|supporterMonitor/);
+  assert.doesNotMatch(renderer, /supporterSubscriptions|supportGiftButton/);
 });
 
-test("new users start with an empty LIVE account while the optional supporter link stays fixed", async () => {
+test("the optional creator follow tab is always visible in the sidebar", async () => {
+  const html = await read("src/ui/index.html");
+  const renderer = await read("src/ui/app.js");
+  assert.match(html, /id="openSupportButton"/);
+  assert.match(html, /id="supportDialog"/);
+  assert.match(html, /id="supportFollowButton"/);
+  assert.match(html, /Teljesen önkéntes/);
+  assert.match(renderer, /openSupportButton.*supportDialog/);
+  assert.match(renderer, /https:\/\/www\.tiktok\.com\/@venom_hun_/);
+  assert.doesNotMatch(html.match(/<button class="nav-item support-nav-item" id="openSupportButton"[^>]*>/)?.[0] || "", /hidden/);
+});
+
+test("Interactions and Falix Hosting are separate main tabs", async () => {
   const main = await read("src/main.js");
-  assert.match(main, /const SUPPORTER_TIKTOK_ACCOUNT = "venom_hun_";/);
+  const html = await read("src/ui/index.html");
+  const renderer = await read("src/ui/app.js");
+  assert.match(html, /id="interactionsTabButton"/);
+  assert.match(html, /id="hostingTabButton"/);
+  assert.match(html, /id="interactionsView"/);
+  assert.match(html, /id="hostingView"/);
+  assert.match(html, /id="hostingPanelUrl"/);
+  assert.match(renderer, /function showView/);
+  assert.match(renderer, /function saveHostingPanel/);
+  assert.match(main, /hostname !== "client\.falixnodes\.net"/);
+});
+
+test("new users start with an empty LIVE account", async () => {
+  const main = await read("src/main.js");
   assert.match(main, /username: "",/);
-  assert.match(main, /account: SUPPORTER_TIKTOK_ACCOUNT/);
   assert.doesNotMatch(main, /username: "venom_hun_"/);
 });
 

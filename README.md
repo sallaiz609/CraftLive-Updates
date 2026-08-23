@@ -12,11 +12,11 @@ egy rövid, előre megadott műveletlistára korlátozva.
 - A LIVE indulásának automatikus figyelése és kapcsolódás 15 másodpercen belül.
 - A LIVE vége után automatikus várakozás a következő közvetítésre.
 - LIVE nélküli teszt minden interakcióhoz; csak a Minecraftnak kell futnia.
-- Szabadon megadható Minecraft Java-verzió 1.7.x-től az aktuális kiadásig.
-- Verziófüggő, kereshető mobválasztó: csak az adott kiadásban már elérhető
-  vanilla mobokat mutatja, és a summon parancsot automatikusan elkészíti.
-- Verziófüggő beépített parancssablonok a régi, modern JSON és modern SNBT
-  parancsformátumokhoz.
+- Fix Minecraft Java 26.2 támogatás: a régi verziók és a verzióválasztó nem
+  részei az alkalmazásnak.
+- Kereshető 26.2-es mobválasztó, benne a Sulfur Cube-bal; a summon parancsot
+  automatikusan elkészíti.
+- A legújabb Minecraft-parancsformátumhoz készült beépített sablonok.
 - 20 ki- és bekapcsolható interakciós hely.
 - Több parancs egy eseményhez, parancsonkénti késleltetéssel.
 - Fix globális túlterhelés-védelem: két interakció között mindig legalább
@@ -34,11 +34,10 @@ egy rövid, előre megadott műveletlistára korlátozva.
   kiadási jegyzetek, ellenőrzött letöltés és automatikus újraindítás.
 - Az új kiadás opcionális funkcióiról a felhasználó külön kapcsolókkal dönthet;
   a választások csak az új verzió indulásakor lépnek életbe.
-- Opcionális támogatói feliratkozás-figyelő: a LIVE alatt számolja a fizetős
-  TikTok-feliratkozásokat, megmutatja a legutóbbi támogatót, és egy gombbal
-  megnyitja a beállított TikTok-profilt. A funkció később is kikapcsolható.
 - Fix Frissítés gomb a bal oldali menüben, közvetlenül a Beállítások alatt.
   Mindig látható, és kézi ellenőrzést indít vagy megnyitja az elérhető frissítést.
+- Külön Interakciók és Hosting főfül. A Hosting fülön a felhasználó a saját
+  Falix szerverpaneljének HTTPS-címét mentheti és nyithatja meg.
 
 ## Windows-telepítő készítése
 
@@ -53,8 +52,8 @@ npm run dist:win
 A buildhez .NET 8 SDK szükséges, mert a Minecraft vezérlését végző kis natív
 Windows-összetevő is ekkor készül el. A futó CraftLive nem indít PowerShellt.
 
-A kész `CraftLive-Setup-0.6.4.exe`, `latest.yml` és
-`CraftLive-Setup-0.6.4.exe.blockmap` a `KESZ` mappába kerül. A Setup EXE-t csak
+A kész `CraftLive-Setup-0.6.6.exe`, `latest.yml` és
+`CraftLive-Setup-0.6.6.exe.blockmap` a `KESZ` mappába kerül. A Setup EXE-t csak
 egyszer kell lefuttatni; ezután a CraftLive telepített alkalmazásként, asztali
 és Start menü parancsikonnal használható. Ha nincs megfelelő Node.js a gépen,
 a script egy hordozható példányt tölt le. Java, Gradle vagy Git nem szükséges a
@@ -81,16 +80,21 @@ felhasználói beállítás. Ha a biztonsági sor megtelik, az új eseményt az 
 kihagyja ahelyett, hogy korlátlan memóriahasználatot vagy parancsáradatot
 okozna.
 
-A Minecraft-verzió a bal oldalsáv fix választójában írható be. A választás az ezután
-beillesztett sablonok parancsformátumát szabja meg; a saját, korábban elmentett
-nyers parancsokat az alkalmazás biztonsági okból nem módosítja automatikusan.
+A Minecraft-verzió nem módosítható: a 0.6.6 kizárólag a legújabb Java Edition
+26.2 kiadást támogatja. Korábbi beállítás frissítésekor a mentett verzióérték
+automatikusan 26.2-re áll. A saját, korábban elmentett nyers parancsokat az
+alkalmazás biztonsági okból nem módosítja automatikusan.
 
-Az interakció szerkesztőjében a mobokat név és kategória szerint lehet keresni.
-A lista a kiválasztott verzióhoz igazodik: például a Warden 1.18.2-ben még nem,
-1.19-től viszont megjelenik. A darabszám és a megjelenési hely kiválasztása után
-a CraftLive állítja elő a szükséges parancsot. A Haladó részben továbbra is
-megadható bármilyen saját parancs. A lista a vanilla Java Edition mobjait
-tartalmazza; modok egyedi mobjai csak saját nyers paranccsal használhatók.
+Az interakció szerkesztőjében a 26.2-es vanilla mobokat név és kategória szerint
+lehet keresni. A lista az új Sulfur Cube-ot is tartalmazza. A darabszám és a
+megjelenési hely kiválasztása után a CraftLive állítja elő a szükséges parancsot.
+A Haladó részben továbbra is megadható bármilyen saját parancs; modok egyedi
+mobjai csak ilyen saját nyers paranccsal használhatók.
+
+A Hosting fül nem futtat szervert a helyi gépen. Minden felhasználó a saját
+`client.falixnodes.net` panelcímét mentheti el, majd a CraftLive-ból megnyithatja
+a Falix vezérlőpultot. A bejelentkezés a Falix oldalán történik; a CraftLive nem
+kéri és nem tárolja a Falix-jelszót.
 
 ## CraftLive-frissítések kiadása
 

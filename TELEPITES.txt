@@ -1,7 +1,7 @@
 CRAFTLIVE – TELEPÍTÉS
 =====================
 
-1. Indítsd el a CraftLive-Setup-0.6.4.exe telepítőt. A telepítő létrehozhat
+1. Indítsd el a CraftLive-Setup-0.6.6.exe telepítőt. A telepítő létrehozhat
    asztali és Start menü parancsikont, majd a végén elindítja a CraftLive-ot.
 
    Ha korábban a ZIP-es 0.5.x változatot használtad, azt előtte zárd be. A
@@ -27,13 +27,11 @@ CRAFTLIVE – TELEPÍTÉS
    Teszt gombot. Ehhez nem kell TikTok LIVE. Ha működik, kapcsold be az
    interakciót.
 
-8. A bal oldalsáv fix Minecraft-verzió mezőjében add meg a használt Java-verziót. A CraftLive
-   1.7.x-től a legújabb kiadásig elfogad verziószámot, és az újonnan
-   kiválasztott sablonokat a megfelelő parancsformátummal illeszti be.
+8. A Minecraft-verzió fixen a legújabb Java Edition 26.2. A régi verziók és a
+   verzióválasztó kikerültek, ezért ezt nem kell és nem is lehet átállítani.
 
-9. A moblista csak a kiválasztott kiadásban már létező vanilla mobokat mutatja.
-   Például a Warden 1.19-től választható. Nincs szükség a summon parancs kézi
-   beírására.
+9. A moblista kizárólag a 26.2-es vanilla mobokat mutatja, köztük a Sulfur
+   Cube-ot. Nincs szükség a summon parancs kézi beírására.
 
 10. A CraftLive a Windows nyelvét követi. Magyar Windows esetén magyar, más
     nyelvű Windows esetén angol felülettel indul.
@@ -54,10 +52,10 @@ CRAFTLIVE – TELEPÍTÉS
     ki és nem állítható át. Egy interakció több összetartozó parancsa együtt
     lefut, csak utána indul az 5 másodperces szünet.
 
-14. A Támogatói feliratkozás-figyelő opcionális. Bekapcsolva az aktív LIVE alatt
-    számolja az új fizetős feliratkozásokat, megmutatja a legutóbbi támogatót,
-    és egy gombbal megnyitja a beállított TikTok-profilt. A korábbi támogatók
-    teljes listáját nem kérdezi le.
+14. Az Interakciók és a Hosting külön főfülön található. A Hosting fülön add
+    meg a saját client.falixnodes.net szerverpanel-címedet, mentsd el, majd a
+    CraftLive-ból megnyithatod. A Falix-jelszót a CraftLive nem kéri és nem
+    tárolja.
 
 Fontos:
 - A CraftLive-nak és a Minecraftnak ugyanazon a Windows gépen kell futnia.
@@ -80,5 +78,5 @@ Hibaelhárítás:
 - A parancs megjelenik, de nem fut le: engedélyezd a csalásokat/parancsokat.
 - Nem nyílik meg a chat: állítsd vissza a chat billentyűjét T-re.
 - A régi ZIP-es app újra kéri ugyanazt a frissítést: zárd be, futtasd egyszer a
-  CraftLive-Setup-0.6.4.exe telepítőt, majd kizárólag a telepített parancsikont
+  CraftLive-Setup-0.6.6.exe telepítőt, majd kizárólag a telepített parancsikont
   indítsd. A régi, kicsomagolt EXE továbbra is a régi verzió maradna.

@@ -22,10 +22,14 @@
         </div>
 
         <nav class="nav" aria-label="Főmenü">
-          <button class="nav-item active" data-view="interactions">
+          <button class="nav-item active" id="interactionsTabButton" data-view="interactions">
             <span class="nav-icon">▦</span>
             Interakciók
             <span class="nav-count" id="navActiveCount">0</span>
+          </button>
+          <button class="nav-item" id="hostingTabButton" data-view="hosting">
+            <span class="nav-icon">☁</span>
+            Hosting
           </button>
           <button class="nav-item" id="openSettingsButton">
             <span class="nav-icon">⚙</span>
@@ -36,22 +40,16 @@
             Frissítés
             <span class="nav-update-badge" id="sidebarUpdateBadge" aria-live="polite"></span>
           </button>
+          <button class="nav-item support-nav-item" id="openSupportButton">
+            <span class="nav-icon">♥</span>
+            Támogatás
+          </button>
         </nav>
 
         <div class="sidebar-version-picker">
-          <label for="minecraftVersion">Minecraft Java-verzió</label>
-          <input id="minecraftVersion" list="minecraftVersionList" value="1.20.1" placeholder="Pl. 1.20.1 vagy 26.1" autocomplete="off" spellcheck="false" />
-          <datalist id="minecraftVersionList">
-            <option value="1.7.10"></option><option value="1.8.9"></option>
-            <option value="1.12.2"></option><option value="1.16.5"></option>
-            <option value="1.18.2"></option><option value="1.19.2"></option>
-            <option value="1.20.1"></option><option value="1.20.4"></option>
-            <option value="1.20.6"></option><option value="1.21.1"></option>
-            <option value="1.21.4"></option><option value="1.21.5"></option>
-            <option value="1.21.8"></option><option value="1.21.11"></option>
-            <option value="26.1"></option><option value="latest"></option>
-          </datalist>
-          <small>A mobok és sablonok ehhez igazodnak.</small>
+          <span>Aktív Minecraft Java-verzió</span>
+          <strong id="minecraftVersionValue">Legújabb (26.2)</strong>
+          <small>Fix beállítás: a CraftLive mindig csak a legújabb kiadást használja.</small>
         </div>
 
         <div class="sidebar-status">
@@ -67,12 +65,13 @@
         </div>
 
         <div class="sidebar-foot">
-          <span id="sidebarVersion">0.6.4</span>
+          <span id="sidebarVersion">0.6.6</span>
           <span>Mod nélkül</span>
         </div>
       </aside>
 
       <main class="main">
+        <section class="app-view" id="interactionsView">
         <header class="topbar">
           <div>
             <p class="eyebrow">VEZÉRLŐPULT</p>
@@ -154,12 +153,6 @@
               <div><h2>Élő napló</h2><span class="live-badge"><i></i> ÉLŐ</span></div>
               <button class="icon-button" id="clearLogButton" title="Napló törlése">⌫</button>
             </div>
-            <div class="supporter-monitor hidden" id="supporterMonitor">
-              <div class="supporter-monitor-head"><span>★</span><div><strong>Támogatói feliratkozások</strong><small id="supporterAccount">@venom_hun_</small></div></div>
-              <div class="supporter-monitor-stats"><strong id="supporterSubscriptionCount">0</strong><span>feliratkozás ebben a munkamenetben</span></div>
-              <p id="lastSupporterSubscriber">Még nincs új támogatói feliratkozás.</p>
-              <button type="button" id="supporterSubscribeLink">Itt szeretnék feliratkozni</button>
-            </div>
             <div class="activity-list" id="activityList"></div>
             <div class="activity-empty" id="activityEmpty">
               <span class="radar-icon">⌁</span>
@@ -167,6 +160,56 @@
               <p>Kapcsolódás után látni fogod az ajándékokat, like-okat és a Minecraft-műveleteket.</p>
             </div>
           </aside>
+        </section>
+        </section>
+
+        <section class="app-view hidden" id="hostingView">
+          <header class="topbar hosting-topbar">
+            <div>
+              <p class="eyebrow">MINECRAFT SZERVER</p>
+              <h1>Hosting</h1>
+            </div>
+            <button class="button primary" id="openFalixButton">Falix megnyitása</button>
+          </header>
+
+          <section class="hosting-hero">
+            <div class="hosting-hero-icon" aria-hidden="true">☁</div>
+            <div>
+              <p class="eyebrow">FALIX CLOUD HOSTING</p>
+              <h2>A szerver nem a saját gépedet terheli</h2>
+              <p>A CraftLive külön Hosting füle a saját Falix vezérlőpultodhoz vezet. A szerver futtatását és erőforrásait a Falix kezeli.</p>
+            </div>
+          </section>
+
+          <section class="hosting-grid">
+            <article class="hosting-card hosting-card-wide">
+              <span class="hosting-card-number">1</span>
+              <div>
+                <h3>Saját Falix szerverpanel</h3>
+                <p>Másold be a saját szervered Falix-címét. A CraftLive ezt helyben menti, és nem osztja meg más felhasználókkal.</p>
+                <label class="field hosting-url-field">
+                  <span>Falix panel HTTPS-címe</span>
+                  <input id="hostingPanelUrl" type="url" value="https://client.falixnodes.net/" placeholder="https://client.falixnodes.net/server/.../console" />
+                </label>
+                <div class="hosting-actions">
+                  <button type="button" class="button secondary" id="saveHostingButton">Cím mentése</button>
+                  <button type="button" class="button ghost" id="openFalixSecondaryButton">Vezérlőpult megnyitása</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="hosting-card">
+              <span class="hosting-card-number">2</span>
+              <div><h3>Indítsd el a szervert</h3><p>A Falix vezérlőpultján válaszd ki a kívánt szervert, majd indítsd el. A bejelentkezést továbbra is a Falix biztonságos oldalán végzed.</p></div>
+            </article>
+
+            <article class="hosting-card">
+              <span class="hosting-card-number">3</span>
+              <div><h3>Interakciók külön fülön</h3><p>Válts vissza az Interakciók fülre a TikTok-ajándékok, tesztek és Minecraft-műveletek kezeléséhez.</p></div>
+            </article>
+          </section>
+
+          <div class="warning-card hosting-note"><strong>Fontos</strong><span>A CraftLive nem tárol Falix-jelszót, és nem ígér folyamatos ingyenes üzemidőt. A tárhelycsomag szabályait a Falix határozza meg.</span></div>
         </section>
       </main>
     </div>
@@ -228,20 +271,20 @@
               </div>
               <div class="mob-builder">
                 <div class="mob-builder-head">
-                  <div><strong>Mob kiválasztása parancs nélkül</strong><small id="mobCatalogVersion">Minecraft 1.20.1</small></div>
+                  <div><strong>Mob kiválasztása parancs nélkül</strong><small id="mobCatalogVersion">Minecraft 26.2</small></div>
                   <span id="mobResultCount">0 mob</span>
                 </div>
                 <div class="form-grid two">
                   <label class="field"><span>Mob keresése</span><input id="mobSearch" placeholder="Pl. Warden, Zombie, Creeper" /></label>
                   <label class="field"><span>Kategória</span><select id="mobCategory"><option value="all">Összes mob</option><option value="hostile">Ellenséges</option><option value="passive">Békés / semleges</option><option value="water">Vízi</option><option value="boss">Főellenség</option></select></label>
                 </div>
-                <label class="field"><span>A kiválasztott verzióban elérhető mobok</span><select id="mobSelect" size="8"></select></label>
+                <label class="field"><span>A legújabb verzióban elérhető mobok</span><select id="mobSelect" size="8"></select></label>
                 <div class="mob-insert-row">
                   <label class="field"><span>Darabszám</span><input id="mobCount" type="number" min="1" max="20" value="1" /></label>
                   <label class="field"><span>Megjelenés helye</span><select id="mobPosition"><option value="near">A játékos körül</option><option value="above">A játékos felett</option><option value="exact">A játékos helyén</option></select></label>
                   <button type="button" class="button secondary" id="insertMobButton">Mob használata</button>
                 </div>
-                <p class="field-help" id="mobEmptyHelp">Csak azok a mobok jelennek meg, amelyek a kiválasztott Minecraft-verzióban már léteznek.</p>
+                <p class="field-help" id="mobEmptyHelp">A lista kizárólag a legújabb Minecraft Java-kiadás vanilla mobjait tartalmazza.</p>
               </div>
               <details class="advanced-commands">
                 <summary>Haladó: nyers Minecraft-parancsok</summary>
@@ -273,7 +316,7 @@
             <div class="test-card">
               <span class="test-icon">▶</span>
               <h3>Próbáld ki éles LIVE nélkül</h3>
-              <p>A teszt sorba állítja a parancsokat; az 5 másodperces fix védelem itt is érvényes. Kiválasztott verzió: <b id="testMinecraftVersion">1.20.1</b>.</p>
+              <p>A teszt sorba állítja a parancsokat; az 5 másodperces fix védelem itt is érvényes. Aktív verzió: <b id="testMinecraftVersion">Legújabb (26.2)</b>.</p>
               <button type="button" class="button secondary full" id="editorTestButton">Teszt indítása</button>
             </div>
             <div class="tip-card">
@@ -310,18 +353,13 @@
           <section class="form-section">
             <h3>Minecraft – mod nélkül</h3>
             <p class="field-help large" id="noModExplanation">A CraftLive automatikusan megkeresi a futó Minecraft Java ablakát. Eseménynél előtérbe hozza, megnyitja a chatet a <b>T</b> billentyűvel, beilleszti a parancsot és elküldi. Nem szükséges Forge mod vagy JAR.</p>
-            <p class="field-help large">A beépített sablonok a kiválasztott, 1.7.10 vagy újabb Java-verzió parancsformátumához igazodnak. A saját, már elmentett nyers parancsokat az alkalmazás nem írja át automatikusan.</p>
+            <p class="field-help large">A CraftLive kizárólag a legújabb Minecraft Java-kiadást támogatja. A saját, már elmentett nyers parancsokat az alkalmazás biztonsági okból nem írja át automatikusan.</p>
             <div class="warning-card"><strong>Szükséges</strong><span>A világban legyenek engedélyezve a csalások/parancsok, és a chat billentyűje maradjon T.</span></div>
-          </section>
-          <section class="form-section">
-            <h3>Opcionális funkciók</h3>
-            <label class="check-row"><input id="supporterSubscriptionsEnabled" type="checkbox" /><span>Támogatói feliratkozás-figyelő</span></label>
-            <p class="field-help">Élőben jelzi és számolja, ha valaki fizetős támogatói feliratkozást indít a beállított TikTok-fióknál. Ez a funkció kihagyható, és később is bármikor módosítható.</p>
           </section>
           <section class="form-section">
             <h3>CraftLive-frissítések</h3>
             <div class="update-status-card" id="updateStatusCard">
-              <div><strong id="updateVersionText">Jelenlegi verzió: 0.6.4</strong><span id="updateStatusText">Automatikus ellenőrzés indításkor és 10 percenként.</span></div>
+              <div><strong id="updateVersionText">Jelenlegi verzió: 0.6.6</strong><span id="updateStatusText">Automatikus ellenőrzés indításkor és 10 percenként.</span></div>
               <button type="button" class="button primary hidden" id="showUpdateButton">Frissítés</button>
             </div>
             <label class="field"><span>Frissítési csatorna</span><input id="updateManifestUrl" type="url" readonly /></label>
@@ -347,13 +385,34 @@
       </form>
     </dialog>
 
+    <dialog class="modal support-modal" id="supportDialog">
+      <form method="dialog">
+        <header class="modal-head">
+          <div><p class="eyebrow">CRAFTLIVE</p><h2>Támogasd a CraftLive-ot</h2></div>
+          <button class="close-button" value="cancel" aria-label="Bezárás">×</button>
+        </header>
+        <div class="support-dialog-body">
+          <div class="support-profile-card">
+            <span class="support-profile-icon" aria-hidden="true">♥</span>
+            <div>
+              <small>KÉSZÍTŐI TIKTOK-PROFIL</small>
+              <strong>@venom_hun_</strong>
+              <p>Ha tetszik a CraftLive, egy TikTok-követéssel önkéntesen támogathatod a további fejlesztését.</p>
+            </div>
+          </div>
+          <button type="button" class="button primary full support-follow-button" id="supportFollowButton">Bekövetem TikTokon</button>
+          <p class="support-optional-note"><b>Teljesen önkéntes.</b> A CraftLive minden funkciója követés nélkül is használható.</p>
+        </div>
+      </form>
+    </dialog>
+
     <dialog class="modal update-modal" id="updateDialog">
       <form method="dialog">
         <header class="modal-head">
           <div><p class="eyebrow">CRAFTLIVE UPDATE</p><h2>Új frissítés érhető el</h2></div>
         </header>
         <div class="update-dialog-body">
-          <div class="update-version-badge"><span id="updateFromVersion">0.6.4</span><b>→</b><strong id="updateToVersion">0.6.5</strong></div>
+          <div class="update-version-badge"><span id="updateFromVersion">0.6.6</span><b>→</b><strong id="updateToVersion">0.6.7</strong></div>
           <div class="update-notes" id="updateNotes">Új funkciók és javítások.</div>
           <section class="update-features hidden" id="updateFeaturesSection">
             <h3>Melyik új funkciót szeretnéd engedélyezni?</h3>
@@ -373,7 +432,7 @@
 
     <div class="app-version-corner" aria-label="CraftLive alkalmazásverzió">
       <span>CraftLive</span>
-      <strong id="cornerVersion">v0.6.4</strong>
+      <strong id="cornerVersion">v0.6.6</strong>
     </div>
     <div class="toast-stack" id="toastStack" aria-live="polite"></div>
     <script src="app.js"></script>

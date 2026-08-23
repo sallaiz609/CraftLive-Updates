@@ -4,7 +4,9 @@ const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector
 const staticEnglish = {
   "Főmenü": "Main menu",
   "Interakciók": "Interactions",
+  "Hosting": "Hosting",
   "Beállítások": "Settings",
+  "Támogatás": "Support",
   "KAPCSOLATOK": "CONNECTIONS",
   "Nincs kapcsolat": "Not connected",
   "Játékablakra vár": "Waiting for game window",
@@ -41,10 +43,12 @@ const staticEnglish = {
   "Teszt": "Test",
   "Itt jelennek meg az események": "Events will appear here",
   "Kapcsolódás után látni fogod az ajándékokat, like-okat és a Minecraft-műveleteket.": "After connecting, gifts, likes, and Minecraft actions will appear here.",
-  "Támogatói feliratkozások": "Supporter subscriptions",
-  "feliratkozás ebben a munkamenetben": "subscriptions in this session",
-  "Még nincs új támogatói feliratkozás.": "No new supporter subscriptions yet.",
-  "Itt szeretnék feliratkozni": "Subscribe here",
+  "Támogasd a CraftLive-ot": "Support CraftLive",
+  "KÉSZÍTŐI TIKTOK-PROFIL": "CREATOR TIKTOK PROFILE",
+  "Ha tetszik a CraftLive, egy TikTok-követéssel önkéntesen támogathatod a további fejlesztését.": "If you enjoy CraftLive, you can voluntarily support its continued development by following the creator on TikTok.",
+  "Bekövetem TikTokon": "Follow on TikTok",
+  "Teljesen önkéntes.": "Completely optional.",
+  "A CraftLive minden funkciója követés nélkül is használható.": "Every CraftLive feature remains available without following.",
   "Interakció szerkesztése": "Edit interaction",
   "Bezárás": "Close",
   "Elnevezés": "Name",
@@ -86,14 +90,13 @@ const staticEnglish = {
   "Békés / semleges": "Passive / neutral",
   "Vízi": "Aquatic",
   "Főellenség": "Boss",
-  "A kiválasztott verzióban elérhető mobok": "Mobs available in the selected version",
+  "A legújabb verzióban elérhető mobok": "Mobs available in the latest version",
   "Darabszám": "Count",
   "Megjelenés helye": "Spawn position",
   "A játékos körül": "Around the player",
   "A játékos felett": "Above the player",
   "A játékos helyén": "At the player",
   "Mob használata": "Use mob",
-  "Csak azok a mobok jelennek meg, amelyek a kiválasztott Minecraft-verzióban már léteznek.": "Only mobs that exist in the selected Minecraft version are shown.",
   "Haladó: nyers Minecraft-parancsok": "Advanced: raw Minecraft commands",
   "Minecraft-parancsok": "Minecraft commands",
   "egy sor = egy parancs, / jel nélkül": "one command per line, without /",
@@ -104,7 +107,7 @@ const staticEnglish = {
   "Parancsok között (ms)": "Between commands (ms)",
   "Esély (%)": "Chance (%)",
   "Próbáld ki éles LIVE nélkül": "Test without an active LIVE",
-  "A teszt sorba állítja a parancsokat; az 5 másodperces fix védelem itt is érvényes. Kiválasztott verzió:": "The test queues the actions; the fixed 5-second protection applies here too. Selected version:",
+  "A teszt sorba állítja a parancsokat; az 5 másodperces fix védelem itt is érvényes. Aktív verzió:": "The test queues the actions; the fixed 5-second protection applies here too. Active version:",
   "Teszt indítása": "Start test",
   "Mod nélküli működés": "No-mod operation",
   "A játékban engedélyezd a parancsokat. Az app röviden megnyitja a chatet, majd automatikusan beírja a műveletet.": "Enable commands in the world. The app briefly opens chat and enters the action automatically.",
@@ -117,18 +120,16 @@ const staticEnglish = {
   "Automatikus LIVE-figyelés az alkalmazás indításakor": "Automatically watch LIVE when the app starts",
   "A figyelés akkor is elindítható, ha még nem fut a LIVE. A CraftLive 15 másodpercenként ellenőrzi, és automatikusan kapcsolódik az indulásakor.": "Monitoring can start before the LIVE. CraftLive checks every 15 seconds and connects automatically when it begins.",
   "Minecraft – mod nélkül": "Minecraft — no mod",
-  "Minecraft Java-verzió": "Minecraft Java version",
-  "A mobok és sablonok ehhez igazodnak.": "Mobs and presets adapt to this version.",
+  "Aktív Minecraft Java-verzió": "Active Minecraft Java version",
+  "Fix beállítás: a CraftLive mindig csak a legújabb kiadást használja.": "Fixed setting: CraftLive always uses only the latest release.",
   "A CraftLive automatikusan megkeresi a futó Minecraft Java ablakát. Eseménynél előtérbe hozza, megnyitja a chatet a": "CraftLive automatically finds the running Minecraft Java window. For an event it brings the game forward, opens chat with",
   "billentyűvel, beilleszti a parancsot és elküldi. Nem szükséges Forge mod vagy JAR.": ", inserts the action, and sends it. No Forge mod or JAR is required.",
-  "A beépített sablonok a kiválasztott, 1.7.10 vagy újabb Java-verzió parancsformátumához igazodnak. A saját, már elmentett nyers parancsokat az alkalmazás nem írja át automatikusan.": "Built-in presets adapt to the selected Java version from 1.7.10 onward. Previously saved raw commands are not rewritten automatically.",
+  "A CraftLive kizárólag a legújabb Minecraft Java-kiadást támogatja. A saját, már elmentett nyers parancsokat az alkalmazás biztonsági okból nem írja át automatikusan.": "CraftLive supports only the latest Minecraft Java release. For safety, previously saved raw commands are not rewritten automatically.",
   "Szükséges": "Required",
+  "Fontos": "Important",
   "A világban legyenek engedélyezve a csalások/parancsok, és a chat billentyűje maradjon T.": "Cheats/commands must be enabled in the world and the chat key must remain T.",
-  "Opcionális funkciók": "Optional features",
-  "Támogatói feliratkozás-figyelő": "Supporter subscription monitor",
-  "Élőben jelzi és számolja, ha valaki fizetős támogatói feliratkozást indít a beállított TikTok-fióknál. Ez a funkció kihagyható, és később is bármikor módosítható.": "Shows and counts paid supporter subscriptions for the configured TikTok account in real time. This feature is optional and can be changed later at any time.",
   "CraftLive-frissítések": "CraftLive updates",
-  "Jelenlegi verzió: 0.6.4": "Current version: 0.6.4",
+  "Jelenlegi verzió: 0.6.6": "Current version: 0.6.6",
   "Nincs beállítva frissítési forrás.": "No update source is configured.",
   "Frissítés": "Update",
   "Frissítési csatorna": "Update channel",
@@ -149,7 +150,22 @@ const staticEnglish = {
   "Egyetlen alkalmazás, JAR nélkül": "One application, no JAR",
   "A beállításaid a saját gépeden maradnak. A TikTok-fiókod jelszavát nem kéri és nem tárolja az alkalmazás.": "Your settings remain on your computer. The application never requests or stores your TikTok password.",
   "@felhasználónév": "@username",
-  "Pl. 1.20.1 vagy 26.1": "E.g. 1.20.1 or 26.1"
+  "A lista kizárólag a legújabb Minecraft Java-kiadás vanilla mobjait tartalmazza.": "The list contains only vanilla mobs from the latest Minecraft Java release.",
+  "MINECRAFT SZERVER": "MINECRAFT SERVER",
+  "Falix megnyitása": "Open Falix",
+  "FALIX CLOUD HOSTING": "FALIX CLOUD HOSTING",
+  "A szerver nem a saját gépedet terheli": "The server does not load your own PC",
+  "A CraftLive külön Hosting füle a saját Falix vezérlőpultodhoz vezet. A szerver futtatását és erőforrásait a Falix kezeli.": "CraftLive's dedicated Hosting tab takes you to your own Falix control panel. Falix handles server runtime and resources.",
+  "Saját Falix szerverpanel": "Your Falix server panel",
+  "Másold be a saját szervered Falix-címét. A CraftLive ezt helyben menti, és nem osztja meg más felhasználókkal.": "Paste your own server's Falix URL. CraftLive stores it locally and does not share it with other users.",
+  "Falix panel HTTPS-címe": "Falix panel HTTPS URL",
+  "Cím mentése": "Save URL",
+  "Vezérlőpult megnyitása": "Open control panel",
+  "Indítsd el a szervert": "Start the server",
+  "A Falix vezérlőpultján válaszd ki a kívánt szervert, majd indítsd el. A bejelentkezést továbbra is a Falix biztonságos oldalán végzed.": "Select your server in the Falix control panel and start it. You still sign in on Falix's secure website.",
+  "Interakciók külön fülön": "Interactions in a separate tab",
+  "Válts vissza az Interakciók fülre a TikTok-ajándékok, tesztek és Minecraft-műveletek kezeléséhez.": "Switch back to the Interactions tab to manage TikTok gifts, tests, and Minecraft actions.",
+  "A CraftLive nem tárol Falix-jelszót, és nem ígér folyamatos ingyenes üzemidőt. A tárhelycsomag szabályait a Falix határozza meg.": "CraftLive does not store your Falix password and cannot promise continuous free uptime. Falix defines the hosting plan rules."
 };
 
 function englishMode() {
@@ -201,66 +217,42 @@ const triggerIcons = {
   subscribe: "★"
 };
 
-function minecraftCommandProfile(version) {
-  if (version === "latest" || /^\d{2,}(?:\.|$)/.test(version)) return "modern-snbt";
-  const match = String(version).match(/^1\.(\d+)(?:\.(\d+))?/);
-  const minor = Number(match?.[1] || 20);
-  const patch = Number(match?.[2] || 0);
-  if (minor === 7) return "legacy-1-7";
-  if (minor >= 8 && minor <= 10) return "legacy-caps";
-  if (minor >= 11 && minor <= 12) return "legacy-namespaced";
-  if (minor > 21 || (minor === 21 && patch >= 5)) return "modern-snbt";
-  return "modern-json";
-}
-
 function minecraftVersionLabel(version) {
-  return version === "latest" ? tx("1.21.5+ / 26.x / legújabb", "1.21.5+ / 26.x / latest") : version;
+  return tx(`Legújabb (${version})`, `Latest (${version})`);
 }
 
-function presetsForVersion(version) {
-  const profile = minecraftCommandProfile(version);
-  const legacyCaps = profile === "legacy-1-7" || profile === "legacy-caps";
-  const legacy = legacyCaps || profile === "legacy-namespaced";
-  const entity = (oldName, modernName) => legacyCaps ? oldName : `minecraft:${modernName}`;
-  const message = (text, color) => {
-    if (profile === "modern-snbt") return `title @a actionbar {text:\"${text}\",color:\"${color}\"}`;
-    if (profile === "modern-json") return `title @a actionbar {\"text\":\"${text}\",\"color\":\"${color}\"}`;
-    return `tellraw @a {\"text\":\"${text}\",\"color\":\"${color}\"}`;
-  };
-  const effect = (name, legacyId, seconds, amplifier) => {
-    if (profile === "legacy-1-7") return `effect @p ${legacyId} ${seconds} ${amplifier}`;
-    if (legacyCaps) return `effect @p ${legacyId} ${seconds} ${amplifier} true`;
-    if (legacy) return `effect @p minecraft:${name} ${seconds} ${amplifier} true`;
-    return `effect give @p minecraft:${name} ${seconds} ${amplifier} true`;
-  };
+function latestPresets() {
+  const entity = (name) => `minecraft:${name}`;
+  const message = (text, color) => `title @a actionbar {text:\"${text}\",color:\"${color}\"}`;
+  const effect = (name, seconds, amplifier) => `effect give @p minecraft:${name} ${seconds} ${amplifier} true`;
 
   return {
     zombie: {
       name: tx("Zombi támadás", "Zombie attack"),
-      commands: `${message(tx("{user} zombit küldött!", "{user} sent a zombie!"), "green")}\nsummon ${entity("Zombie", "zombie")} ~ ~1 ~`
+      commands: `${message(tx("{user} zombit küldött!", "{user} sent a zombie!"), "green")}\nsummon ${entity("zombie")} ~ ~1 ~`
     },
     creeper: {
       name: tx("Creeper támadás", "Creeper attack"),
-      commands: `${message(tx("{user} Creepert küldött!", "{user} sent a Creeper!"), "red")}\nsummon ${entity("Creeper", "creeper")} ~2 ~ ~2`
+      commands: `${message(tx("{user} Creepert küldött!", "{user} sent a Creeper!"), "red")}\nsummon ${entity("creeper")} ~2 ~ ~2`
     },
-    lightning: { name: tx("Villámcsapás", "Lightning strike"), commands: `summon ${entity("LightningBolt", "lightning_bolt")} ~ ~ ~` },
+    lightning: { name: tx("Villámcsapás", "Lightning strike"), commands: `summon ${entity("lightning_bolt")} ~ ~ ~` },
     tnt: {
       name: tx("TNT-eső", "TNT rain"),
       commands: [
-        `summon ${entity("PrimedTnt", "tnt")} ~2 ~8 ~ {Fuse:60}`,
-        `summon ${entity("PrimedTnt", "tnt")} ~-2 ~9 ~1 {Fuse:70}`,
-        `summon ${entity("PrimedTnt", "tnt")} ~ ~10 ~-2 {Fuse:80}`
+        `summon ${entity("tnt")} ~2 ~8 ~ {Fuse:60}`,
+        `summon ${entity("tnt")} ~-2 ~9 ~1 {Fuse:70}`,
+        `summon ${entity("tnt")} ~ ~10 ~-2 {Fuse:80}`
       ].join("\n")
     },
     heal: {
       name: tx("Gyógyítás", "Healing"),
-      commands: `${effect("regeneration", 10, 10, 2)}\n${effect("absorption", 22, 15, 1)}`
+      commands: `${effect("regeneration", 10, 2)}\n${effect("absorption", 15, 1)}`
     },
     blindness: {
       name: tx("Vakság", "Blindness"),
-      commands: `${effect("blindness", 15, 12, 0)}\n${message(tx("{user} elvette a látásod!", "{user} took your sight!"), "dark_purple")}`
+      commands: `${effect("blindness", 12, 0)}\n${message(tx("{user} elvette a látásod!", "{user} took your sight!"), "dark_purple")}`
     },
-    diamond: { name: tx("Gyémánt jutalom", "Diamond reward"), commands: `give @p ${legacy ? "diamond" : "minecraft:diamond"} {amount}` },
+    diamond: { name: tx("Gyémánt jutalom", "Diamond reward"), commands: "give @p minecraft:diamond {amount}" },
     storm: { name: tx("Vihar", "Storm"), commands: "weather thunder 90" },
     night: { name: tx("Legyen éjszaka", "Set night"), commands: "time set night" },
     teleport: { name: tx("Véletlen teleport", "Random teleport"), commands: "spreadplayers ~ ~ 20 80 false @p" }
@@ -271,6 +263,15 @@ let state = null;
 let editingSlot = null;
 let selectedTrigger = "gift";
 let renderedUpdateVersion = "";
+let activeView = "interactions";
+
+function showView(view) {
+  activeView = view === "hosting" ? "hosting" : "interactions";
+  $("#interactionsView").classList.toggle("hidden", activeView !== "interactions");
+  $("#hostingView").classList.toggle("hidden", activeView !== "hosting");
+  $("#interactionsTabButton").classList.toggle("active", activeView === "interactions");
+  $("#hostingTabButton").classList.toggle("active", activeView === "hosting");
+}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -318,9 +319,10 @@ function render() {
   if (document.activeElement !== $("#usernameInput")) {
     $("#usernameInput").value = state.config.username || "";
   }
-  if (document.activeElement !== $("#minecraftVersion")) {
-    $("#minecraftVersion").value = state.config.minecraftVersion || "1.20.1";
+  if (document.activeElement !== $("#hostingPanelUrl")) {
+    $("#hostingPanelUrl").value = state.config.hostingPanelUrl || "https://client.falixnodes.net/";
   }
+  $("#minecraftVersionValue").textContent = minecraftVersionLabel(state.config.minecraftVersion);
   $("#navActiveCount").textContent = String(active);
   $("#activeMetric").textContent = `${active} / 20`;
   $("#queueMetric").textContent = String(state.status.queuedInteractions || 0);
@@ -361,7 +363,6 @@ function render() {
 
   renderSlots();
   renderLogs();
-  renderSupporterMonitor();
   renderUpdatePanel();
   if ($("#editorDialog").open) {
     renderRecentGifts();
@@ -495,20 +496,6 @@ function renderLogs() {
   }).join("");
 }
 
-function renderSupporterMonitor() {
-  const monitor = state.supporterSubscriptions;
-  if (!monitor) return;
-  $("#supporterMonitor").classList.toggle("hidden", !monitor.enabled);
-  if (!monitor.enabled) return;
-  $("#supporterAccount").textContent = `@${String(monitor.account || "venom_hun_").replace(/^@/, "")}`;
-  $("#supporterSubscriptionCount").textContent = String(monitor.count || 0);
-  $("#supporterSubscribeLink").textContent = `${tx("Feliratkozom itt", "Subscribe here")}: @${String(monitor.account || "venom_hun_").replace(/^@/, "")}`;
-  const subscriber = monitor.lastSubscriber;
-  $("#lastSupporterSubscriber").textContent = subscriber
-    ? `${tx("Legutóbbi támogató", "Latest supporter")}: ${subscriber.nickname || subscriber.username || tx("ismeretlen", "unknown")}${subscriber.username ? ` (@${subscriber.username.replace(/^@/, "")})` : ""}`
-    : tx("Még nincs új támogatói feliratkozás.", "No new supporter subscriptions yet.");
-}
-
 function openEditor(slot) {
   editingSlot = structuredClone(slot);
   selectedTrigger = editingSlot.trigger.kind;
@@ -590,11 +577,9 @@ function renderMobCatalog() {
   ).join("");
   if (mobs.some((mob) => mob.id === previousValue)) select.value = previousValue;
   $("#mobResultCount").textContent = `${mobs.length} ${tx("mob", "mobs")}`;
-  $("#mobCatalogVersion").textContent = state.minecraftCatalogVersion === state.config.minecraftVersion
-    ? `Minecraft ${state.minecraftCatalogVersion}`
-    : `Minecraft ${state.config.minecraftVersion} → ${state.minecraftCatalogVersion} ${tx("adatlista", "catalog")}`;
+  $("#mobCatalogVersion").textContent = `Minecraft ${state.minecraftCatalogVersion}`;
   $("#mobEmptyHelp").textContent = mobs.length
-    ? tx("Csak azok a mobok jelennek meg, amelyek a kiválasztott Minecraft-verzióban már léteznek.", "Only mobs that exist in the selected Minecraft version are shown.")
+    ? tx("A lista kizárólag a legújabb Minecraft Java-kiadás vanilla mobjait tartalmazza.", "The list contains only vanilla mobs from the latest Minecraft Java release.")
     : tx("Ebben a keresésben nincs elérhető mob.", "No mobs match this search.");
 }
 
@@ -612,7 +597,7 @@ function mobCoordinates(position, index) {
 
 function useSelectedMob() {
   const mob = (state.mobs || []).find((candidate) => candidate.id === $("#mobSelect").value);
-  if (!mob) return toast(tx("Nincs kiválasztott mob", "No mob selected"), tx("Válassz egy mobot a verzióhoz tartozó listából.", "Choose a mob from the version-specific list."), "error");
+  if (!mob) return toast(tx("Nincs kiválasztott mob", "No mob selected"), tx("Válassz egy mobot a legújabb listából.", "Choose a mob from the latest list."), "error");
   const count = Math.min(20, Math.max(1, Number($("#mobCount").value) || 1));
   const position = $("#mobPosition").value;
   const commands = Array.from({ length: count }, (_, index) =>
@@ -686,30 +671,6 @@ async function testSlot(slotId) {
   }
 }
 
-async function saveSidebarMinecraftVersion() {
-  const input = $("#minecraftVersion");
-  const previousVersion = state.config.minecraftVersion || "1.20.1";
-  const requestedVersion = input.value.trim();
-  if (!requestedVersion || requestedVersion === previousVersion) {
-    input.value = previousVersion;
-    return;
-  }
-  try {
-    state = await window.craftlive.saveSettings({
-      username: state.config.username,
-      autoConnect: state.config.autoConnect,
-      supporterSubscriptionsEnabled: Boolean(state.config.featureFlags?.["supporter-subscriptions"]),
-      updateManifestUrl: state.config.updateManifestUrl,
-      minecraftVersion: requestedVersion
-    });
-    render();
-    toast(tx("Minecraft-verzió elmentve", "Minecraft version saved"), minecraftVersionLabel(state.config.minecraftVersion));
-  } catch (error) {
-    input.value = previousVersion;
-    toast(tx("Mentési hiba", "Save error"), error.message || String(error), "error");
-  }
-}
-
 function openSettings() {
   $("#appLanguageText").textContent = tx(
     "Alkalmazás nyelve: magyar, a Windows beállítása alapján.",
@@ -717,11 +678,28 @@ function openSettings() {
   );
   $("#settingsUsername").value = state.config.username || "";
   $("#autoConnect").checked = state.config.autoConnect;
-  $("#supporterSubscriptionsEnabled").checked = Boolean(state.config.featureFlags?.["supporter-subscriptions"]);
   $("#updateManifestUrl").value = state.config.updateManifestUrl || "";
-  $("#minecraftVersion").value = state.config.minecraftVersion || "1.20.1";
   renderUpdatePanel();
   $("#settingsDialog").showModal();
+}
+
+async function saveHostingPanel() {
+  try {
+    state = await window.craftlive.saveSettings({
+      username: state.config.username,
+      autoConnect: state.config.autoConnect,
+      updateManifestUrl: state.config.updateManifestUrl,
+      hostingPanelUrl: $("#hostingPanelUrl").value
+    });
+    render();
+    toast(tx("Falix-cím elmentve", "Falix URL saved"));
+  } catch (error) {
+    toast(tx("Mentési hiba", "Save error"), error.message || String(error), "error");
+  }
+}
+
+function openFalixPanel() {
+  window.craftlive.openExternal(state.config.hostingPanelUrl || "https://client.falixnodes.net/");
 }
 
 async function checkUpdateFromUi() {
@@ -748,17 +726,8 @@ async function init() {
   applyStaticLanguage();
   render();
   window.craftlive.onState((nextState) => {
-    const previousCount = state?.supporterSubscriptions?.count || 0;
-    const nextCount = nextState?.supporterSubscriptions?.count || 0;
     state = nextState;
     render();
-    if (nextState?.supporterSubscriptions?.enabled && nextCount > previousCount) {
-      const subscriber = nextState.supporterSubscriptions.lastSubscriber;
-      toast(
-        tx("Új támogatói feliratkozás", "New supporter subscription"),
-        subscriber?.nickname || subscriber?.username || `@${nextState.supporterSubscriptions.account}`
-      );
-    }
   });
 
   $("#connectButton").addEventListener("click", handleConnect);
@@ -766,13 +735,13 @@ async function init() {
   $("#searchInput").addEventListener("input", renderSlots);
   $("#filterSelect").addEventListener("change", renderSlots);
   $("#openSettingsButton").addEventListener("click", openSettings);
+  $("#interactionsTabButton").addEventListener("click", () => showView("interactions"));
+  $("#hostingTabButton").addEventListener("click", () => showView("hosting"));
+  $("#saveHostingButton").addEventListener("click", saveHostingPanel);
+  $("#openFalixButton").addEventListener("click", openFalixPanel);
+  $("#openFalixSecondaryButton").addEventListener("click", openFalixPanel);
+  $("#openSupportButton").addEventListener("click", () => $("#supportDialog").showModal());
   $("#sidebarUpdateButton").addEventListener("click", checkUpdateFromUi);
-  $("#minecraftVersion").addEventListener("change", saveSidebarMinecraftVersion);
-  $("#minecraftVersion").addEventListener("keydown", (event) => {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    event.currentTarget.blur();
-  });
   $("#clearLogButton").addEventListener("click", async () => { state = await window.craftlive.clearLog(); render(); });
 
   $("#slotsGrid").addEventListener("click", async (event) => {
@@ -809,20 +778,19 @@ async function init() {
   $("#presetRow").addEventListener("click", (event) => {
     const button = event.target.closest("[data-preset]");
     if (!button) return;
-    const preset = presetsForVersion(state.config.minecraftVersion)[button.dataset.preset];
+    const preset = latestPresets()[button.dataset.preset];
     if (!preset) return;
     $("#slotName").value = preset.name;
     $("#slotCommands").value = preset.commands;
-    toast(tx("Verzióhoz igazított sablon", "Version-aware preset"), `Minecraft ${minecraftVersionLabel(state.config.minecraftVersion)} • ${tx("Még szabadon módosíthatod.", "You can still customize it.")}`);
+    toast(tx("Legújabb verzióhoz készült sablon", "Latest-version preset"), `Minecraft ${state.config.minecraftVersion} • ${tx("Még szabadon módosíthatod.", "You can still customize it.")}`);
   });
 
   $("#mobSearch").addEventListener("input", renderMobCatalog);
   $("#mobCategory").addEventListener("change", renderMobCatalog);
   $("#insertMobButton").addEventListener("click", useSelectedMob);
   $("#mobSelect").addEventListener("dblclick", useSelectedMob);
-  $("#supporterSubscribeLink").addEventListener("click", () => {
-    const username = String(state.supporterSubscriptions?.account || "venom_hun_").replace(/^@/, "");
-    window.craftlive.openExternal(`https://www.tiktok.com/@${encodeURIComponent(username)}`);
+  $("#supportFollowButton").addEventListener("click", () => {
+    window.craftlive.openExternal("https://www.tiktok.com/@venom_hun_");
   });
 
   $("#updateDialog").addEventListener("cancel", (event) => event.preventDefault());
@@ -892,9 +860,8 @@ async function init() {
       state = await window.craftlive.saveSettings({
         username: $("#settingsUsername").value,
         autoConnect: $("#autoConnect").checked,
-        supporterSubscriptionsEnabled: $("#supporterSubscriptionsEnabled").checked,
         updateManifestUrl: $("#updateManifestUrl").value,
-        minecraftVersion: $("#minecraftVersion").value
+        hostingPanelUrl: state.config.hostingPanelUrl
       });
       $("#settingsDialog").close();
       render();

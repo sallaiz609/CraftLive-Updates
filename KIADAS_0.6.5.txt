@@ -1,0 +1,19 @@
+CRAFTLIVE 0.6.5 – GITHUB-KIADÁS
+================================
+
+1. A kicsomagolt forrás teljes tartalmát töltsd fel a CraftLive-Updates
+   tárház main ágába, a meglévő fájlok felülírásával.
+2. Nyisd meg az Actions lapot, majd válaszd a „CraftLive Windows installer”
+   munkafolyamatot.
+3. Kattints a Run workflow gombra, hagyd a main ágat kiválasztva, majd indítsd
+   el a futást.
+4. A zöld futás automatikusan létrehozza a v0.6.5 kiadást, és feltölti:
+
+   CraftLive-Setup-0.6.5.exe
+   CraftLive-Setup-0.6.5.exe.blockmap
+   latest.yml
+
+A telepített CraftLive automatikusan érzékeli a v0.6.5 kiadást, letölti,
+telepíti, majd újraindítja az alkalmazást. Ez a kiadás eltávolít minden
+pénzküldési és fizetős készítői támogatási lehetőséget; csak az önkéntes
+TikTok-követési link marad.

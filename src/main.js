@@ -6,7 +6,7 @@ import { existsSync } from "node:fs";
 import { readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { MOB_CATALOGS } from "./mob-catalog.js";
+import { LATEST_MINECRAFT_VERSION, MOB_CATALOGS } from "./mob-catalog.js";
 import { DEFAULT_UPDATE_MANIFEST_URL } from "./update-config.js";
 import {
   ControlEvent,
@@ -16,17 +16,16 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SLOT_COUNT = 20;
-const CONFIG_VERSION = 4;
+const CONFIG_VERSION = 5;
 const LOG_LIMIT = 250;
 const QUEUE_LIMIT = 1000;
 const GLOBAL_INTERACTION_INTERVAL_MS = 5000;
 const UI_BROADCAST_INTERVAL_MS = 150;
 const LIVE_RETRY_INTERVAL_MS = 15000;
 const LIVE_RECONNECT_DELAY_MS = 5000;
-const DEFAULT_MINECRAFT_VERSION = "1.20.1";
 const MAX_MANIFEST_BYTES = 64 * 1024;
 const UPDATE_CHECK_INTERVAL_MS = 10 * 60 * 1000;
-const SUPPORTER_TIKTOK_ACCOUNT = "venom_hun_";
+const DEFAULT_HOSTING_PANEL_URL = "https://client.falixnodes.net/";
 const { autoUpdater } = electronUpdater;
 
 let mainWindow = null;
@@ -68,8 +67,6 @@ let updateState = {
   progress: 0,
   error: ""
 };
-let supporterSubscriptionCount = 0;
-let lastSupporterSubscriber = null;
 let tiktokUsernameResetForAppUpdate = false;
 
 function mt(hungarian, english) {
@@ -127,8 +124,9 @@ function makeDefaultConfig() {
     username: "",
     autoConnect: false,
     updateManifestUrl: DEFAULT_UPDATE_MANIFEST_URL,
+    hostingPanelUrl: DEFAULT_HOSTING_PANEL_URL,
     featureFlags: {},
-    minecraftVersion: DEFAULT_MINECRAFT_VERSION,
+    minecraftVersion: LATEST_MINECRAFT_VERSION,
     slots
   };
 }
@@ -168,8 +166,9 @@ function normalizeConfig(raw) {
     username: String(raw?.username || "").replace(/^@/, "").trim().slice(0, 80),
     autoConnect: Boolean(raw?.autoConnect),
     updateManifestUrl: normalizeUpdateManifestUrl(raw?.updateManifestUrl || DEFAULT_UPDATE_MANIFEST_URL, false),
+    hostingPanelUrl: normalizeHostingPanelUrl(raw?.hostingPanelUrl),
     featureFlags: normalizeFeatureFlags(raw?.featureFlags),
-    minecraftVersion: normalizeMinecraftVersion(raw?.minecraftVersion),
+    minecraftVersion: LATEST_MINECRAFT_VERSION,
     slots: Array.from({ length: SLOT_COUNT }, (_, index) => normalizeSlot(rawSlots[index], index))
   };
 }
@@ -178,15 +177,6 @@ function clampNumber(value, min, max, fallback) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, Math.round(parsed)));
-}
-
-function normalizeMinecraftVersion(value) {
-  const version = String(value || "").trim().slice(0, 20);
-  if (version === "latest") return version;
-  const classicMatch = version.match(/^1\.(\d+)(?:\.(\d+))?$/);
-  if (classicMatch && Number(classicMatch[1]) >= 7) return version;
-  if (/^(?:2[6-9]|[3-9]\d)(?:\.\d+){0,2}$/.test(version)) return version;
-  return DEFAULT_MINECRAFT_VERSION;
 }
 
 function normalizeUpdateManifestUrl(value, required = true) {
@@ -200,6 +190,19 @@ function normalizeUpdateManifestUrl(value, required = true) {
     if (!candidate && required) throw new Error(mt("Add meg a frissítési leíró HTTPS-címét.", "Enter the HTTPS update manifest URL."));
     if (candidate) throw new Error(mt("A frissítési címnek érvényes HTTPS-címnek kell lennie.", "The update address must be a valid HTTPS URL."));
     return "";
+  }
+}
+
+function normalizeHostingPanelUrl(value) {
+  const candidate = String(value || DEFAULT_HOSTING_PANEL_URL).trim().slice(0, 1000);
+  try {
+    const parsed = new URL(candidate);
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.hostname !== "client.falixnodes.net") {
+      throw new Error();
+    }
+    return parsed.href;
+  } catch {
+    throw new Error(mt("Csak érvényes Falix panelcím használható.", "Only a valid Falix panel URL can be used."));
   }
 }
 
@@ -243,7 +246,7 @@ async function saveConfig() {
 }
 
 function publicState() {
-  const mobCatalog = resolveMobCatalog(config.minecraftVersion);
+  const mobCatalog = resolveMobCatalog();
   return {
     config,
     logs,
@@ -254,12 +257,6 @@ function publicState() {
     update: {
       currentVersion: app.getVersion(),
       ...updateState
-    },
-    supporterSubscriptions: {
-      enabled: Boolean(config.featureFlags["supporter-subscriptions"]),
-      account: SUPPORTER_TIKTOK_ACCOUNT,
-      count: supporterSubscriptionCount,
-      lastSubscriber: lastSupporterSubscriber
     },
     status: {
       tiktok: tiktokStatus,
@@ -274,29 +271,11 @@ function publicState() {
   };
 }
 
-function versionParts(version) {
-  return String(version).split(".").map((part) => Number(part) || 0);
-}
-
-function compareMinecraftVersions(left, right) {
-  const a = versionParts(left);
-  const b = versionParts(right);
-  for (let index = 0; index < Math.max(a.length, b.length); index += 1) {
-    if ((a[index] || 0) !== (b[index] || 0)) return (a[index] || 0) - (b[index] || 0);
-  }
-  return 0;
-}
-
-function resolveMobCatalog(requestedVersion) {
-  const versions = Object.keys(MOB_CATALOGS).sort(compareMinecraftVersions);
-  if (!versions.length) return { version: "", mobs: [] };
-  if (requestedVersion === "latest") {
-    const version = versions.at(-1);
-    return { version, mobs: MOB_CATALOGS[version] };
-  }
-  const compatible = versions.filter((version) => compareMinecraftVersions(version, requestedVersion) <= 0);
-  const version = compatible.at(-1) || versions[0];
-  return { version, mobs: MOB_CATALOGS[version] };
+function resolveMobCatalog() {
+  return {
+    version: LATEST_MINECRAFT_VERSION,
+    mobs: MOB_CATALOGS[LATEST_MINECRAFT_VERSION] || []
+  };
 }
 
 function compareAppVersions(left, right) {
@@ -319,18 +298,20 @@ function validateUpdateManifest(raw, manifestUrl) {
   if (!/^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/.test(version)) {
     throw new Error(mt("A frissítési leíróban hibás a verziószám.", "The update manifest contains an invalid version number."));
   }
-  let downloadUrl;
-  try {
-    downloadUrl = new URL(String(raw?.downloadUrl || ""), manifestUrl);
-  } catch {
-    throw new Error(mt("A frissítési csomag címe hibás.", "The update package URL is invalid."));
-  }
-  if (downloadUrl.protocol !== "https:" || downloadUrl.username || downloadUrl.password) {
-    throw new Error(mt("A frissítési csomagnak HTTPS-címen kell lennie.", "The update package must use an HTTPS URL."));
+  const downloadCandidate = String(raw?.downloadUrl || "").trim();
+  let downloadUrl = "";
+  if (downloadCandidate) {
+    try {
+      const parsed = new URL(downloadCandidate, manifestUrl);
+      if (parsed.protocol !== "https:" || parsed.username || parsed.password) throw new Error();
+      downloadUrl = parsed.href;
+    } catch {
+      throw new Error(mt("A frissítési csomag címe hibás.", "The update package URL is invalid."));
+    }
   }
   const sha256 = String(raw?.sha256 || "").trim().toLocaleLowerCase();
-  if (!/^[a-f0-9]{64}$/.test(sha256)) {
-    throw new Error(mt("A frissítési leíróból hiányzik az érvényes SHA-256 ellenőrzőösszeg.", "The update manifest is missing a valid SHA-256 checksum."));
+  if (sha256 && !/^[a-f0-9]{64}$/.test(sha256)) {
+    throw new Error(mt("A frissítési leíró SHA-256 ellenőrzőösszege hibás.", "The update manifest contains an invalid SHA-256 checksum."));
   }
   const seenFeatures = new Set();
   const features = (Array.isArray(raw?.features) ? raw.features : []).slice(0, 20).flatMap((feature) => {
@@ -343,7 +324,7 @@ function validateUpdateManifest(raw, manifestUrl) {
   });
   return {
     version,
-    downloadUrl: downloadUrl.href,
+    downloadUrl,
     sha256,
     notes: String(appLanguage === "hu" ? raw?.notesHu || raw?.notes || "" : raw?.notesEn || raw?.notes || "").slice(0, 3000),
     features
@@ -646,7 +627,7 @@ function enqueueSlot(slot, event, isTest = false) {
     isTest ? "test" : "action",
     `${slot.name} ${mt("sorba állítva", "queued")}`,
     isTest
-      ? `${mt("LIVE nélkül", "Without LIVE")} • Minecraft ${config.minecraftVersion === "latest" ? mt("1.21.5+ / legújabb", "1.21.5+ / latest") : config.minecraftVersion} • ${commands.length} ${mt("parancs", "actions")} • ${mt("fix 5 mp védelem", "fixed 5 s protection")}`
+      ? `${mt("LIVE nélkül", "Without LIVE")} • Minecraft ${LATEST_MINECRAFT_VERSION} • ${commands.length} ${mt("parancs", "actions")} • ${mt("fix 5 mp védelem", "fixed 5 s protection")}`
       : `${event.user || mt("Néző", "Viewer")} • ${commands.length} ${mt("parancs", "actions")} • ${mt("fix 5 mp védelem", "fixed 5 s protection")}`
   );
   return true;
@@ -757,14 +738,6 @@ function wireConnection(connection) {
   });
   connection.on(WebcastEvent.SUB_NOTIFY || "subNotify", (data) => {
     const subscriber = userFrom(data);
-    if (config.featureFlags["supporter-subscriptions"]) {
-      supporterSubscriptionCount += 1;
-      lastSupporterSubscriber = {
-        username: safeText(subscriber.user),
-        nickname: safeText(subscriber.nickname),
-        time: new Date().toISOString()
-      };
-    }
     processLiveEvent({ kind: "subscribe", ...subscriber, count: 1 });
   });
   connection.on(ControlEvent.DISCONNECTED, () => {
@@ -1046,8 +1019,8 @@ function registerIpc() {
     config.username = String(settings?.username || "").replace(/^@/, "").trim().slice(0, 80);
     config.autoConnect = Boolean(settings?.autoConnect);
     config.updateManifestUrl = normalizeUpdateManifestUrl(settings?.updateManifestUrl || DEFAULT_UPDATE_MANIFEST_URL, false);
-    config.featureFlags["supporter-subscriptions"] = Boolean(settings?.supporterSubscriptionsEnabled);
-    config.minecraftVersion = normalizeMinecraftVersion(settings?.minecraftVersion);
+    config.hostingPanelUrl = normalizeHostingPanelUrl(settings?.hostingPanelUrl || config.hostingPanelUrl);
+    config.minecraftVersion = LATEST_MINECRAFT_VERSION;
     await saveConfig();
     broadcastState();
     return publicState();
