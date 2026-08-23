@@ -18,7 +18,7 @@
     "start": "electron .",
     "check": "node --check src/main.js && node --check src/preload.cjs && node --check src/ui/app.js && node --test tests/*.test.mjs && node tests/connector-import.mjs",
     "build:input-helper": "dotnet publish native/CraftLive.InputHelper.csproj -c Release -r win-x64 -o native/bin",
-    "dist:win": "npm run check && npm run build:input-helper && electron-builder --win nsis --x64",
+    "dist:win": ""dist:win": "npm run check && npm run build:input-helper && electron-builder --win nsis --x64 --publish never",",
     "dist:portable": "npm run check && npm run build:input-helper && node scripts/package-win.mjs"
   },
   "dependencies": {
