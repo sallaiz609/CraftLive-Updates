@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="craft_background">#06130D</color>
+    <color name="craft_panel">#0C2117</color>
+    <color name="craft_panel_alt">#123224</color>
+    <color name="craft_green">#8CFF2E</color>
+    <color name="craft_green_dark">#4F9F16</color>
+    <color name="craft_text">#F1FFF5</color>
+    <color name="craft_muted">#B9D4C2</color>
+    <color name="craft_red">#FF6A6A</color>
+</resources>
