@@ -258,3 +258,19 @@ public final class TikTokConnector {
 
     private static Object defaultValue(Class<?> type) {
         if (!type.isPrimitive()) return null;
+        if (type == boolean.class) return false;
+        if (type == byte.class) return (byte) 0;
+        if (type == short.class) return (short) 0;
+        if (type == int.class) return 0;
+        if (type == long.class) return 0L;
+        if (type == float.class) return 0f;
+        if (type == double.class) return 0d;
+        if (type == char.class) return '\0';
+        return null;
+    }
+
+    @FunctionalInterface
+    private interface EventConsumer {
+        void accept(Object[] arguments);
+    }
+}
