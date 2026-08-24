@@ -18,6 +18,9 @@
     <string name="stop_live">LIVE figyelés leállítása</string>
     <string name="open_minecraft">Minecraft megnyitása</string>
     <string name="test_bedrock">Bedrock teszt</string>
+    <string name="test_opening_chat">CraftLive teszt: a Minecraft chat megnyitása…</string>
+    <string name="test_chat_not_opened">A Minecraft chat nem nyílt meg. Nyisd meg a világot, majd próbáld újra vagy kalibráld a chatgombot.</string>
+    <string name="test_command_submitted">A tesztparancs elküldve. Ha nincs zombi, kapcsold be a csalásokat/parancsokat a világban.</string>
     <string name="enable_accessibility">1. Minecraft-vezérlés engedélyezése</string>
     <string name="enable_keyboard">2. CraftLive billentyűzet engedélyezése</string>
     <string name="choose_keyboard">3. CraftLive billentyűzet kiválasztása</string>
