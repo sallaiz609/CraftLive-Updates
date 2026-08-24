@@ -86,14 +86,17 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
 
         float xPercent = store.preferences().getFloat("chat_x_percent", 0.50f);
         float yPercent = store.preferences().getFloat("chat_y_percent", 0.035f);
+        boolean manuallyCalibrated = store.preferences().getBoolean("chat_calibrated", false);
 
         List<float[]> positions = new ArrayList<>();
         addUniquePosition(positions, xPercent, yPercent);
-        // A jelenlegi Bedrock érintős HUD felül, pontosan középen tartja a chatgombot.
-        // A második középső és a bal felső pont a többi elterjedt HUD-hoz marad meg.
-        addUniquePosition(positions, 0.50f, 0.035f);
-        addUniquePosition(positions, 0.50f, 0.060f);
-        addUniquePosition(positions, 0.055f, 0.075f);
+        if (!manuallyCalibrated) {
+            // Automatikus tartalékpontok csak kézi kalibráció előtt használhatók.
+            // Mentés után kizárólag a felhasználó által megjelölt chatgombot érintjük meg.
+            addUniquePosition(positions, 0.50f, 0.035f);
+            addUniquePosition(positions, 0.50f, 0.060f);
+            addUniquePosition(positions, 0.055f, 0.075f);
+        }
 
         List<ScreenFrame> frames = currentScreenFrames();
         if (diagnostic) showToast(R.string.test_opening_chat);
