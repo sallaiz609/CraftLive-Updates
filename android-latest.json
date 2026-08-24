@@ -1,9 +1,9 @@
 {
-  "versionCode": 13000,
-  "versionName": "0.3.0",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.3.0/CraftLive-Android-0.3.0.apk",
-  "sha256": "8029149e0fb4a8d32303f14ef004d8a2565590d06035ce3c20d39813b3d7b7a7",
-  "notesHu": "Javítva a Bedrock háttérkapcsolat olyan telefonokon is, ahol a Minecraft elutasította a 127.0.0.1 címet. Az interakciós szerkesztőben képekkel és érmeárral választhatók ki a TikTok-ajándékok. A LIVE csatlakozásakor automatikusan betöltődik az adott fiók teljes aktuális ajándékkatalógusa. Minden aktuális Bedrock mob külön listából választható, kézi parancsírás nélkül. Előre elkészített Minecraft-műveletek: mob, villám, gyémánt, gyógyítás, nappal és vihar. A fix 5 másodperces védelem változatlanul kötelező.",
-  "notesEn": "Fixed Bedrock background connections on phones where Minecraft rejected 127.0.0.1. The interaction editor now provides TikTok gift selection with images and coin prices. The complete current gift catalog for the account is loaded automatically after the LIVE connects. Every current Bedrock mob can be selected from a list without typing commands. Ready-made Minecraft actions include mobs, lightning, diamonds, healing, daytime and thunder. The fixed five-second protection remains mandatory.",
+  "versionCode": 13001,
+  "versionName": "0.3.1",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.3.1/CraftLive-Android-0.3.1.apk",
+  "sha256": "af246e5883d1465631dc968b266002186cdcb3fdb641abd6f3ba8b243fdfb15d",
+  "notesHu": "• Javítva lett a Minecraft csatlakozási kódja (WebSocket).\n• A működő kapcsolódási parancs most egy gombnyomással kimásolható.\n• Új útmutató mutatja meg, mit kell bekapcsolni a Minecraft beállításaiban.\n• Minden frissítés után automatikusan megjelenik, mi változott.",
+  "notesEn": "• Fixed the Minecraft connection code (WebSocket).\n• The working connection command can now be copied with one tap.\n• A new guide shows which Minecraft settings must be enabled.\n• CraftLive now automatically shows what changed after every update.",
   "mandatory": true
 }
