@@ -13,6 +13,7 @@ import android.widget.TextView;
 public final class CraftLiveImeService extends InputMethodService {
     private static volatile CraftLiveImeService instance;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private boolean delivering;
 
     public static void tryDeliverPendingCommand() {
         CraftLiveImeService service = instance;
@@ -56,25 +57,34 @@ public final class CraftLiveImeService extends InputMethodService {
     }
 
     private void deliverPendingCommand() {
+        if (delivering) return;
         InteractionStore store = new InteractionStore(this);
         String command = store.preferences().getString("pending_command", "");
         long createdAt = store.preferences().getLong("pending_command_time", 0L);
         if (command == null || command.trim().isEmpty()) return;
-        if (System.currentTimeMillis() - createdAt > 15_000L) {
+        if (System.currentTimeMillis() - createdAt > 45_000L) {
             clearPending(store);
             return;
         }
 
         InputConnection connection = getCurrentInputConnection();
         if (connection == null) return;
-        connection.commitText(command, 1);
+        if (!connection.commitText(command, 1)) return;
+        delivering = true;
         handler.postDelayed(() -> {
             InputConnection current = getCurrentInputConnection();
-            if (current == null) return;
-            current.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
-            current.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER));
+            if (current == null) {
+                delivering = false;
+                return;
+            }
+            boolean down = current.sendKeyEvent(
+                    new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
+            boolean up = current.sendKeyEvent(
+                    new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER));
+            if (!down && !up) current.performEditorAction(EditorInfo.IME_ACTION_DONE);
             clearPending(store);
-        }, 100L);
+            delivering = false;
+        }, 180L);
     }
 
     private static void clearPending(InteractionStore store) {
