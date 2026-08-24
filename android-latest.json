@@ -1,9 +1,9 @@
 {
-  "versionCode": 11008,
-  "versionName": "0.1.8",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.8/CraftLive-Android-0.1.8.apk",
-  "sha256": "6ea042c394490c32b3b8c832bc35ff8c3c96e190dfb2f3d0600c37e45ba76436",
-  "notesHu": "A Bedrock chat megnyitása után a CraftLive most külön fókuszálja a tényleges parancsbeviteli mezőt. A parancsot több kompatibilis Android-beviteli módszerrel próbálja beírni, és az Entert csak ellenőrzött beírás után küldi el. Sikertelen bevitelkor a chat automatikusan bezáródik, ezért nem marad nyitva játék közben. A közvetlen, teljesen háttérbeli vezérlés helyi Bedrock világban külső Android-appból nem érhető el, ezért a chat sikeres interakciónál csak röviden villan fel.",
-  "notesEn": "After opening Bedrock chat, CraftLive now explicitly focuses the real command input field. It tries multiple compatible Android input methods and sends Enter only after verified text entry. If input fails, chat closes automatically instead of remaining open during gameplay. A local Bedrock world cannot be controlled fully in the background by an external Android app, so chat only flashes briefly when an interaction succeeds.",
+  "versionCode": 12000,
+  "versionName": "0.2.0",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.2.0/CraftLive-Android-0.2.0.apk",
+  "sha256": "f79cc279e45715d232293d6868408bd2720e77eebc34ae6d5a605c44c8b592db",
+  "notesHu": "Új helyi Bedrock WebSocket-híd fut a 127.0.0.1:19134 címen. Az interakciók ezentúl a háttérben hajtódnak végre, ezért esemény közben nem nyílik meg a Minecraft chat. Az alkalmazás valós időben jelzi a kapcsolat állapotát, kimásolja a /wsserver kapcsolási parancsot, és csak valódi Minecraft-kapcsolatnál enged tesztet küldeni. A korábbi kisegítő lehetőség, CraftLive-billentyűzet és képernyőfedvény már nem szükséges. A fix 5 másodperces biztonsági késleltetés megmaradt.",
+  "notesEn": "A new local Bedrock WebSocket bridge runs on 127.0.0.1:19134. Interactions now execute in the background, so Minecraft chat does not open during events. The app shows live connection status, copies the /wsserver connection command, and only permits tests when Minecraft is truly connected. The former accessibility helper, CraftLive keyboard, and screen overlay are no longer required. The fixed five-second safety delay remains active.",
   "mandatory": true
 }
