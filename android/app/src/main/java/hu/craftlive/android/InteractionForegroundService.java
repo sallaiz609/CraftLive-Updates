@@ -170,8 +170,9 @@ public final class InteractionForegroundService extends Service implements TikTo
         variables.put("gift", key == null ? "" : key);
         variables.put("user", user == null ? "" : user);
         variables.put("count", String.valueOf(amount));
+        boolean diagnostic = "test".equals(key);
         for (String command : BedrockCommandTranslator.translateMany(rawCommand, variables)) {
-            queue.offerLast(new QueuedCommand(command));
+            queue.offerLast(new QueuedCommand(command, diagnostic));
         }
         updateNotification();
     }
@@ -182,7 +183,7 @@ public final class InteractionForegroundService extends Service implements TikTo
             while (workerRunning.get()) {
                 try {
                     QueuedCommand item = queue.takeFirst();
-                    boolean sent = CraftLiveAccessibilityService.sendCommand(item.command);
+                    boolean sent = CraftLiveAccessibilityService.sendCommand(item.command, item.diagnostic);
                     if (!sent) {
                         store.preferences().edit()
                                 .putString("last_dispatch_error", "minecraft_not_foreground")
@@ -276,9 +277,11 @@ public final class InteractionForegroundService extends Service implements TikTo
 
     private static final class QueuedCommand {
         private final String command;
+        private final boolean diagnostic;
 
-        private QueuedCommand(String command) {
+        private QueuedCommand(String command, boolean diagnostic) {
             this.command = command;
+            this.diagnostic = diagnostic;
         }
     }
 }
