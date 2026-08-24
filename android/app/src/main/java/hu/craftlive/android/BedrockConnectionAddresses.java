@@ -16,6 +16,9 @@ final class BedrockConnectionAddresses {
 
     static List<String> addresses() {
         Set<String> result = new LinkedHashSet<>();
+        // Bedrock and CraftLive run on the same Android device. Prefer the stable
+        // loopback address instead of a Wi-Fi/mobile address that may change.
+        result.add("127.0.0.1");
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             if (interfaces != null) {
@@ -31,7 +34,6 @@ final class BedrockConnectionAddresses {
             }
         } catch (Exception ignored) {
         }
-        result.add("127.0.0.1");
         return new ArrayList<>(result);
     }
 

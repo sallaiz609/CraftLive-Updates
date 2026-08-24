@@ -1,1 +1,4 @@
-Fixed Bedrock background connections on phones where Minecraft rejected 127.0.0.1. The interaction editor now provides TikTok gift selection with images and coin prices. The complete current gift catalog for the account is loaded automatically after the LIVE connects. Every current Bedrock mob can be selected from a list without typing commands. Ready-made Minecraft actions include mobs, lightning, diamonds, healing, daytime and thunder. The fixed five-second protection remains mandatory.
+• Fixed the Minecraft connection code (WebSocket).
+• The working connection command can now be copied with one tap.
+• A new guide shows which Minecraft settings must be enabled.
+• CraftLive now automatically shows what changed after every update.

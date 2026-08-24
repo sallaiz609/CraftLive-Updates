@@ -47,4 +47,11 @@ public final class BedrockWebSocketProtocolTest {
         assertTrue(thrown);
         assertFalse(BedrockConnectionAddresses.command("127.0.0.1").isEmpty());
     }
+
+    @Test
+    public void prefersStableSameDeviceConnectionCommand() {
+        assertEquals("127.0.0.1", BedrockConnectionAddresses.preferredAddress());
+        assertEquals("/wsserver ws://127.0.0.1:19134",
+                BedrockConnectionAddresses.command(BedrockConnectionAddresses.preferredAddress()));
+    }
 }
