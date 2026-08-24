@@ -17,6 +17,11 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
         return instance != null;
     }
 
+    public static void markForegroundPackage(String packageName) {
+        CraftLiveAccessibilityService service = instance;
+        if (service != null) service.activePackage = packageName == null ? "" : packageName;
+    }
+
     public static boolean sendCommand(String command) {
         CraftLiveAccessibilityService service = instance;
         if (service == null || !"com.mojang.minecraftpe".equals(service.activePackage)) return false;
@@ -33,7 +38,15 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         CharSequence packageName = event == null ? null : event.getPackageName();
-        activePackage = packageName == null ? "" : packageName.toString();
+        CharSequence className = event == null ? null : event.getClassName();
+        String packageValue = packageName == null ? "" : packageName.toString();
+        String classValue = className == null ? "" : className.toString();
+        if ("com.android.systemui".equals(packageValue)) return;
+        if (getPackageName().equals(packageValue)
+                && (classValue.contains("SoftInputWindow") || classValue.contains("InputMethod"))) {
+            return;
+        }
+        activePackage = packageValue;
         // A szolgáltatás nem olvassa a képernyő tartalmát; kizárólag a csomagnevet figyeli.
     }
 
@@ -61,8 +74,8 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
                 .apply();
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        float xPercent = store.preferences().getFloat("chat_x_percent", 0.055f);
-        float yPercent = store.preferences().getFloat("chat_y_percent", 0.075f);
+        float xPercent = store.preferences().getFloat("chat_x_percent", 0.40f);
+        float yPercent = store.preferences().getFloat("chat_y_percent", 0.055f);
         float x = Math.max(1f, Math.min(metrics.widthPixels - 1f, metrics.widthPixels * xPercent));
         float y = Math.max(1f, Math.min(metrics.heightPixels - 1f, metrics.heightPixels * yPercent));
 
@@ -74,8 +87,11 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
         dispatchGesture(gesture, new GestureResultCallback() {
             @Override
             public void onCompleted(GestureDescription gestureDescription) {
-                // A Minecraft megnyitja a chatet, majd az aktív CraftLive IME elküldi a függő parancsot.
-                mainHandler.postDelayed(() -> CraftLiveImeService.tryDeliverPendingCommand(), 220L);
+                // A Minecraft megnyitja a chatet, majd az aktív CraftLive IME több biztonságos
+                // próbálkozással elküldi a függő parancsot. Siker után a parancs törlődik.
+                mainHandler.postDelayed(CraftLiveImeService::tryDeliverPendingCommand, 350L);
+                mainHandler.postDelayed(CraftLiveImeService::tryDeliverPendingCommand, 850L);
+                mainHandler.postDelayed(CraftLiveImeService::tryDeliverPendingCommand, 1_500L);
             }
         }, mainHandler);
     }
