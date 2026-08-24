@@ -1,0 +1,9 @@
+{
+  "versionCode": 1,
+  "versionName": "0.1.0",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.0/CraftLive-Android-0.1.0.apk",
+  "sha256": "REPLACE_WITH_THE_APK_SHA256",
+  "notesHu": "Első Android Bedrock kiadás helyi vezérléssel és alkalmazáson belüli frissítéssel.",
+  "notesEn": "First Android Bedrock release with local control and in-app updates.",
+  "mandatory": true
+}

@@ -1,0 +1,24 @@
+CRAFTLIVE ANDROID 0.1.0 – ÁLLAPOT
+=================================
+
+Elkészült:
+- helyi Minecraft Bedrock vezérlés Androidon;
+- 20 szerkeszthető Standard interakciós hely;
+- külön, 5 valódi TikTok LIVE óra után feloldódó PLUS rész;
+- fix és nem kikapcsolható 5 másodperces interakciós sor;
+- LIVE nélküli teszt;
+- magyar/angol rendszer-nyelv;
+- minden alkalmazásverziónál újra bekért TikTok-felhasználónév;
+- jól látható alkalmazásverzió;
+- alkalmazáson belüli frissítés, SHA-256 ellenőrzéssel;
+- aláírt GitHub Android-kiadási folyamat;
+- külön Android CI debug build.
+
+Android biztonsági korlát:
+Az app az új APK-t saját maga ellenőrzi és letölti, de a rendszer telepítési
+ablakában a felhasználónak meg kell érintenie a Telepítés gombot. Normál,
+Play Áruházon kívül telepített alkalmazás ezt nem kerülheti meg.
+
+GitHub:
+A forrás a CraftLive-Updates tároló craftlive-android-0.1.0 ágán, az android/
+mappában található. A Windowsos forrás ettől külön marad.
