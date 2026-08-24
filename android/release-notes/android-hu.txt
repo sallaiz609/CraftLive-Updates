@@ -1,1 +1,10 @@
-Javítva a Bedrock teszt és az interakciók Minecraftba küldése. A parancssor már a Minecraft megnyitása előtt biztonságosan elindul, pontosabb az előtér-érzékelés, új telefonos chatgomb-alapérték került be, és az engedélyezési rész automatikusan eltűnik, amikor minden szükséges vezérlés aktív.
+CraftLive Android 0.1.2
+
+Javítva a frissítés felismerése: a verziókód most mindig növekvő, ezért az alkalmazás biztosan felajánlja az új kiadást.
+
+Tartalmazza a 0.1.1 javításait is:
+- Megbízhatóbb Bedrock teszt és Minecraft-parancsküldés.
+- A parancssor már a Minecraft megnyitása előtt elindul.
+- Pontosabb előtér-érzékelés és többszöri kézbesítési próbálkozás.
+- A szükséges billentyűzet és vezérlési engedélyek ellenőrzése.
+- Az engedélyezési rész automatikusan eltűnik, amikor minden aktív.
