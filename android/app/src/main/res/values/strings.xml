@@ -12,6 +12,10 @@
     <string name="plus_locked">PLUS lezárva – %1$.1f / 5 LIVE óra</string>
     <string name="plus_unlocked">PLUS feloldva – extrém interakciók elérhetők</string>
     <string name="fixed_delay">Fix védelem: minden Minecraft-interakció között 5 másodperc telik el.</string>
+    <string name="auto_rotate">Automatikus forgatás</string>
+    <string name="auto_rotate_description">Bekapcsolva a CraftLive követi a telefon két fekvő irányát. Kikapcsolva az aktuális fekvő helyzetet rögzíti.</string>
+    <string name="auto_rotate_enabled">Az automatikus fekvő forgatás bekapcsolva.</string>
+    <string name="auto_rotate_locked">Az aktuális fekvő irány rögzítve.</string>
     <string name="tiktok_username">TikTok-felhasználónév (@ nélkül)</string>
     <string name="save">Mentés</string>
     <string name="start_live">LIVE figyelés indítása</string>
