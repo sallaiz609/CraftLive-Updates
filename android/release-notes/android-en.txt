@@ -1,10 +1,1 @@
-CraftLive Android 0.1.2
-
-Fixed update detection: Android version codes now always increase, so the app can reliably offer every newer release.
-
-Also includes the 0.1.1 fixes:
-- More reliable Bedrock testing and Minecraft command delivery.
-- The command queue starts before Minecraft opens.
-- More accurate foreground detection and multiple delivery attempts.
-- Required keyboard and control permissions are verified.
-- The setup section hides automatically when everything is active.
+Fixed Bedrock tests where Minecraft chat did not open at all. CraftLive now runs in mandatory landscape mode, uses Minecraft's actual landscape display size, automatically tries both common mobile HUD chat-button locations, and submits commands through multiple compatible Android input actions. The Bedrock test now actually summons a zombie, and short status messages show how far delivery progressed.
