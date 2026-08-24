@@ -12,10 +12,6 @@
     <string name="plus_locked">PLUS locked – %1$.1f / 5 LIVE hours</string>
     <string name="plus_unlocked">PLUS unlocked – extreme interactions available</string>
     <string name="fixed_delay">Fixed protection: every Minecraft interaction is separated by 5 seconds.</string>
-    <string name="auto_rotate">Automatic rotation</string>
-    <string name="auto_rotate_description">When enabled, CraftLive follows the phone between both landscape orientations. When disabled, the current landscape orientation is locked.</string>
-    <string name="auto_rotate_enabled">Automatic landscape rotation enabled.</string>
-    <string name="auto_rotate_locked">The current landscape orientation is locked.</string>
     <string name="tiktok_username">TikTok username (without @)</string>
     <string name="save">Save</string>
     <string name="start_live">Start LIVE monitoring</string>
@@ -30,6 +26,11 @@
     <string name="choose_keyboard">3. Select CraftLive keyboard</string>
     <string name="check_update">Update</string>
     <string name="calibration">Calibrate chat button</string>
+    <string name="calibration_drag_help">Edit\n\n(Drag the target icon onto Minecraft's chat icon, then press Save.)</string>
+    <string name="calibration_overlay_permission_required">Allow CraftLive to display over other apps. Minecraft will then open automatically.</string>
+    <string name="calibration_opening_minecraft">Minecraft is opening. Drag the target onto the chat icon.</string>
+    <string name="calibration_overlay_instruction">Drag the target exactly onto the chat icon</string>
+    <string name="calibration_saved">The exact chat-button position was saved.</string>
     <string name="battery_settings">4. Background/battery settings</string>
     <string name="support_creator">Follow the creator · @venom_hun_</string>
     <string name="interaction_slots">Interactions – 20 free slots</string>
@@ -78,8 +79,5 @@
     <string name="comment">Comment</string>
     <string name="setup_incomplete">Android settings opened. Return to CraftLive after enabling it.</string>
     <string name="update_bad_signature">The APK signature must match the installed CraftLive. Always use the same release key for GitHub releases.</string>
-    <string name="calibration_x">Chat button horizontal position: %1$d%%</string>
-    <string name="calibration_y">Chat button vertical position: %1$d%%</string>
-    <string name="calibration_help">Set the Bedrock chat button position as a percentage of the landscape game screen. The new default is 50% horizontally and 4% vertically.</string>
     <string name="queued_count">queued: %1$d</string>
 </resources>
