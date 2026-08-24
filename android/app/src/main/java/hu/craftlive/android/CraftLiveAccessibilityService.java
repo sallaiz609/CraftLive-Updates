@@ -40,6 +40,13 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
         return true;
     }
 
+    public static void closeMinecraftChatAfterInputFailure() {
+        CraftLiveAccessibilityService service = instance;
+        if (service == null || !MINECRAFT_PACKAGE.equals(service.activePackage)) return;
+        service.mainHandler.postDelayed(
+                () -> service.performGlobalAction(GLOBAL_ACTION_BACK), 120L);
+    }
+
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
@@ -82,6 +89,7 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
                 .putLong("pending_command_time", System.currentTimeMillis())
                 .putBoolean("pending_command_diagnostic", diagnostic)
                 .putLong("pending_input_session", inputSessionMarker)
+                .putBoolean("pending_focus_attempted", false)
                 .apply();
 
         float xPercent = store.preferences().getFloat("chat_x_percent", 0.50f);
@@ -115,7 +123,8 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
                                  int positionIndex, int frameIndex, long inputSessionMarker) {
         if (!isPending(store, command)) return;
         if (CraftLiveImeService.hasNewMinecraftInputSessionSince(inputSessionMarker)) {
-            CraftLiveImeService.tryDeliverPendingCommand();
+            focusMinecraftChatInput(store, command, diagnostic,
+                    frames.get(Math.min(frameIndex, Math.max(0, frames.size() - 1))));
             return;
         }
         if (positionIndex >= positions.size()) {
@@ -148,7 +157,7 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
                                 .putFloat("chat_x_percent", position[0])
                                 .putFloat("chat_y_percent", position[1])
                                 .apply();
-                        CraftLiveImeService.tryDeliverPendingCommand();
+                        focusMinecraftChatInput(store, command, diagnostic, frame);
                     } else {
                         int[] next = nextAttempt(frames.size(), positionIndex, safeFrameIndex);
                         tryChatPosition(store, command, diagnostic, frames, positions,
@@ -168,6 +177,49 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
             int[] next = nextAttempt(frames.size(), positionIndex, safeFrameIndex);
             mainHandler.postDelayed(() -> tryChatPosition(store, command, diagnostic,
                     frames, positions, next[0], next[1], inputSessionMarker), 180L);
+        }
+    }
+
+    /**
+     * A Bedrock chatablaka megnyitáskor létrehozhat egy InputConnectiont úgy is,
+     * hogy a tényleges szövegmező még nem kapott fókuszt. Ilyenkor a billentyűzet
+     * commitText hívása sikeresnek látszik, de a játék eldobja a szöveget. A chat
+     * alsó beviteli sávjának egyszeri megérintése után már a valódi mező fogadja
+     * a parancsot. Ez a lépés csak a már megnyitott chatben történik.
+     */
+    private void focusMinecraftChatInput(InteractionStore store, String command,
+                                         boolean diagnostic, ScreenFrame frame) {
+        if (!isPending(store, command)) return;
+        boolean attempted = store.preferences().getBoolean("pending_focus_attempted", false);
+        if (attempted) {
+            CraftLiveImeService.tryDeliverPendingCommand();
+            return;
+        }
+        store.preferences().edit().putBoolean("pending_focus_attempted", true).apply();
+
+        float x = clamp(frame.left + frame.width * 0.45f,
+                frame.left + 1f, frame.left + frame.width - 1f);
+        float y = clamp(frame.top + frame.height * 0.94f,
+                frame.top + 1f, frame.top + frame.height - 1f);
+        Path path = new Path();
+        path.moveTo(x, y);
+        GestureDescription gesture = new GestureDescription.Builder()
+                .addStroke(new GestureDescription.StrokeDescription(path, 0L, 70L))
+                .build();
+        GestureResultCallback callback = new GestureResultCallback() {
+            @Override
+            public void onCompleted(GestureDescription gestureDescription) {
+                mainHandler.postDelayed(CraftLiveImeService::tryDeliverPendingCommand, 240L);
+                mainHandler.postDelayed(CraftLiveImeService::tryDeliverPendingCommand, 620L);
+            }
+
+            @Override
+            public void onCancelled(GestureDescription gestureDescription) {
+                mainHandler.postDelayed(CraftLiveImeService::tryDeliverPendingCommand, 220L);
+            }
+        };
+        if (!dispatchGesture(gesture, callback, mainHandler)) {
+            mainHandler.postDelayed(CraftLiveImeService::tryDeliverPendingCommand, 220L);
         }
     }
 
@@ -252,6 +304,7 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
                 .remove("pending_command_time")
                 .remove("pending_command_diagnostic")
                 .remove("pending_input_session")
+                .remove("pending_focus_attempted")
                 .apply();
     }
 

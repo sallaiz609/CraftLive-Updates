@@ -1,21 +1,17 @@
-# CraftLive Android 0.1.7
+# CraftLive Android 0.1.8
 
-- A CraftLive kezelőfelülete ismét fix álló módban működik.
-- Új, felül elérhető **Chatgomb kalibrálása** menüpont.
-- A **Szerkesztés** automatikusan megnyitja a Minecraftot, így a valódi chat ikon látható marad.
-- A mozgatható célkeresztet pontosan a Minecraft chat ikonjára lehet húzni.
-- A **Mentés** eltárolja a pontos helyet, majd azonnal eltünteti a célkeresztet és a kezelősávot.
-- Kézi kalibráció után a teszt kizárólag a mentett pontot használja.
-- Az engedélyeket minden indításkor ténylegesen ellenőrzi, és csak a valóban hiányzó lépést jeleníti meg.
-- Frissítés után nem kell az aktív Minecraft-vezérlést vagy billentyűzetet ki- és visszakapcsolni.
+- A Bedrock chat megnyitása után a CraftLive külön a tényleges szövegmezőre fókuszál.
+- Többlépcsős parancsbevitel: `commitText`, composing text és virtuális billentyűesemény tartalék módszer.
+- Enter csak akkor kerül elküldésre, ha a parancs ténylegesen bekerült vagy a nyers billentyűeseményeket a mező fogadta.
+- Sikertelen bevitelkor a chat automatikusan bezáródik.
+- Sikeres interakciónál a chat csak röviden villan fel.
+- Az engedélyek állapotának megőrzése és a kézi chatgomb-kalibráció változatlanul megmaradt.
 
----
+## English
 
-- CraftLive's interface is fixed to portrait mode again.
-- Added a clearly visible **Calibrate chat button** menu at the top.
-- **Edit** opens Minecraft automatically so the real chat icon stays visible.
-- A draggable target can be placed exactly on Minecraft's chat icon.
-- **Save** stores the exact position and immediately removes the target and controls.
-- After manual calibration, tests use only the saved point.
-- Permissions are verified on every launch and only a genuinely missing step is shown.
-- Active Minecraft control and keyboard permissions no longer need to be toggled after an update.
+- CraftLive explicitly focuses Bedrock's actual chat input field after opening chat.
+- Multi-stage input uses `commitText`, composing text and virtual key events as fallbacks.
+- Enter is sent only after verified input or accepted raw key events.
+- Chat closes automatically when text entry fails.
+- On success, chat only flashes briefly.
+- Permission-state preservation and manual chat-button calibration remain available.
