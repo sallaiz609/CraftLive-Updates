@@ -1,9 +1,9 @@
 {
-  "versionCode": 11004,
-  "versionName": "0.1.4",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.4/CraftLive-Android-0.1.4.apk",
-  "sha256": "c05b6322d67a371934e7d83cf4afd09e0f26215e7223713b7712242e937ea537",
-  "notesHu": "Javítva a téves „tesztparancs elküldve” visszajelzés és a képen látható, felül középre helyezett Bedrock-chatgomb kezelése. A CraftLive most csak egy új, bizonyítottan a Minecraft által megnyitott beviteli munkamenetbe írhat, más alkalmazás vagy korábbi szövegmező nem fogadhatja a parancsot. A sikeresen felismert chatgombhelyet automatikusan megjegyzi.",
-  "notesEn": "Fixed the false “test command submitted” message and added support for the top-center Bedrock chat button shown by the current touch HUD. CraftLive now writes only into a new input session proven to have been opened by Minecraft, so another app or a stale text field cannot receive the command. A successfully detected chat-button position is remembered automatically.",
+  "versionCode": 11005,
+  "versionName": "0.1.5",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.5/CraftLive-Android-0.1.5.apk",
+  "sha256": "a1847e177bedbdab1ef6fa658caa881afc85399f6b34b6c669525033316c20e0",
+  "notesHu": "Javítva az automatikus Bedrock-chatmegnyitás. A CraftLive megvárja, amíg a Minecraft fekvő ablaka ténylegesen fogadja az érintéseket, a valós ablakméret és a gyártói tájolás alapján több biztonságos képernyőgeometriát próbál, a megszakított érintést pedig automatikusan újrapróbálja.",
+  "notesEn": "Fixed automatic Bedrock chat opening. CraftLive now waits until the resumed landscape Minecraft window can receive touches, tries safe screen geometries based on the real window size and vendor orientation reporting, and automatically retries cancelled gestures.",
   "mandatory": true
 }
