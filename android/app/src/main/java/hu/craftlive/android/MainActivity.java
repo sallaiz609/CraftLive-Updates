@@ -19,10 +19,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -31,10 +33,12 @@ import android.widget.Toast;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public final class MainActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private InteractionStore store;
+    private GiftCatalogStore giftCatalog;
     private UpdateManager updateManager;
     private EditText usernameInput;
     private TextView statusText;
@@ -59,6 +63,7 @@ public final class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         store = new InteractionStore(this);
+        giftCatalog = new GiftCatalogStore(this);
         store.clearTikTokUsernameForNewVersion(versionCode());
         updateManager = new UpdateManager(this);
         requestNotificationPermission();
@@ -129,7 +134,7 @@ public final class MainActivity extends Activity {
         root.addView(bridgeStatusText, marginBottom(7));
 
         TextView bridgeHelp = panelText(getString(R.string.bridge_setup_note,
-                BedrockWebSocketServer.CONNECT_COMMAND), R.color.craft_text);
+                preferredConnectCommand()), R.color.craft_text);
         root.addView(bridgeHelp, marginBottom(7));
 
         LinearLayout bridgeRow = horizontal();
@@ -263,6 +268,7 @@ public final class MainActivity extends Activity {
         EditText name = dialogField(slot.name, getString(R.string.slot_empty));
         form.addView(name, marginBottom(6));
 
+        form.addView(sectionTitle(getString(R.string.trigger_type)));
         Spinner trigger = new Spinner(this);
         String[] labels = {
                 getString(R.string.gift), getString(R.string.like), getString(R.string.follow),
@@ -274,32 +280,109 @@ public final class MainActivity extends Activity {
         trigger.setSelection(slot.triggerType.ordinal());
         form.addView(trigger, marginBottom(6));
 
+        String initialGift = slot.triggerType == InteractionSlot.TriggerType.GIFT
+                && slot.triggerKey != null && !slot.triggerKey.trim().isEmpty()
+                ? slot.triggerKey.trim() : "Rose";
+        String[] selectedGift = {initialGift};
+        Button giftButton = actionButton(giftButtonLabel(initialGift), false);
+        form.addView(giftButton, marginBottom(4));
+        TextView giftHint = sectionTitle(getString(R.string.gift_catalog_hint));
+        form.addView(giftHint);
+        giftButton.setOnClickListener(v -> showGiftPicker(selectedGift[0], giftName -> {
+            selectedGift[0] = giftName;
+            giftButton.setText(giftButtonLabel(giftName));
+        }));
+
         EditText key = dialogField(slot.triggerKey, getString(R.string.trigger_key));
         form.addView(key, marginBottom(6));
         EditText threshold = dialogField(String.valueOf(slot.threshold), getString(R.string.threshold));
         threshold.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         form.addView(threshold, marginBottom(6));
-        EditText command = dialogField(slot.command, getString(R.string.command));
+
+        form.addView(sectionTitle(getString(R.string.action_type)));
+        Spinner action = new Spinner(this);
+        boolean hungarian = "hu".equals(Locale.getDefault().getLanguage());
+        String[] actionLabels = BedrockActionCatalog.labels(hungarian);
+        action.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, actionLabels));
+        int initialAction = BedrockActionCatalog.detect(slot.command);
+        action.setSelection(initialAction);
+        form.addView(action, marginBottom(6));
+
+        TextView mobTitle = sectionTitle(getString(R.string.mob_select));
+        form.addView(mobTitle);
+        Spinner mob = new Spinner(this);
+        List<BedrockMobCatalog.Item> mobs = BedrockMobCatalog.all();
+        String[] mobLabels = new String[mobs.size()];
+        for (int index = 0; index < mobs.size(); index++) mobLabels[index] = mobs.get(index).label();
+        mob.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, mobLabels));
+        mob.setSelection(BedrockMobCatalog.indexOf(BedrockActionCatalog.mobId(slot.command)));
+        form.addView(mob, marginBottom(6));
+
+        EditText command = dialogField(slot.command, getString(R.string.custom_command));
         command.setSingleLine(false);
         command.setMinLines(2);
         form.addView(command, marginBottom(6));
 
+        Runnable updateTriggerVisibility = () -> {
+            InteractionSlot.TriggerType type = InteractionSlot.TriggerType.values()[
+                    trigger.getSelectedItemPosition()];
+            boolean isGift = type == InteractionSlot.TriggerType.GIFT;
+            boolean isLike = type == InteractionSlot.TriggerType.LIKE;
+            boolean isComment = type == InteractionSlot.TriggerType.COMMENT;
+            giftButton.setVisibility(isGift ? View.VISIBLE : View.GONE);
+            giftHint.setVisibility(isGift ? View.VISIBLE : View.GONE);
+            key.setVisibility(isComment ? View.VISIBLE : View.GONE);
+            threshold.setVisibility(isLike ? View.VISIBLE : View.GONE);
+        };
+        Runnable updateActionVisibility = () -> {
+            int selected = action.getSelectedItemPosition();
+            mobTitle.setVisibility(selected == BedrockActionCatalog.SPAWN_MOB
+                    ? View.VISIBLE : View.GONE);
+            mob.setVisibility(selected == BedrockActionCatalog.SPAWN_MOB
+                    ? View.VISIBLE : View.GONE);
+            command.setVisibility(selected == BedrockActionCatalog.CUSTOM
+                    ? View.VISIBLE : View.GONE);
+        };
+        trigger.setOnItemSelectedListener(simpleSelection(updateTriggerVisibility));
+        action.setOnItemSelectedListener(simpleSelection(updateActionVisibility));
+        updateTriggerVisibility.run();
+        updateActionVisibility.run();
+
+        ScrollView formScroll = new ScrollView(this);
+        formScroll.addView(form, matchWrap());
+
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.slot_title, slot.index + 1,
                         slot.plus ? getString(R.string.plus) : getString(R.string.standard)))
-                .setView(form)
+                .setView(formScroll)
                 .setNegativeButton(R.string.cancel, null)
                 .setPositiveButton(R.string.save, (dialog, which) -> {
                     slot.enabled = enabled.isChecked();
                     slot.name = name.getText().toString().trim();
                     slot.triggerType = InteractionSlot.TriggerType.values()[trigger.getSelectedItemPosition()];
-                    slot.triggerKey = key.getText().toString().trim();
+                    if (slot.triggerType == InteractionSlot.TriggerType.GIFT) {
+                        slot.triggerKey = selectedGift[0];
+                    } else if (slot.triggerType == InteractionSlot.TriggerType.COMMENT) {
+                        slot.triggerKey = key.getText().toString().trim();
+                    } else {
+                        slot.triggerKey = "";
+                    }
                     try {
                         slot.threshold = Math.max(1, Integer.parseInt(threshold.getText().toString().trim()));
                     } catch (NumberFormatException ignored) {
                         slot.threshold = 1;
                     }
-                    slot.command = command.getText().toString().trim();
+                    int actionIndex = action.getSelectedItemPosition();
+                    String mobId = mobs.get(mob.getSelectedItemPosition()).id;
+                    slot.command = BedrockActionCatalog.command(
+                            actionIndex, mobId, command.getText().toString());
+                    if (slot.name.isEmpty()) {
+                        String triggerName = slot.triggerType == InteractionSlot.TriggerType.GIFT
+                                ? selectedGift[0] : triggerLabel(slot.triggerType);
+                        slot.name = triggerName + " → " + actionLabels[actionIndex];
+                    }
                     List<InteractionSlot> slots = slot.plus ? store.loadPlus() : store.loadStandard();
                     slots.set(slot.index, slot);
                     if (slot.plus) store.savePlus(slots); else store.saveStandard(slots);
@@ -412,7 +495,10 @@ public final class MainActivity extends Activity {
                 bridgeStatusText.setText(getString(R.string.bridge_error, bridgeDetail));
                 bridgeStatusText.setTextColor(color(R.color.craft_red));
             } else if ("listening".equals(bridgeState)) {
-                bridgeStatusText.setText(R.string.bridge_listening);
+                String address = bridgeDetail == null || bridgeDetail.trim().isEmpty()
+                        ? BedrockConnectionAddresses.preferredAddress() : bridgeDetail;
+                bridgeStatusText.setText(getString(R.string.bridge_listening,
+                        address, BedrockWebSocketServer.PORT));
                 bridgeStatusText.setTextColor(color(R.color.craft_muted));
             } else {
                 bridgeStatusText.setText(R.string.bridge_starting);
@@ -459,16 +545,114 @@ public final class MainActivity extends Activity {
     }
 
     private void copyConnectCommand() {
-        putConnectCommandOnClipboard();
-        toast(R.string.connect_command_copied);
+        List<String> addresses = BedrockConnectionAddresses.addresses();
+        if (addresses.size() <= 1) {
+            putConnectCommandOnClipboard(preferredConnectCommand());
+            toast(R.string.connect_command_copied);
+            return;
+        }
+        String[] commands = new String[addresses.size()];
+        for (int index = 0; index < addresses.size(); index++) {
+            commands[index] = BedrockConnectionAddresses.command(addresses.get(index));
+        }
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.bridge_address_picker_title)
+                .setItems(commands, (dialog, which) -> {
+                    putConnectCommandOnClipboard(commands[which]);
+                    toast(R.string.connect_command_copied);
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     private void putConnectCommandOnClipboard() {
+        putConnectCommandOnClipboard(preferredConnectCommand());
+    }
+
+    private void putConnectCommandOnClipboard(String command) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         if (clipboard != null) {
             clipboard.setPrimaryClip(ClipData.newPlainText(
-                    getString(R.string.app_name), BedrockWebSocketServer.CONNECT_COMMAND));
+                    getString(R.string.app_name), command));
         }
+    }
+
+    private String preferredConnectCommand() {
+        return BedrockConnectionAddresses.command(BedrockConnectionAddresses.preferredAddress());
+    }
+
+    private String giftButtonLabel(String giftName) {
+        for (GiftCatalogItem item : giftCatalog.all()) {
+            if (item.name.equalsIgnoreCase(giftName)) {
+                String icon = item.fallbackIcon.isEmpty() ? "🎁" : item.fallbackIcon;
+                return icon + "  " + item.name + (item.diamondCost > 0
+                        ? "  ·  " + item.diamondCost + " ♦" : "");
+            }
+        }
+        return "🎁  " + giftName;
+    }
+
+    private void showGiftPicker(String current, Consumer<String> selected) {
+        LinearLayout list = vertical();
+        list.setPadding(dp(8), dp(6), dp(8), dp(12));
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.gift_select)
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+        for (GiftCatalogItem item : giftCatalog.all()) {
+            LinearLayout row = horizontal();
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(dp(10), dp(8), dp(10), dp(8));
+            row.setBackground(panelBackground(item.name.equalsIgnoreCase(current)
+                            ? R.color.craft_panel_alt : R.color.craft_panel,
+                    1, R.color.craft_green_dark));
+
+            if (item.imageUrl.isEmpty()) {
+                TextView icon = text(item.fallbackIcon.isEmpty() ? "🎁" : item.fallbackIcon,
+                        28f, R.color.craft_text, false);
+                icon.setGravity(Gravity.CENTER);
+                row.addView(icon, new LinearLayout.LayoutParams(dp(54), dp(54)));
+            } else {
+                ImageView image = new ImageView(this);
+                image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                row.addView(image, new LinearLayout.LayoutParams(dp(54), dp(54)));
+                GiftImageLoader.load(item.imageUrl, image);
+            }
+
+            LinearLayout labels = vertical();
+            labels.setPadding(dp(12), 0, 0, 0);
+            labels.addView(text(item.name, 17f, R.color.craft_text, true));
+            labels.addView(text(item.diamondCost > 0
+                            ? getString(R.string.gift_cost, item.diamondCost)
+                            : getString(R.string.gift_cost_unknown),
+                    15f, R.color.craft_muted, false));
+            row.addView(labels, new LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+            row.setOnClickListener(v -> {
+                selected.accept(item.name);
+                dialog.dismiss();
+            });
+            LinearLayout.LayoutParams rowParams = matchWrap();
+            rowParams.setMargins(0, 0, 0, dp(5));
+            list.addView(row, rowParams);
+        }
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(list, matchWrap());
+        dialog.setView(scroll);
+        dialog.show();
+    }
+
+    private AdapterView.OnItemSelectedListener simpleSelection(Runnable callback) {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                callback.run();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        };
     }
 
     private void requestNotificationPermission() {

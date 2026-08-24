@@ -10,9 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 final class BedrockWebSocketServer extends WebSocketServer {
-    static final String HOST = "127.0.0.1";
+    static final String BIND_HOST = "0.0.0.0";
     static final int PORT = 19134;
-    static final String CONNECT_COMMAND = "/wsserver ws://" + HOST + ":" + PORT;
 
     interface Listener {
         void onBedrockListening();
@@ -31,7 +30,10 @@ final class BedrockWebSocketServer extends WebSocketServer {
     private final Listener listener;
 
     BedrockWebSocketServer(Listener listener) {
-        super(new InetSocketAddress(HOST, PORT));
+        // Androidon a Minecraft folyamatából érkező loopback kapcsolat egyes
+        // készülékeken nem ugyanabba a hálózati névtérbe kerül. A wildcard bind
+        // ezért a telefon helyi IPv4-címén is elérhetővé teszi a hidat.
+        super(new InetSocketAddress(BIND_HOST, PORT));
         this.listener = listener;
         setConnectionLostTimeout(20);
         setReuseAddr(true);
@@ -84,6 +86,12 @@ final class BedrockWebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket connection, ClientHandshake handshake) {
+        if (connection == null || connection.getRemoteSocketAddress() == null
+                || !BedrockConnectionAddresses.isLocalAddress(
+                connection.getRemoteSocketAddress().getAddress())) {
+            if (connection != null) connection.close(1008, "CraftLive accepts local Minecraft only");
+            return;
+        }
         clients.add(connection);
         listener.onBedrockConnected();
     }
@@ -106,8 +114,12 @@ final class BedrockWebSocketServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket connection, Exception error) {
-        if (connection != null) clients.remove(connection);
-        listener.onBedrockError(readable(error));
+        if (connection != null) {
+            clients.remove(connection);
+            if (clients.isEmpty()) listener.onBedrockDisconnected();
+        } else {
+            listener.onBedrockError(readable(error));
+        }
     }
 
     @Override

@@ -45,6 +45,6 @@ public final class BedrockWebSocketProtocolTest {
             thrown = true;
         }
         assertTrue(thrown);
-        assertFalse(BedrockWebSocketServer.CONNECT_COMMAND.isEmpty());
+        assertFalse(BedrockConnectionAddresses.command("127.0.0.1").isEmpty());
     }
 }

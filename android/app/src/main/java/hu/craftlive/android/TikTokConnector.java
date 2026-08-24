@@ -1,9 +1,13 @@
 package hu.craftlive.android;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -16,6 +20,7 @@ public final class TikTokConnector {
     public interface Listener {
         void onConnected();
         void onWaiting();
+        void onGiftCatalog(List<GiftCatalogItem> gifts);
         void onEvent(InteractionSlot.TriggerType type, String key, int amount, String user);
         void onError(String message);
     }
@@ -51,12 +56,20 @@ public final class TikTokConnector {
             Class<?> api = Class.forName("io.github.jwdeveloper.tiktok.TikTokLive");
             Method newClient = api.getMethod("newClient", String.class);
             Object builder = newClient.invoke(null, username);
-            builder = register(builder, "onConnected", args -> listener.onConnected());
+            builder = register(builder, "onConnected", args -> {
+                listener.onGiftCatalog(extractGiftCatalog(clientFrom(args)));
+                listener.onConnected();
+            });
             builder = register(builder, "onReconnecting", args -> listener.onWaiting());
             builder = register(builder, "onDisconnected", args -> listener.onWaiting());
             builder = register(builder, "onGift", args -> {
                 Object event = eventFrom(args);
-                String gift = nestedString(event, "getGift", "getName");
+                Object giftObject = invokeIfPresent(event, "getGift");
+                String gift = string(giftObject, "getName");
+                GiftCatalogItem catalogItem = giftItem(giftObject);
+                if (catalogItem != null) {
+                    listener.onGiftCatalog(Collections.singletonList(catalogItem));
+                }
                 String user = userName(event);
                 listener.onEvent(InteractionSlot.TriggerType.GIFT, gift, 1, user);
             });
@@ -138,6 +151,58 @@ public final class TikTokConnector {
 
     private static Object eventFrom(Object[] args) {
         return args != null && args.length > 1 ? args[1] : (args != null && args.length == 1 ? args[0] : null);
+    }
+
+    private static Object clientFrom(Object[] args) {
+        return args != null && args.length > 1 ? args[0] : null;
+    }
+
+    private static List<GiftCatalogItem> extractGiftCatalog(Object client) {
+        ArrayList<GiftCatalogItem> result = new ArrayList<>();
+        Object manager = invokeIfPresent(client, "getGiftManager");
+        if (manager == null) manager = invokeIfPresent(client, "getGiftsManager");
+        Object values = invokeIfPresent(manager, "toList");
+        if (values instanceof Iterable<?>) {
+            for (Object value : (Iterable<?>) values) {
+                GiftCatalogItem item = giftItem(value);
+                if (item != null) result.add(item);
+            }
+        }
+        return result;
+    }
+
+    private static GiftCatalogItem giftItem(Object gift) {
+        if (gift == null) return null;
+        String name = string(gift, "getName");
+        if (name.isEmpty() || "undefined".equalsIgnoreCase(name)) return null;
+        int id = number(gift, "getId", -1);
+        int cost = number(gift, "getDiamondCost", 0);
+        Object picture = invokeIfPresent(gift, "getPicture");
+        String imageUrl = firstUrl(picture);
+        return new GiftCatalogItem(id, name, cost, imageUrl, "🎁");
+    }
+
+    private static String firstUrl(Object picture) {
+        if (picture == null) return "";
+        String[] methods = {"getLink", "getUrl", "getUrls", "getUrlList"};
+        for (String method : methods) {
+            Object value = invokeIfPresent(picture, method);
+            if (value == null) continue;
+            if (value instanceof Iterable<?>) {
+                for (Object item : (Iterable<?>) value) {
+                    if (item != null && !String.valueOf(item).isEmpty()) return String.valueOf(item);
+                }
+                continue;
+            }
+            if (value.getClass().isArray() && Array.getLength(value) > 0) {
+                Object item = Array.get(value, 0);
+                if (item != null) return String.valueOf(item);
+                continue;
+            }
+            String text = String.valueOf(value);
+            if (!text.isEmpty()) return text;
+        }
+        return "";
     }
 
     private static Method findMethod(Class<?> type, String name, int parameters) {
