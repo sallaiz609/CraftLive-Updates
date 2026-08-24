@@ -1,9 +1,9 @@
 {
-  "versionCode": 11007,
-  "versionName": "0.1.7",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.7/CraftLive-Android-0.1.7.apk",
-  "sha256": "ba058a8d515dcfc487c0986c8908802ccab0f0fc72b9e7ec5da12b9da0c0c688",
-  "notesHu": "A CraftLive ismét fix álló módban működik. A felső Chatgomb kalibrálása menü Szerkesztés gombja automatikusan megnyitja a Minecraftot, ahol egy mozgatható célkeresztet a chat ikonra lehet húzni. Mentés után a pontos hely eltárolódik, a célkereszt és a kezelősáv pedig azonnal eltűnik. A teszt ezután kizárólag ezt a kézzel beállított pontot használja. Az app megjegyzi és minden indításkor ténylegesen ellenőrzi az engedélyeket; csak a valóban hiányzó lépést mutatja.",
-  "notesEn": "CraftLive is fixed to portrait mode again. The Edit button in the top Calibrate chat button menu opens Minecraft automatically and displays a draggable target that can be placed on the chat icon. Saving stores the exact position and immediately removes the target and controls. Tests then use only this manually calibrated point. The app preserves and verifies permissions on every launch and only shows a step that is actually missing.",
+  "versionCode": 11008,
+  "versionName": "0.1.8",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.8/CraftLive-Android-0.1.8.apk",
+  "sha256": "6ea042c394490c32b3b8c832bc35ff8c3c96e190dfb2f3d0600c37e45ba76436",
+  "notesHu": "A Bedrock chat megnyitása után a CraftLive most külön fókuszálja a tényleges parancsbeviteli mezőt. A parancsot több kompatibilis Android-beviteli módszerrel próbálja beírni, és az Entert csak ellenőrzött beírás után küldi el. Sikertelen bevitelkor a chat automatikusan bezáródik, ezért nem marad nyitva játék közben. A közvetlen, teljesen háttérbeli vezérlés helyi Bedrock világban külső Android-appból nem érhető el, ezért a chat sikeres interakciónál csak röviden villan fel.",
+  "notesEn": "After opening Bedrock chat, CraftLive now explicitly focuses the real command input field. It tries multiple compatible Android input methods and sends Enter only after verified text entry. If input fails, chat closes automatically instead of remaining open during gameplay. A local Bedrock world cannot be controlled fully in the background by an external Android app, so chat only flashes briefly when an interaction succeeds.",
   "mandatory": true
 }
