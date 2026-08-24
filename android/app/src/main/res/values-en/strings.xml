@@ -18,6 +18,9 @@
     <string name="stop_live">Stop LIVE monitoring</string>
     <string name="open_minecraft">Open Minecraft</string>
     <string name="test_bedrock">Bedrock test</string>
+    <string name="test_opening_chat">CraftLive test: opening Minecraft chat…</string>
+    <string name="test_chat_not_opened">Minecraft chat did not open. Enter a world, then retry or calibrate the chat button.</string>
+    <string name="test_command_submitted">Test command submitted. If no zombie appears, enable cheats/commands in the world.</string>
     <string name="enable_accessibility">1. Enable Minecraft control</string>
     <string name="enable_keyboard">2. Enable CraftLive keyboard</string>
     <string name="choose_keyboard">3. Select CraftLive keyboard</string>
