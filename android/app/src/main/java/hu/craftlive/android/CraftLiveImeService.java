@@ -11,20 +11,32 @@ import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public final class CraftLiveImeService extends InputMethodService {
+    private static final String MINECRAFT_PACKAGE = "com.mojang.minecraftpe";
+    private static final AtomicLong INPUT_SESSION_COUNTER = new AtomicLong();
     private static volatile CraftLiveImeService instance;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean delivering;
     private volatile boolean inputActive;
+    private volatile long inputSessionId;
 
     public static void tryDeliverPendingCommand() {
         CraftLiveImeService service = instance;
         if (service != null) service.handler.postDelayed(service::deliverPendingCommand, 180L);
     }
 
-    public static boolean isInputActive() {
+    public static long currentInputSessionMarker() {
         CraftLiveImeService service = instance;
-        return service != null && service.inputActive;
+        return service == null ? 0L : service.inputSessionId;
+    }
+
+    public static boolean hasNewMinecraftInputSessionSince(long marker) {
+        CraftLiveImeService service = instance;
+        if (service == null || !service.inputActive || service.inputSessionId <= marker) return false;
+        EditorInfo info = service.getCurrentInputEditorInfo();
+        return info != null && MINECRAFT_PACKAGE.equals(info.packageName);
     }
 
     @Override
@@ -48,6 +60,7 @@ public final class CraftLiveImeService extends InputMethodService {
     @Override
     public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
+        inputSessionId = INPUT_SESSION_COUNTER.incrementAndGet();
         inputActive = true;
         handler.postDelayed(this::deliverPendingCommand, 140L);
     }
@@ -55,6 +68,7 @@ public final class CraftLiveImeService extends InputMethodService {
     @Override
     public void onStartInputView(EditorInfo info, boolean restarting) {
         super.onStartInputView(info, restarting);
+        if (!inputActive) inputSessionId = INPUT_SESSION_COUNTER.incrementAndGet();
         inputActive = true;
         handler.postDelayed(this::deliverPendingCommand, 140L);
     }
@@ -76,11 +90,16 @@ public final class CraftLiveImeService extends InputMethodService {
         InteractionStore store = new InteractionStore(this);
         String command = store.preferences().getString("pending_command", "");
         long createdAt = store.preferences().getLong("pending_command_time", 0L);
+        long inputSessionMarker = store.preferences().getLong("pending_input_session", Long.MAX_VALUE);
         if (command == null || command.trim().isEmpty()) return;
         if (System.currentTimeMillis() - createdAt > 45_000L) {
             clearPending(store);
             return;
         }
+
+        if (!hasNewMinecraftInputSessionSince(inputSessionMarker)) return;
+        EditorInfo editorInfo = getCurrentInputEditorInfo();
+        if (editorInfo == null || !MINECRAFT_PACKAGE.equals(editorInfo.packageName)) return;
 
         InputConnection connection = getCurrentInputConnection();
         if (connection == null) return;
@@ -119,6 +138,7 @@ public final class CraftLiveImeService extends InputMethodService {
                 .remove("pending_command")
                 .remove("pending_command_time")
                 .remove("pending_command_diagnostic")
+                .remove("pending_input_session")
                 .apply();
     }
 }

@@ -73,36 +73,41 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
 
     private void openMinecraftChat(String command, boolean diagnostic) {
         InteractionStore store = new InteractionStore(this);
+        long inputSessionMarker = CraftLiveImeService.currentInputSessionMarker();
         store.preferences().edit()
                 .putString("pending_command", command)
                 .putLong("pending_command_time", System.currentTimeMillis())
                 .putBoolean("pending_command_diagnostic", diagnostic)
+                .putLong("pending_input_session", inputSessionMarker)
                 .apply();
 
         DisplayMetrics metrics = currentDisplayMetrics();
-        float xPercent = store.preferences().getFloat("chat_x_percent", 0.40f);
-        float yPercent = store.preferences().getFloat("chat_y_percent", 0.055f);
+        float xPercent = store.preferences().getFloat("chat_x_percent", 0.50f);
+        float yPercent = store.preferences().getFloat("chat_y_percent", 0.035f);
 
         List<float[]> positions = new ArrayList<>();
         addUniquePosition(positions, xPercent, yPercent);
-        // A Bedrock két elterjedt mobil HUD-ja eltérő helyen tartja a chatgombot.
-        // Először a mentett/új középső helyet próbáljuk, majd csak akkor a bal felsőt,
-        // ha a CraftLive billentyűzet nem kapott szövegmezőt.
-        addUniquePosition(positions, 0.40f, 0.055f);
+        // A jelenlegi Bedrock érintős HUD felül, pontosan középen tartja a chatgombot.
+        // A második középső és a bal felső pont a többi elterjedt HUD-hoz marad meg.
+        addUniquePosition(positions, 0.50f, 0.035f);
+        addUniquePosition(positions, 0.50f, 0.060f);
         addUniquePosition(positions, 0.055f, 0.075f);
 
         if (diagnostic) showToast(R.string.test_opening_chat);
-        tryChatPosition(store, command, diagnostic, metrics, positions, 0);
+        tryChatPosition(store, command, diagnostic, metrics, positions, 0, inputSessionMarker);
     }
 
     private void tryChatPosition(InteractionStore store, String command, boolean diagnostic,
-                                 DisplayMetrics metrics, List<float[]> positions, int index) {
-        if (!isPending(store, command) || CraftLiveImeService.isInputActive()) {
+                                 DisplayMetrics metrics, List<float[]> positions, int index,
+                                 long inputSessionMarker) {
+        if (!isPending(store, command)) return;
+        if (CraftLiveImeService.hasNewMinecraftInputSessionSince(inputSessionMarker)) {
             CraftLiveImeService.tryDeliverPendingCommand();
             return;
         }
         if (index >= positions.size()) {
             if (diagnostic) showToast(R.string.test_chat_not_opened);
+            clearPending(store);
             return;
         }
 
@@ -122,10 +127,16 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
             public void onCompleted(GestureDescription gestureDescription) {
                 mainHandler.postDelayed(CraftLiveImeService::tryDeliverPendingCommand, 250L);
                 mainHandler.postDelayed(() -> {
-                    if (isPending(store, command) && !CraftLiveImeService.isInputActive()) {
-                        tryChatPosition(store, command, diagnostic, metrics, positions, index + 1);
-                    } else {
+                    if (!isPending(store, command)) return;
+                    if (CraftLiveImeService.hasNewMinecraftInputSessionSince(inputSessionMarker)) {
+                        store.preferences().edit()
+                                .putFloat("chat_x_percent", position[0])
+                                .putFloat("chat_y_percent", position[1])
+                                .apply();
                         CraftLiveImeService.tryDeliverPendingCommand();
+                    } else {
+                        tryChatPosition(store, command, diagnostic, metrics, positions, index + 1,
+                                inputSessionMarker);
                     }
                 }, 850L);
             }
@@ -152,6 +163,15 @@ public final class CraftLiveAccessibilityService extends AccessibilityService {
 
     private static boolean isPending(InteractionStore store, String command) {
         return command.equals(store.preferences().getString("pending_command", ""));
+    }
+
+    private static void clearPending(InteractionStore store) {
+        store.preferences().edit()
+                .remove("pending_command")
+                .remove("pending_command_time")
+                .remove("pending_command_diagnostic")
+                .remove("pending_input_session")
+                .apply();
     }
 
     private void showToast(int message) {
