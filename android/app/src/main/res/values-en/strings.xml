@@ -26,7 +26,7 @@
     <string name="choose_keyboard">3. Select CraftLive keyboard</string>
     <string name="check_update">Update</string>
     <string name="calibration">Calibrate chat button</string>
-    <string name="calibration_drag_help">Edit\n\n(Drag the target icon onto Minecraft's chat icon, then press Save.)</string>
+    <string name="calibration_drag_help">Edit\n\n(Drag the target icon onto Minecraft\'s chat icon, then press Save.)</string>
     <string name="calibration_overlay_permission_required">Allow CraftLive to display over other apps. Minecraft will then open automatically.</string>
     <string name="calibration_opening_minecraft">Minecraft is opening. Drag the target onto the chat icon.</string>
     <string name="calibration_overlay_instruction">Drag the target exactly onto the chat icon</string>
