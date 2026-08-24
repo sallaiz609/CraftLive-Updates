@@ -476,8 +476,8 @@ public final class MainActivity extends Activity {
         form.setPadding(dp(20), 0, dp(20), 0);
         TextView help = text(getString(R.string.calibration_help), 16f, R.color.craft_muted, false);
         form.addView(help, marginBottom(10));
-        int xInitial = Math.round(store.preferences().getFloat("chat_x_percent", 0.40f) * 100f);
-        int yInitial = Math.round(store.preferences().getFloat("chat_y_percent", 0.055f) * 100f);
+        int xInitial = Math.round(store.preferences().getFloat("chat_x_percent", 0.50f) * 100f);
+        int yInitial = Math.round(store.preferences().getFloat("chat_y_percent", 0.035f) * 100f);
         TextView xLabel = text(getString(R.string.calibration_x, xInitial), 17f, R.color.craft_text, true);
         SeekBar x = new SeekBar(this);
         x.setMax(100);
