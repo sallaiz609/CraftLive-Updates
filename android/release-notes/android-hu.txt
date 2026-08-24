@@ -1,10 +1,1 @@
-CraftLive Android 0.1.2
-
-Javítva a frissítés felismerése: a verziókód most mindig növekvő, ezért az alkalmazás biztosan felajánlja az új kiadást.
-
-Tartalmazza a 0.1.1 javításait is:
-- Megbízhatóbb Bedrock teszt és Minecraft-parancsküldés.
-- A parancssor már a Minecraft megnyitása előtt elindul.
-- Pontosabb előtér-érzékelés és többszöri kézbesítési próbálkozás.
-- A szükséges billentyűzet és vezérlési engedélyek ellenőrzése.
-- Az engedélyezési rész automatikusan eltűnik, amikor minden aktív.
+Javítva a Bedrock teszt, amikor a Minecraft chat egyáltalán nem nyílt meg. A CraftLive kötelező fekvő módban fut, a Minecraft tényleges fekvő kijelzőméretével számol, automatikusan felismeri a két gyakori mobil HUD chatgombhelyét, és több kompatibilis Android-küldési móddal hajtja végre a parancsot. A Bedrock teszt most valóban zombit idéz, és rövid állapotüzenetek mutatják, meddig jutott a vezérlés.
