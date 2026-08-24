@@ -15,6 +15,8 @@ on:
   push:
     tags:
       - "android-v*"
+    branches:
+      - "release/android-*"
 
 permissions:
   contents: write
@@ -34,9 +36,15 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ inputs.version }}"
             MANDATORY="${{ inputs.mandatory }}"
-          else
+          elif [[ "$GITHUB_REF_NAME" == android-v* ]]; then
             VERSION="${GITHUB_REF_NAME#android-v}"
             MANDATORY="true"
+          elif [[ "$GITHUB_REF_NAME" == release/android-* ]]; then
+            VERSION="${GITHUB_REF_NAME#release/android-}"
+            MANDATORY="true"
+          else
+            echo "Unsupported release ref: $GITHUB_REF_NAME"
+            exit 1
           fi
           if [[ ! "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
             echo "Invalid Android version: $VERSION (expected MAJOR.MINOR.PATCH)"
