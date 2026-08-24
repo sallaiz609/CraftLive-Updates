@@ -1,15 +1,13 @@
-# CraftLive Android 0.1.4
+# CraftLive Android 0.1.5
 
-- Javítva a téves „tesztparancs elküldve” visszajelzés.
-- A jelenlegi Bedrock érintős HUD felül középen lévő chatgombját használja alapértelmezetten.
-- A parancs kizárólag egy új, igazoltan a Minecraft által megnyitott beviteli munkamenetbe kerülhet.
-- A CraftLive saját vagy korábban nyitva maradt szövegmezője nem fogadhat Minecraft-parancsot.
-- A sikeresen felismert chatgombhelyet az alkalmazás automatikusan megjegyzi.
+- Javítva az automatikus Bedrock-chatmegnyitás a fekvő Minecraftban.
+- A CraftLive megvárja, amíg a visszanyitott játék ténylegesen fogadja az érintéseket.
+- A valós ablakméret és a gyártói tájolás alapján több biztonságos képernyőgeometriát próbál.
+- A rendszer által megszakított automatikus érintést önállóan újrapróbálja.
 
 ---
 
-- Fixed the false “test command submitted” confirmation.
-- The top-center chat button used by the current Bedrock touch HUD is now the default.
-- Commands can only be written into a new input session verified to belong to Minecraft.
-- CraftLive's own or a stale text field cannot receive a Minecraft command.
-- A successfully detected chat-button position is remembered automatically.
+- Fixed automatic Bedrock chat opening in landscape Minecraft.
+- CraftLive waits until the resumed game can actually receive touches.
+- It tries safe screen geometries based on the real window size and vendor orientation reporting.
+- System-cancelled automatic gestures are retried automatically.
