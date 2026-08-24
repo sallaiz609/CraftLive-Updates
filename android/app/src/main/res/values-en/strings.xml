@@ -44,6 +44,8 @@
     <string name="minecraft_missing">Minecraft Bedrock is not installed.</string>
     <string name="test_queued">The test was added to the fixed 5-second queue.</string>
     <string name="accessibility_missing">Enable CraftLive Minecraft control first.</string>
+    <string name="keyboard_missing">Enable the CraftLive command sender keyboard first.</string>
+    <string name="keyboard_not_selected">Select CraftLive command sender as the active keyboard.</string>
     <string name="notification_channel">CraftLive interactions</string>
     <string name="notification_title">CraftLive monitoring is active</string>
     <string name="notification_text">Fixed 5-second protection · queued commands: %1$d</string>
@@ -71,6 +73,6 @@
     <string name="update_bad_signature">The APK signature must match the installed CraftLive. Always use the same release key for GitHub releases.</string>
     <string name="calibration_x">Chat button horizontal position: %1$d%%</string>
     <string name="calibration_y">Chat button vertical position: %1$d%%</string>
-    <string name="calibration_help">Set the Bedrock chat button position in portrait mode. Xiaomi 14T Pro default: top left.</string>
+    <string name="calibration_help">Set the Bedrock chat button position as a percentage of the landscape game screen. The new default is 40% horizontally and 6% vertically.</string>
     <string name="queued_count">queued: %1$d</string>
 </resources>

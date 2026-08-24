@@ -1,10 +1,15 @@
-# CraftLive Android
+# CraftLive Android 0.1.1
 
-- Local Minecraft Bedrock control on the same Android device.
-- 20 editable Standard interaction slots.
-- PLUS interactions unlock after 5 verified TikTok LIVE hours.
-- Fixed 5-second safety delay between Minecraft commands.
-- In-app update check, APK download, SHA-256 verification and installer hand-off.
-- Hungarian and English interface based on the Android system language.
+- Javítva a Bedrock teszt és a Minecraft-interakciók parancsküldése.
+- A parancssor már a Minecraft megnyitása előtt biztonságosan elindul.
+- Pontosabb az előtérben lévő alkalmazás érzékelése.
+- Frissült a telefonos, fekvő módú Bedrock chatgomb alaphelye.
+- Az engedélyezési rész automatikusan eltűnik, ha minden szükséges vezérlés aktív.
 
-The app uses Android Accessibility and a dedicated input method only to open Minecraft chat and send commands configured by the user. Android always requires the user to approve an APK installation.
+---
+
+- Fixed Bedrock test and Minecraft interaction command delivery.
+- The command queue now starts safely before Minecraft opens.
+- Foreground-app detection is more accurate.
+- Updated the default Bedrock chat-button location for landscape phone play.
+- The setup section hides automatically when all required controls are active.

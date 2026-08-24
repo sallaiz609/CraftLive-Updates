@@ -1,1 +1,1 @@
-Local Minecraft Bedrock control on Android with 20 Standard interaction slots, PLUS unlocked after 5 verified LIVE hours, a fixed 5-second safety queue, and in-app updates.
+Fixed Bedrock tests and interaction delivery to Minecraft. The command queue now starts before Minecraft opens, foreground detection is more accurate, the mobile chat-button default is updated, and the setup section hides automatically when all required controls are active.

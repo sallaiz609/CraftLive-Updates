@@ -1,8 +1,10 @@
 package hu.craftlive.android;
 
 import android.Manifest;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +20,8 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.view.Gravity;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
+import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -44,6 +48,7 @@ public final class MainActivity extends Activity {
     private Button liveButton;
     private Button standardTab;
     private Button plusTab;
+    private LinearLayout setupContainer;
     private boolean showingPlus;
     private boolean receiverRegistered;
 
@@ -80,8 +85,12 @@ public final class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        CraftLiveAccessibilityService.markForegroundPackage(getPackageName());
         if (updateManager != null) updateManager.resumePendingInstallIfAllowed();
-        if (statusText != null) refreshStatus();
+        if (statusText != null) {
+            refreshStatus();
+            refreshSetupVisibility();
+        }
     }
 
     @Override
@@ -159,19 +168,23 @@ public final class MainActivity extends Activity {
         statusText = panelText(getString(R.string.status_idle), R.color.craft_muted);
         root.addView(statusText, marginBottom(14));
 
-        root.addView(sectionTitle(getString(R.string.setup_note)));
-        root.addView(fullButton(R.string.enable_accessibility, v -> openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
-        root.addView(fullButton(R.string.enable_keyboard, v -> openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS)));
-        root.addView(fullButton(R.string.choose_keyboard, v -> {
+        setupContainer = vertical();
+        setupContainer.addView(sectionTitle(getString(R.string.setup_note)));
+        setupContainer.addView(fullButton(R.string.enable_accessibility,
+                v -> openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
+        setupContainer.addView(fullButton(R.string.enable_keyboard,
+                v -> openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS)));
+        setupContainer.addView(fullButton(R.string.choose_keyboard, v -> {
             InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             if (manager != null) manager.showInputMethodPicker();
         }));
-        root.addView(fullButton(R.string.battery_settings, v -> {
+        setupContainer.addView(fullButton(R.string.battery_settings, v -> {
             Intent details = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.parse("package:" + getPackageName()));
             startActivity(details);
             toast(R.string.setup_incomplete);
         }));
+        root.addView(setupContainer, matchWrap());
 
         LinearLayout toolRow = horizontal();
         toolRow.addView(actionButtonWithClick(R.string.open_minecraft, v -> openMinecraft()), weightedButton());
@@ -200,6 +213,7 @@ public final class MainActivity extends Activity {
         root.addView(slotContainer, matchWrap());
         setContentView(scroll);
         refreshStatus();
+        refreshSetupVisibility();
         rebuildSlots();
     }
 
@@ -345,18 +359,31 @@ public final class MainActivity extends Activity {
             return;
         }
         if (command == null || command.trim().isEmpty()) return;
-        if (!CraftLiveAccessibilityService.isReady()) {
+        if (!isAccessibilityEnabled()) {
             toast(R.string.accessibility_missing);
             openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             return;
         }
-        if (!openMinecraft()) return;
-        handler.postDelayed(() -> {
-            Intent test = new Intent(this, InteractionForegroundService.class)
-                    .setAction(InteractionForegroundService.ACTION_TEST)
-                    .putExtra(InteractionForegroundService.EXTRA_COMMAND, command);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(test); else startService(test);
-        }, 1_800L);
+        if (!isCraftLiveImeEnabled()) {
+            toast(R.string.keyboard_missing);
+            openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS);
+            return;
+        }
+        if (!isCraftLiveImeSelected()) {
+            toast(R.string.keyboard_not_selected);
+            InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (manager != null) manager.showInputMethodPicker();
+            return;
+        }
+        if (getPackageManager().getLaunchIntentForPackage("com.mojang.minecraftpe") == null) {
+            toast(R.string.minecraft_missing);
+            return;
+        }
+        Intent test = new Intent(this, InteractionForegroundService.class)
+                .setAction(InteractionForegroundService.ACTION_TEST)
+                .putExtra(InteractionForegroundService.EXTRA_COMMAND, command);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(test); else startService(test);
+        handler.postDelayed(this::openMinecraft, 180L);
         toast(R.string.test_queued);
     }
 
@@ -401,6 +428,47 @@ public final class MainActivity extends Activity {
             plusProgress.setText(getString(R.string.plus_locked, hours));
         }
         if (!store.isPlusUnlocked() && showingPlus) switchTab(false);
+        refreshSetupVisibility();
+    }
+
+    private void refreshSetupVisibility() {
+        if (setupContainer == null) return;
+        boolean ready = isAccessibilityEnabled() && isCraftLiveImeEnabled() && isCraftLiveImeSelected();
+        setupContainer.setVisibility(ready ? View.GONE : View.VISIBLE);
+    }
+
+    private boolean isAccessibilityEnabled() {
+        AccessibilityManager manager = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
+        if (manager == null || !manager.isEnabled()) return false;
+        ComponentName expected = new ComponentName(this, CraftLiveAccessibilityService.class);
+        List<AccessibilityServiceInfo> enabled = manager.getEnabledAccessibilityServiceList(
+                AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+        for (AccessibilityServiceInfo info : enabled) {
+            if (info.getResolveInfo() == null || info.getResolveInfo().serviceInfo == null) continue;
+            ComponentName actual = new ComponentName(
+                    info.getResolveInfo().serviceInfo.packageName,
+                    info.getResolveInfo().serviceInfo.name);
+            if (expected.equals(actual)) return true;
+        }
+        return CraftLiveAccessibilityService.isReady();
+    }
+
+    private boolean isCraftLiveImeEnabled() {
+        InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        if (manager == null) return false;
+        ComponentName expected = new ComponentName(this, CraftLiveImeService.class);
+        for (InputMethodInfo info : manager.getEnabledInputMethodList()) {
+            ComponentName actual = ComponentName.unflattenFromString(info.getId());
+            if (expected.equals(actual)) return true;
+        }
+        return false;
+    }
+
+    private boolean isCraftLiveImeSelected() {
+        String selected = Settings.Secure.getString(
+                getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
+        ComponentName actual = selected == null ? null : ComponentName.unflattenFromString(selected);
+        return new ComponentName(this, CraftLiveImeService.class).equals(actual);
     }
 
     private void showCalibration() {
@@ -408,8 +476,8 @@ public final class MainActivity extends Activity {
         form.setPadding(dp(20), 0, dp(20), 0);
         TextView help = text(getString(R.string.calibration_help), 16f, R.color.craft_muted, false);
         form.addView(help, marginBottom(10));
-        int xInitial = Math.round(store.preferences().getFloat("chat_x_percent", 0.055f) * 100f);
-        int yInitial = Math.round(store.preferences().getFloat("chat_y_percent", 0.075f) * 100f);
+        int xInitial = Math.round(store.preferences().getFloat("chat_x_percent", 0.40f) * 100f);
+        int yInitial = Math.round(store.preferences().getFloat("chat_y_percent", 0.055f) * 100f);
         TextView xLabel = text(getString(R.string.calibration_x, xInitial), 17f, R.color.craft_text, true);
         SeekBar x = new SeekBar(this);
         x.setMax(100);
