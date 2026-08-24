@@ -37,6 +37,7 @@ public final class InteractionForegroundService extends Service implements
     private final AtomicBoolean workerRunning = new AtomicBoolean(false);
     private final ScheduledExecutorService ticker = Executors.newSingleThreadScheduledExecutor();
     private InteractionStore store;
+    private GiftCatalogStore giftCatalog;
     private TikTokConnector connector;
     private BedrockWebSocketServer bedrockServer;
     private volatile boolean liveConnected;
@@ -69,6 +70,7 @@ public final class InteractionForegroundService extends Service implements
         super.onCreate();
         instance = this;
         store = new InteractionStore(this);
+        giftCatalog = new GiftCatalogStore(this);
         store.preferences().edit()
                 .putString("bedrock_bridge_status", "starting")
                 .putString("bedrock_bridge_detail", "")
@@ -156,6 +158,12 @@ public final class InteractionForegroundService extends Service implements
     }
 
     @Override
+    public void onGiftCatalog(List<GiftCatalogItem> gifts) {
+        if (giftCatalog != null) giftCatalog.merge(gifts);
+        sendStatusBroadcast();
+    }
+
+    @Override
     public void onEvent(InteractionSlot.TriggerType type, String key, int amount, String user) {
         if (type == InteractionSlot.TriggerType.LIKE) {
             handleLikeEvent(Math.max(1, amount), user);
@@ -197,7 +205,7 @@ public final class InteractionForegroundService extends Service implements
 
     @Override
     public void onBedrockListening() {
-        writeBedrockStatus("listening", "");
+        writeBedrockStatus("listening", BedrockConnectionAddresses.preferredAddress());
     }
 
     @Override
@@ -207,7 +215,7 @@ public final class InteractionForegroundService extends Service implements
 
     @Override
     public void onBedrockDisconnected() {
-        writeBedrockStatus("listening", "");
+        writeBedrockStatus("listening", BedrockConnectionAddresses.preferredAddress());
     }
 
     @Override
