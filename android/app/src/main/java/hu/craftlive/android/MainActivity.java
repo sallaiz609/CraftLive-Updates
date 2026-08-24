@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -20,7 +19,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.view.Gravity;
-import android.view.Surface;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.InputMethodInfo;
@@ -31,9 +29,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,8 +37,6 @@ import java.util.List;
 import java.util.Locale;
 
 public final class MainActivity extends Activity {
-    private static final String PREF_AUTO_ROTATE_LANDSCAPE = "auto_rotate_landscape";
-
     private final Handler handler = new Handler(Looper.getMainLooper());
     private InteractionStore store;
     private UpdateManager updateManager;
@@ -54,8 +48,13 @@ public final class MainActivity extends Activity {
     private Button standardTab;
     private Button plusTab;
     private LinearLayout setupContainer;
+    private Button accessibilitySetupButton;
+    private Button keyboardSetupButton;
+    private Button keyboardPickerButton;
+    private Button batterySetupButton;
     private boolean showingPlus;
     private boolean receiverRegistered;
+    private boolean calibrationPermissionPending;
 
     private final BroadcastReceiver statusReceiver = new BroadcastReceiver() {
         @Override
@@ -68,7 +67,6 @@ public final class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         store = new InteractionStore(this);
-        applyLandscapeRotation(store.preferences().getBoolean(PREF_AUTO_ROTATE_LANDSCAPE, true));
         store.clearTikTokUsernameForNewVersion(versionCode());
         updateManager = new UpdateManager(this);
         requestNotificationPermission();
@@ -93,9 +91,20 @@ public final class MainActivity extends Activity {
         super.onResume();
         CraftLiveAccessibilityService.markForegroundPackage(getPackageName());
         if (updateManager != null) updateManager.resumePendingInstallIfAllowed();
+        if (calibrationPermissionPending) {
+            calibrationPermissionPending = false;
+            if (Settings.canDrawOverlays(this)) {
+                handler.postDelayed(this::launchCalibrationEditor, 300L);
+            } else {
+                toast(R.string.calibration_overlay_permission_required);
+            }
+        }
         if (statusText != null) {
             refreshStatus();
             refreshSetupVisibility();
+            // Android may reconnect accessibility and IME services shortly after an
+            // application update. Recheck without asking the user to toggle anything.
+            handler.postDelayed(this::refreshSetupVisibility, 900L);
         }
     }
 
@@ -136,6 +145,9 @@ public final class MainActivity extends Activity {
         header.addView(version);
         root.addView(header, marginBottom(18));
 
+        Button calibrationMenu = fullButton(R.string.calibration, v -> showCalibrationMenu());
+        root.addView(calibrationMenu);
+
         LinearLayout tabRow = horizontal();
         standardTab = actionButton(getString(R.string.standard), true);
         plusTab = actionButton(getString(R.string.plus), false);
@@ -151,31 +163,6 @@ public final class MainActivity extends Activity {
 
         TextView safety = panelText(getString(R.string.fixed_delay), R.color.craft_green);
         root.addView(safety, marginBottom(12));
-
-        LinearLayout rotationPanel = horizontal();
-        rotationPanel.setGravity(Gravity.CENTER_VERTICAL);
-        rotationPanel.setPadding(dp(14), dp(10), dp(14), dp(10));
-        rotationPanel.setBackground(panelBackground(R.color.craft_panel, 1, R.color.craft_panel_alt));
-        LinearLayout rotationText = vertical();
-        rotationText.addView(text(getString(R.string.auto_rotate), 18f, R.color.craft_text, true));
-        TextView rotationDescription = text(getString(R.string.auto_rotate_description),
-                15f, R.color.craft_muted, false);
-        rotationDescription.setPadding(0, dp(3), dp(10), 0);
-        rotationText.addView(rotationDescription);
-        rotationPanel.addView(rotationText,
-                new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        Switch autoRotate = new Switch(this);
-        boolean autoRotateEnabled = store.preferences().getBoolean(PREF_AUTO_ROTATE_LANDSCAPE, true);
-        autoRotate.setChecked(autoRotateEnabled);
-        autoRotate.setContentDescription(getString(R.string.auto_rotate));
-        autoRotate.setOnCheckedChangeListener((buttonView, checked) -> {
-            store.preferences().edit().putBoolean(PREF_AUTO_ROTATE_LANDSCAPE, checked).apply();
-            applyLandscapeRotation(checked);
-            toast(checked ? R.string.auto_rotate_enabled : R.string.auto_rotate_locked);
-        });
-        rotationPanel.addView(autoRotate,
-                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(52)));
-        root.addView(rotationPanel, marginBottom(12));
 
         usernameInput = new EditText(this);
         usernameInput.setHint(R.string.tiktok_username);
@@ -201,20 +188,24 @@ public final class MainActivity extends Activity {
 
         setupContainer = vertical();
         setupContainer.addView(sectionTitle(getString(R.string.setup_note)));
-        setupContainer.addView(fullButton(R.string.enable_accessibility,
-                v -> openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
-        setupContainer.addView(fullButton(R.string.enable_keyboard,
-                v -> openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS)));
-        setupContainer.addView(fullButton(R.string.choose_keyboard, v -> {
+        accessibilitySetupButton = fullButton(R.string.enable_accessibility,
+                v -> openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+        keyboardSetupButton = fullButton(R.string.enable_keyboard,
+                v -> openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS));
+        keyboardPickerButton = fullButton(R.string.choose_keyboard, v -> {
             InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             if (manager != null) manager.showInputMethodPicker();
-        }));
-        setupContainer.addView(fullButton(R.string.battery_settings, v -> {
+        });
+        batterySetupButton = fullButton(R.string.battery_settings, v -> {
             Intent details = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.parse("package:" + getPackageName()));
             startActivity(details);
             toast(R.string.setup_incomplete);
-        }));
+        });
+        setupContainer.addView(accessibilitySetupButton);
+        setupContainer.addView(keyboardSetupButton);
+        setupContainer.addView(keyboardPickerButton);
+        setupContainer.addView(batterySetupButton);
         root.addView(setupContainer, matchWrap());
 
         LinearLayout toolRow = horizontal();
@@ -223,12 +214,7 @@ public final class MainActivity extends Activity {
                 v -> testCommand("/summon zombie ~ ~1 ~")), weightedButton());
         root.addView(toolRow, marginBottom(8));
 
-        LinearLayout updateRow = horizontal();
-        updateRow.addView(actionButtonWithClick(R.string.check_update,
-                v -> updateManager.check(true)), weightedButton());
-        updateRow.addView(actionButtonWithClick(R.string.calibration,
-                v -> showCalibration()), weightedButton());
-        root.addView(updateRow, marginBottom(8));
+        root.addView(fullButton(R.string.check_update, v -> updateManager.check(true)));
 
         Button support = fullButton(R.string.support_creator, v -> {
             Intent profile = new Intent(Intent.ACTION_VIEW,
@@ -464,35 +450,53 @@ public final class MainActivity extends Activity {
 
     private void refreshSetupVisibility() {
         if (setupContainer == null) return;
-        boolean ready = isAccessibilityEnabled() && isCraftLiveImeEnabled() && isCraftLiveImeSelected();
-        setupContainer.setVisibility(ready ? View.GONE : View.VISIBLE);
+        boolean accessibilityReady = isAccessibilityEnabled();
+        boolean keyboardEnabled = isCraftLiveImeEnabled();
+        boolean keyboardSelected = isCraftLiveImeSelected();
+
+        accessibilitySetupButton.setVisibility(accessibilityReady ? View.GONE : View.VISIBLE);
+        keyboardSetupButton.setVisibility(keyboardEnabled ? View.GONE : View.VISIBLE);
+        keyboardPickerButton.setVisibility(
+                keyboardEnabled && !keyboardSelected ? View.VISIBLE : View.GONE);
+
+        // The battery page is guidance, not a permission that should block use.
+        // Keep it available only during the first incomplete setup; never force it
+        // back on an already configured user after an application update.
+        boolean actualSetupMissing = !accessibilityReady || !keyboardEnabled || !keyboardSelected;
+        batterySetupButton.setVisibility(actualSetupMissing ? View.VISIBLE : View.GONE);
+        setupContainer.setVisibility(actualSetupMissing ? View.VISIBLE : View.GONE);
     }
 
     private boolean isAccessibilityEnabled() {
         AccessibilityManager manager = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
-        if (manager == null || !manager.isEnabled()) return false;
         ComponentName expected = new ComponentName(this, CraftLiveAccessibilityService.class);
-        List<AccessibilityServiceInfo> enabled = manager.getEnabledAccessibilityServiceList(
-                AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
-        for (AccessibilityServiceInfo info : enabled) {
-            if (info.getResolveInfo() == null || info.getResolveInfo().serviceInfo == null) continue;
-            ComponentName actual = new ComponentName(
-                    info.getResolveInfo().serviceInfo.packageName,
-                    info.getResolveInfo().serviceInfo.name);
-            if (expected.equals(actual)) return true;
+        if (manager != null && manager.isEnabled()) {
+            List<AccessibilityServiceInfo> enabled = manager.getEnabledAccessibilityServiceList(
+                    AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+            for (AccessibilityServiceInfo info : enabled) {
+                if (info.getResolveInfo() == null || info.getResolveInfo().serviceInfo == null) continue;
+                ComponentName actual = new ComponentName(
+                        info.getResolveInfo().serviceInfo.packageName,
+                        info.getResolveInfo().serviceInfo.name);
+                if (expected.equals(actual)) return true;
+            }
         }
+        // The service connection may still be restarting after an APK update while
+        // Android's persisted setting is already correct.
+        if (secureComponentListContains(Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, expected)) return true;
         return CraftLiveAccessibilityService.isReady();
     }
 
     private boolean isCraftLiveImeEnabled() {
         InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        if (manager == null) return false;
         ComponentName expected = new ComponentName(this, CraftLiveImeService.class);
-        for (InputMethodInfo info : manager.getEnabledInputMethodList()) {
-            ComponentName actual = ComponentName.unflattenFromString(info.getId());
-            if (expected.equals(actual)) return true;
+        if (manager != null) {
+            for (InputMethodInfo info : manager.getEnabledInputMethodList()) {
+                ComponentName actual = ComponentName.unflattenFromString(info.getId());
+                if (expected.equals(actual)) return true;
+            }
         }
-        return false;
+        return secureComponentListContains(Settings.Secure.ENABLED_INPUT_METHODS, expected);
     }
 
     private boolean isCraftLiveImeSelected() {
@@ -502,48 +506,46 @@ public final class MainActivity extends Activity {
         return new ComponentName(this, CraftLiveImeService.class).equals(actual);
     }
 
-    private void showCalibration() {
-        LinearLayout form = vertical();
-        form.setPadding(dp(20), 0, dp(20), 0);
-        TextView help = text(getString(R.string.calibration_help), 16f, R.color.craft_muted, false);
-        form.addView(help, marginBottom(10));
-        int xInitial = Math.round(store.preferences().getFloat("chat_x_percent", 0.50f) * 100f);
-        int yInitial = Math.round(store.preferences().getFloat("chat_y_percent", 0.035f) * 100f);
-        TextView xLabel = text(getString(R.string.calibration_x, xInitial), 17f, R.color.craft_text, true);
-        SeekBar x = new SeekBar(this);
-        x.setMax(100);
-        x.setProgress(xInitial);
-        form.addView(xLabel);
-        form.addView(x);
-        TextView yLabel = text(getString(R.string.calibration_y, yInitial), 17f, R.color.craft_text, true);
-        SeekBar y = new SeekBar(this);
-        y.setMax(100);
-        y.setProgress(yInitial);
-        form.addView(yLabel);
-        form.addView(y);
-        x.setOnSeekBarChangeListener(labelListener(xLabel, R.string.calibration_x));
-        y.setOnSeekBarChangeListener(labelListener(yLabel, R.string.calibration_y));
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.calibration)
-                .setView(form)
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.save, (dialog, which) -> {
-                    store.preferences().edit()
-                            .putFloat("chat_x_percent", Math.max(1, x.getProgress()) / 100f)
-                            .putFloat("chat_y_percent", Math.max(1, y.getProgress()) / 100f)
-                            .apply();
-                    toast(R.string.saved);
-                }).show();
+    private boolean secureComponentListContains(String settingName, ComponentName expected) {
+        String value = Settings.Secure.getString(getContentResolver(), settingName);
+        if (value == null || value.trim().isEmpty()) return false;
+        for (String item : value.split(":")) {
+            String componentValue = item.trim();
+            int subtypeSeparator = componentValue.indexOf(';');
+            if (subtypeSeparator >= 0) componentValue = componentValue.substring(0, subtypeSeparator);
+            ComponentName actual = ComponentName.unflattenFromString(componentValue);
+            if (expected.equals(actual)) return true;
+        }
+        return false;
     }
 
-    private SeekBar.OnSeekBarChangeListener labelListener(TextView label, int formatResource) {
-        return new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                label.setText(getString(formatResource, progress));
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-        };
+    private void showCalibrationMenu() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.calibration)
+                .setMessage(R.string.calibration_drag_help)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.edit, (dialog, which) -> requestCalibrationEditor())
+                .show();
+    }
+
+    private void requestCalibrationEditor() {
+        if (!Settings.canDrawOverlays(this)) {
+            calibrationPermissionPending = true;
+            Intent permission = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivity(permission);
+            toast(R.string.calibration_overlay_permission_required);
+            return;
+        }
+        launchCalibrationEditor();
+    }
+
+    private void launchCalibrationEditor() {
+        Intent overlay = new Intent(this, CalibrationOverlayService.class)
+                .setAction(CalibrationOverlayService.ACTION_SHOW);
+        startService(overlay);
+        handler.postDelayed(this::openMinecraft, 180L);
+        toast(R.string.calibration_opening_minecraft);
     }
 
     private void openSettings(String action) {
@@ -556,21 +558,6 @@ public final class MainActivity extends Activity {
                 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 51);
         }
-    }
-
-    private void applyLandscapeRotation(boolean automatic) {
-        if (automatic) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-            return;
-        }
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        boolean reverseLandscape = rotation == Surface.ROTATION_270
-                || (rotation == Surface.ROTATION_180
-                && getResources().getConfiguration().orientation
-                == android.content.res.Configuration.ORIENTATION_LANDSCAPE);
-        setRequestedOrientation(reverseLandscape
-                ? ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-                : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     private String triggerLabel(InteractionSlot.TriggerType type) {

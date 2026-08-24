@@ -12,10 +12,6 @@
     <string name="plus_locked">PLUS lezárva – %1$.1f / 5 LIVE óra</string>
     <string name="plus_unlocked">PLUS feloldva – extrém interakciók elérhetők</string>
     <string name="fixed_delay">Fix védelem: minden Minecraft-interakció között 5 másodperc telik el.</string>
-    <string name="auto_rotate">Automatikus forgatás</string>
-    <string name="auto_rotate_description">Bekapcsolva a CraftLive követi a telefon két fekvő irányát. Kikapcsolva az aktuális fekvő helyzetet rögzíti.</string>
-    <string name="auto_rotate_enabled">Az automatikus fekvő forgatás bekapcsolva.</string>
-    <string name="auto_rotate_locked">Az aktuális fekvő irány rögzítve.</string>
     <string name="tiktok_username">TikTok-felhasználónév (@ nélkül)</string>
     <string name="save">Mentés</string>
     <string name="start_live">LIVE figyelés indítása</string>
@@ -30,6 +26,11 @@
     <string name="choose_keyboard">3. CraftLive billentyűzet kiválasztása</string>
     <string name="check_update">Frissítés</string>
     <string name="calibration">Chatgomb kalibrálása</string>
+    <string name="calibration_drag_help">Szerkesztés\n\n(Húzd a célkereszt ikont a Minecraft chat ikonjára, majd nyomd meg a Mentés gombot.)</string>
+    <string name="calibration_overlay_permission_required">Engedélyezd a CraftLive megjelenítését más alkalmazások felett. Utána automatikusan megnyílik a Minecraft.</string>
+    <string name="calibration_opening_minecraft">A Minecraft megnyílik. Húzd a célkeresztet a chat ikonra.</string>
+    <string name="calibration_overlay_instruction">Húzd a célkeresztet pontosan a chat ikonra</string>
+    <string name="calibration_saved">A chatgomb pontos helye elmentve.</string>
     <string name="battery_settings">4. Háttérfutás / akkumulátor beállítása</string>
     <string name="support_creator">Készítő követése · @venom_hun_</string>
     <string name="interaction_slots">Interakciók – 20 szabad hely</string>
@@ -78,8 +79,5 @@
     <string name="comment">Komment</string>
     <string name="setup_incomplete">A rendszerbeállítások megnyíltak. Engedélyezés után térj vissza a CraftLive-ba.</string>
     <string name="update_bad_signature">Az APK aláírásának egyeznie kell a telepített CraftLive-éval. A GitHub-kiadásnál mindig ugyanazt a kiadási kulcsot használd.</string>
-    <string name="calibration_x">Chatgomb vízszintes helye: %1$d%%</string>
-    <string name="calibration_y">Chatgomb függőleges helye: %1$d%%</string>
-    <string name="calibration_help">Add meg a Bedrock chatgombjának helyét a fekvő játékképernyő százalékában. Az új alapérték: 50% vízszintesen és 4% függőlegesen.</string>
     <string name="queued_count">várakozó: %1$d</string>
 </resources>
