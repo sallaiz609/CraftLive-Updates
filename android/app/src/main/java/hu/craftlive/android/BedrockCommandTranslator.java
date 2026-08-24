@@ -38,6 +38,17 @@ public final class BedrockCommandTranslator {
 
     private static String sanitize(String value) {
         if (value == null) return "";
-        return value.replaceAll("[^\\p{L}\\p{N}_ .@-]", "").trim();
+        int stop = value.length();
+        for (int index = 0; index < value.length(); index++) {
+            char character = value.charAt(index);
+            if (character == ';' || character == '/' || character == '\\'
+                    || character == '\r' || character == '\n') {
+                stop = index;
+                break;
+            }
+        }
+        String safePrefix = value.substring(0, stop);
+        if (safePrefix.length() > 64) safePrefix = safePrefix.substring(0, 64);
+        return safePrefix.replaceAll("[^\\p{L}\\p{N}_ .@-]", "").trim();
     }
 }
