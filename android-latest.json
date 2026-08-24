@@ -1,9 +1,9 @@
 {
-  "versionCode": 1003,
-  "versionName": "0.1.0",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.0/CraftLive-Android-0.1.0.apk",
-  "sha256": "7ef16978513f9bdc9e0f9525984237f19c98ccf967b879b7e0afbb0942d3cfbe",
-  "notesHu": "Helyi Minecraft Bedrock-vezérlés Androidon, 20 Standard interakciós hellyel, 5 LIVE óra után feloldható PLUS résszel, fix 5 másodperces védelemmel és alkalmazáson belüli frissítéssel.",
-  "notesEn": "Local Minecraft Bedrock control on Android with 20 Standard interaction slots, PLUS unlocked after 5 verified LIVE hours, a fixed 5-second safety queue, and in-app updates.",
+  "versionCode": 1001,
+  "versionName": "0.1.1",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.1/CraftLive-Android-0.1.1.apk",
+  "sha256": "cb0a8e4fe50ab10932600922e735e672fe6bc60d8062e6a7ad8fab0804b130bd",
+  "notesHu": "Javítva a Bedrock teszt és az interakciók Minecraftba küldése. A parancssor már a Minecraft megnyitása előtt biztonságosan elindul, pontosabb az előtér-érzékelés, új telefonos chatgomb-alapérték került be, és az engedélyezési rész automatikusan eltűnik, amikor minden szükséges vezérlés aktív.",
+  "notesEn": "Fixed Bedrock tests and interaction delivery to Minecraft. The command queue now starts before Minecraft opens, foreground detection is more accurate, the mobile chat-button default is updated, and the setup section hides automatically when all required controls are active.",
   "mandatory": true
 }
