@@ -54,7 +54,7 @@
     <string name="update_later">Később</string>
     <string name="update_downloading">Frissítés letöltése…</string>
     <string name="update_error">A frissítés nem sikerült: %1$s</string>
-    <string name="update_permission">Engedélyezd a CraftLive számára az ismeretlen alkalmazások telepítését, majd nyomd meg újra a Frissítés gombot.</string>
+    <string name="update_permission">Engedélyezd a CraftLive számára az ismeretlen alkalmazások telepítését. Visszatéréskor a letöltés automatikusan folytatódik.</string>
     <string name="update_install">A letöltés kész. Hagyd jóvá a rendszer telepítési ablakát.</string>
     <string name="mandatory_update">Ez kötelező frissítés.</string>
     <string name="setup_note">A működéshez a Minecraft legyen megnyitva, a világban legyenek engedélyezve a csalások/parancsok, és a CraftLive parancsküldő legyen az aktív billentyűzet.</string>
@@ -72,4 +72,5 @@
     <string name="calibration_x">Chatgomb vízszintes helye: %1$d%%</string>
     <string name="calibration_y">Chatgomb függőleges helye: %1$d%%</string>
     <string name="calibration_help">Álló módban add meg a Bedrock chatgombjának helyét. Xiaomi 14T Pro alapérték: bal felső sarok.</string>
+    <string name="queued_count">várakozó: %1$d</string>
 </resources>
