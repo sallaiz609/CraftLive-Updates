@@ -48,6 +48,10 @@ public final class MainActivity extends Activity {
     private Button standardTab;
     private Button plusTab;
     private LinearLayout setupContainer;
+    private Button accessibilitySetupButton;
+    private Button keyboardSetupButton;
+    private Button keyboardPickerButton;
+    private Button batterySetupButton;
     private boolean showingPlus;
     private boolean receiverRegistered;
     private boolean calibrationPermissionPending;
@@ -98,6 +102,9 @@ public final class MainActivity extends Activity {
         if (statusText != null) {
             refreshStatus();
             refreshSetupVisibility();
+            // Android may reconnect accessibility and IME services shortly after an
+            // application update. Recheck without asking the user to toggle anything.
+            handler.postDelayed(this::refreshSetupVisibility, 900L);
         }
     }
 
@@ -181,20 +188,24 @@ public final class MainActivity extends Activity {
 
         setupContainer = vertical();
         setupContainer.addView(sectionTitle(getString(R.string.setup_note)));
-        setupContainer.addView(fullButton(R.string.enable_accessibility,
-                v -> openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
-        setupContainer.addView(fullButton(R.string.enable_keyboard,
-                v -> openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS)));
-        setupContainer.addView(fullButton(R.string.choose_keyboard, v -> {
+        accessibilitySetupButton = fullButton(R.string.enable_accessibility,
+                v -> openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+        keyboardSetupButton = fullButton(R.string.enable_keyboard,
+                v -> openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS));
+        keyboardPickerButton = fullButton(R.string.choose_keyboard, v -> {
             InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             if (manager != null) manager.showInputMethodPicker();
-        }));
-        setupContainer.addView(fullButton(R.string.battery_settings, v -> {
+        });
+        batterySetupButton = fullButton(R.string.battery_settings, v -> {
             Intent details = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.parse("package:" + getPackageName()));
             startActivity(details);
             toast(R.string.setup_incomplete);
-        }));
+        });
+        setupContainer.addView(accessibilitySetupButton);
+        setupContainer.addView(keyboardSetupButton);
+        setupContainer.addView(keyboardPickerButton);
+        setupContainer.addView(batterySetupButton);
         root.addView(setupContainer, matchWrap());
 
         LinearLayout toolRow = horizontal();
@@ -439,35 +450,53 @@ public final class MainActivity extends Activity {
 
     private void refreshSetupVisibility() {
         if (setupContainer == null) return;
-        boolean ready = isAccessibilityEnabled() && isCraftLiveImeEnabled() && isCraftLiveImeSelected();
-        setupContainer.setVisibility(ready ? View.GONE : View.VISIBLE);
+        boolean accessibilityReady = isAccessibilityEnabled();
+        boolean keyboardEnabled = isCraftLiveImeEnabled();
+        boolean keyboardSelected = isCraftLiveImeSelected();
+
+        accessibilitySetupButton.setVisibility(accessibilityReady ? View.GONE : View.VISIBLE);
+        keyboardSetupButton.setVisibility(keyboardEnabled ? View.GONE : View.VISIBLE);
+        keyboardPickerButton.setVisibility(
+                keyboardEnabled && !keyboardSelected ? View.VISIBLE : View.GONE);
+
+        // The battery page is guidance, not a permission that should block use.
+        // Keep it available only during the first incomplete setup; never force it
+        // back on an already configured user after an application update.
+        boolean actualSetupMissing = !accessibilityReady || !keyboardEnabled || !keyboardSelected;
+        batterySetupButton.setVisibility(actualSetupMissing ? View.VISIBLE : View.GONE);
+        setupContainer.setVisibility(actualSetupMissing ? View.VISIBLE : View.GONE);
     }
 
     private boolean isAccessibilityEnabled() {
         AccessibilityManager manager = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
-        if (manager == null || !manager.isEnabled()) return false;
         ComponentName expected = new ComponentName(this, CraftLiveAccessibilityService.class);
-        List<AccessibilityServiceInfo> enabled = manager.getEnabledAccessibilityServiceList(
-                AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
-        for (AccessibilityServiceInfo info : enabled) {
-            if (info.getResolveInfo() == null || info.getResolveInfo().serviceInfo == null) continue;
-            ComponentName actual = new ComponentName(
-                    info.getResolveInfo().serviceInfo.packageName,
-                    info.getResolveInfo().serviceInfo.name);
-            if (expected.equals(actual)) return true;
+        if (manager != null && manager.isEnabled()) {
+            List<AccessibilityServiceInfo> enabled = manager.getEnabledAccessibilityServiceList(
+                    AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+            for (AccessibilityServiceInfo info : enabled) {
+                if (info.getResolveInfo() == null || info.getResolveInfo().serviceInfo == null) continue;
+                ComponentName actual = new ComponentName(
+                        info.getResolveInfo().serviceInfo.packageName,
+                        info.getResolveInfo().serviceInfo.name);
+                if (expected.equals(actual)) return true;
+            }
         }
+        // The service connection may still be restarting after an APK update while
+        // Android's persisted setting is already correct.
+        if (secureComponentListContains(Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, expected)) return true;
         return CraftLiveAccessibilityService.isReady();
     }
 
     private boolean isCraftLiveImeEnabled() {
         InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        if (manager == null) return false;
         ComponentName expected = new ComponentName(this, CraftLiveImeService.class);
-        for (InputMethodInfo info : manager.getEnabledInputMethodList()) {
-            ComponentName actual = ComponentName.unflattenFromString(info.getId());
-            if (expected.equals(actual)) return true;
+        if (manager != null) {
+            for (InputMethodInfo info : manager.getEnabledInputMethodList()) {
+                ComponentName actual = ComponentName.unflattenFromString(info.getId());
+                if (expected.equals(actual)) return true;
+            }
         }
-        return false;
+        return secureComponentListContains(Settings.Secure.ENABLED_INPUT_METHODS, expected);
     }
 
     private boolean isCraftLiveImeSelected() {
@@ -475,6 +504,19 @@ public final class MainActivity extends Activity {
                 getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
         ComponentName actual = selected == null ? null : ComponentName.unflattenFromString(selected);
         return new ComponentName(this, CraftLiveImeService.class).equals(actual);
+    }
+
+    private boolean secureComponentListContains(String settingName, ComponentName expected) {
+        String value = Settings.Secure.getString(getContentResolver(), settingName);
+        if (value == null || value.trim().isEmpty()) return false;
+        for (String item : value.split(":")) {
+            String componentValue = item.trim();
+            int subtypeSeparator = componentValue.indexOf(';');
+            if (subtypeSeparator >= 0) componentValue = componentValue.substring(0, subtypeSeparator);
+            ComponentName actual = ComponentName.unflattenFromString(componentValue);
+            if (expected.equals(actual)) return true;
+        }
+        return false;
     }
 
     private void showCalibrationMenu() {
