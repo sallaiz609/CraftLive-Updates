@@ -44,6 +44,8 @@
     <string name="minecraft_missing">A Minecraft Bedrock nincs telepítve.</string>
     <string name="test_queued">A teszt bekerült a fix 5 másodperces sorba.</string>
     <string name="accessibility_missing">Előbb engedélyezd a CraftLive Minecraft-vezérlést.</string>
+    <string name="keyboard_missing">Előbb engedélyezd a CraftLive parancsküldő billentyűzetet.</string>
+    <string name="keyboard_not_selected">Válaszd ki aktív billentyűzetként a CraftLive parancsküldőt.</string>
     <string name="notification_channel">CraftLive interakciók</string>
     <string name="notification_title">CraftLive figyelés aktív</string>
     <string name="notification_text">Fix 5 mp-es védelem · várakozó parancsok: %1$d</string>
@@ -71,6 +73,6 @@
     <string name="update_bad_signature">Az APK aláírásának egyeznie kell a telepített CraftLive-éval. A GitHub-kiadásnál mindig ugyanazt a kiadási kulcsot használd.</string>
     <string name="calibration_x">Chatgomb vízszintes helye: %1$d%%</string>
     <string name="calibration_y">Chatgomb függőleges helye: %1$d%%</string>
-    <string name="calibration_help">Álló módban add meg a Bedrock chatgombjának helyét. Xiaomi 14T Pro alapérték: bal felső sarok.</string>
+    <string name="calibration_help">Add meg a Bedrock chatgombjának helyét a fekvő játékképernyő százalékában. Az új alapérték: 40% vízszintesen és 6% függőlegesen.</string>
     <string name="queued_count">várakozó: %1$d</string>
 </resources>
