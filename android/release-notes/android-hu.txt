@@ -1,1 +1,1 @@
-Helyi Minecraft Bedrock-vezérlés Androidon, 20 Standard interakciós hellyel, 5 LIVE óra után feloldható PLUS résszel, fix 5 másodperces védelemmel és alkalmazáson belüli frissítéssel.
+Javítva a Bedrock teszt és az interakciók Minecraftba küldése. A parancssor már a Minecraft megnyitása előtt biztonságosan elindul, pontosabb az előtér-érzékelés, új telefonos chatgomb-alapérték került be, és az engedélyezési rész automatikusan eltűnik, amikor minden szükséges vezérlés aktív.
