@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -19,6 +20,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.view.Gravity;
+import android.view.Surface;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.InputMethodInfo;
@@ -31,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +41,8 @@ import java.util.List;
 import java.util.Locale;
 
 public final class MainActivity extends Activity {
+    private static final String PREF_AUTO_ROTATE_LANDSCAPE = "auto_rotate_landscape";
+
     private final Handler handler = new Handler(Looper.getMainLooper());
     private InteractionStore store;
     private UpdateManager updateManager;
@@ -63,6 +68,7 @@ public final class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         store = new InteractionStore(this);
+        applyLandscapeRotation(store.preferences().getBoolean(PREF_AUTO_ROTATE_LANDSCAPE, true));
         store.clearTikTokUsernameForNewVersion(versionCode());
         updateManager = new UpdateManager(this);
         requestNotificationPermission();
@@ -145,6 +151,31 @@ public final class MainActivity extends Activity {
 
         TextView safety = panelText(getString(R.string.fixed_delay), R.color.craft_green);
         root.addView(safety, marginBottom(12));
+
+        LinearLayout rotationPanel = horizontal();
+        rotationPanel.setGravity(Gravity.CENTER_VERTICAL);
+        rotationPanel.setPadding(dp(14), dp(10), dp(14), dp(10));
+        rotationPanel.setBackground(panelBackground(R.color.craft_panel, 1, R.color.craft_panel_alt));
+        LinearLayout rotationText = vertical();
+        rotationText.addView(text(getString(R.string.auto_rotate), 18f, R.color.craft_text, true));
+        TextView rotationDescription = text(getString(R.string.auto_rotate_description),
+                15f, R.color.craft_muted, false);
+        rotationDescription.setPadding(0, dp(3), dp(10), 0);
+        rotationText.addView(rotationDescription);
+        rotationPanel.addView(rotationText,
+                new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        Switch autoRotate = new Switch(this);
+        boolean autoRotateEnabled = store.preferences().getBoolean(PREF_AUTO_ROTATE_LANDSCAPE, true);
+        autoRotate.setChecked(autoRotateEnabled);
+        autoRotate.setContentDescription(getString(R.string.auto_rotate));
+        autoRotate.setOnCheckedChangeListener((buttonView, checked) -> {
+            store.preferences().edit().putBoolean(PREF_AUTO_ROTATE_LANDSCAPE, checked).apply();
+            applyLandscapeRotation(checked);
+            toast(checked ? R.string.auto_rotate_enabled : R.string.auto_rotate_locked);
+        });
+        rotationPanel.addView(autoRotate,
+                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(52)));
+        root.addView(rotationPanel, marginBottom(12));
 
         usernameInput = new EditText(this);
         usernameInput.setHint(R.string.tiktok_username);
@@ -525,6 +556,21 @@ public final class MainActivity extends Activity {
                 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 51);
         }
+    }
+
+    private void applyLandscapeRotation(boolean automatic) {
+        if (automatic) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            return;
+        }
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        boolean reverseLandscape = rotation == Surface.ROTATION_270
+                || (rotation == Surface.ROTATION_180
+                && getResources().getConfiguration().orientation
+                == android.content.res.Configuration.ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(reverseLandscape
+                ? ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+                : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     private String triggerLabel(InteractionSlot.TriggerType type) {

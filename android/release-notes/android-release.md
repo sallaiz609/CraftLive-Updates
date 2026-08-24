@@ -1,13 +1,11 @@
-# CraftLive Android 0.1.5
+# CraftLive Android 0.1.6
 
-- Javítva az automatikus Bedrock-chatmegnyitás a fekvő Minecraftban.
-- A CraftLive megvárja, amíg a visszanyitott játék ténylegesen fogadja az érintéseket.
-- A valós ablakméret és a gyártói tájolás alapján több biztonságos képernyőgeometriát próbál.
-- A rendszer által megszakított automatikus érintést önállóan újrapróbálja.
+- Új, jól látható automatikus forgatás kapcsoló a főképernyőn.
+- Bekapcsolva a CraftLive követi a telefon két fekvő irányát; kikapcsolva az aktuális fekvő helyzetet rögzíti.
+- Tartalmazza az automatikus Bedrock-chatmegnyitás várakozási, képernyőgeometriai és újrapróbálkozási javításait.
 
 ---
 
-- Fixed automatic Bedrock chat opening in landscape Minecraft.
-- CraftLive waits until the resumed game can actually receive touches.
-- It tries safe screen geometries based on the real window size and vendor orientation reporting.
-- System-cancelled automatic gestures are retried automatically.
+- Added a clearly visible automatic rotation switch to the main screen.
+- When enabled, CraftLive follows both landscape orientations; when disabled, it locks the current landscape orientation.
+- Includes the automatic Bedrock chat-opening wait, screen-geometry and retry fixes.

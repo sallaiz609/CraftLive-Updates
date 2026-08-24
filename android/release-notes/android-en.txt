@@ -1,1 +1,1 @@
-Fixed automatic Bedrock chat opening. CraftLive now waits until the resumed landscape Minecraft window can receive touches, tries safe screen geometries based on the real window size and vendor orientation reporting, and automatically retries cancelled gestures.
+Added an automatic rotation switch to the main screen. When enabled, CraftLive follows the phone between both landscape orientations; when disabled, it locks the current landscape orientation. This release also includes the automatic Bedrock chat opening and retry fixes.
