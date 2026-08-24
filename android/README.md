@@ -1,10 +1,11 @@
-# CraftLive Android 0.1.0
+# CraftLive Android
 
 Android-first CraftLive client for controlling a local Minecraft Bedrock world on the same phone. It does not require a hosted Minecraft server.
 
 ## Included
 
-- Direct Bedrock chat-command delivery with an Android Accessibility Service and the CraftLive input method.
+- Local Bedrock WebSocket bridge bound only to `127.0.0.1:19134`.
+- Background command delivery without opening or typing into Minecraft chat for every event.
 - TikTok LIVE gift, like, follow, subscription, share and comment event adapter.
 - 20 editable Standard interaction slots.
 - PLUS tab unlocked after 5 hours of verified connected TikTok LIVE time.
@@ -19,11 +20,12 @@ Read [README_HU.md](README_HU.md) for the Hungarian setup and release guide.
 
 ## Important limitations
 
-- Minecraft must be foregrounded, and commands/cheats must be enabled in the world.
-- The user must enable the CraftLive Accessibility Service and select the CraftLive input method.
+- Commands/cheats and WebSocket connections must be enabled in the Minecraft world.
+- Minecraft must connect to the local bridge with `/wsserver ws://127.0.0.1:19134` after a full Minecraft or bridge restart.
+- A local unencrypted `ws://` connection requires Minecraft's encrypted-WebSocket requirement to be disabled.
 - Android requires user confirmation for every APK installation. Silent updates are not available to normal sideloaded apps.
 - TikTok LIVE connectivity uses a reverse-engineered, unofficial API and can require connector updates when TikTok changes its protocol.
-- Google Play may apply additional policy review to accessibility-based automation. GitHub sideload distribution is the intended first release path.
+- GitHub sideload distribution is the intended first release path.
 
 ## Build
 

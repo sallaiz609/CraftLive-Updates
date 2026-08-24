@@ -65,8 +65,10 @@ android {
 
 dependencies {
     implementation("androidx.core:core:1.15.0")
+    implementation("org.java-websocket:Java-WebSocket:1.5.7")
     // Nem hivatalos, hitelesítés nélküli TikTok LIVE kliens. A CraftLive reflexión
     // keresztül használja, így a csatlakozó később az UI átírása nélkül cserélhető.
     implementation("com.github.jwdeveloper.TikTok-Live-Java:Client:1.10.0-Release")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
 }

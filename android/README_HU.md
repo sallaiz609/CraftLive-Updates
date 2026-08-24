@@ -1,19 +1,19 @@
-# CraftLive Android 0.1.0 – helyi Bedrock
+# CraftLive Android – helyi Bedrock
 
 Ez a külön Android-alkalmazás a telefonon futó Minecraft Bedrockot vezérli. Nem indít Minecraft-szervert és nem használja a Java-hostingot.
 
 ## Első beállítás a telefonon
 
-1. Telepítsd a GitHub-kiadásból a `CraftLive-Android-0.1.0.apk` fájlt.
+1. Telepítsd a legújabb `CraftLive-Android-*.apk` fájlt a GitHub-kiadásból.
 2. Nyisd meg a CraftLive-ot, majd engedélyezd az értesítéseket.
-3. Nyomd meg az „1. Minecraft-vezérlés engedélyezése” gombot, és kapcsold be a CraftLive szolgáltatást.
-4. Engedélyezd a „CraftLive parancsküldő” billentyűzetet.
-5. Válaszd ki aktív billentyűzetként a CraftLive parancsküldőt.
-6. Xiaomi/HyperOS alatt az alkalmazás adatlapján állítsd az akkumulátorhasználatot „Nincs korlátozás” értékre.
-7. A Minecraft világában engedélyezd a csalásokat/parancsokat.
-8. Nyomd meg a Bedrock tesztet. A CraftLive megnyitja a Minecraftot, a chatet, és elküldi a tesztparancsot.
+3. A Minecraft világában engedélyezd a csalásokat és a WebSocket-kapcsolatokat.
+4. A CraftLive-ban másold ki a kapcsolási parancsot.
+5. Nyisd meg a Minecraft világ chatjét, és küldd el ezt: `/wsserver ws://127.0.0.1:19134`.
+6. Ha a CraftLive „Minecraft kapcsolódva” állapotot mutat, a Bedrock teszt és a LIVE-interakciók már a háttérben futnak.
 
-Ha a chatgomb érintése nem pontos, használd a „Chatgomb kalibrálása” gombot. Az alapérték a bal felső sarokhoz van beállítva.
+A Minecraft teljes bezárása vagy a CraftLive-híd újraindítása után a kapcsolási parancsot ismét el kell küldeni. A világ beállításaiban a WebSocket-kapcsolatok legyenek engedélyezve; helyi `ws://` kapcsolatnál a titkosított WebSocket kötelezővé tétele legyen kikapcsolva.
+
+A kisegítő lehetőség, a külön CraftLive-billentyűzet és a chatgomb kalibrálása az új WebSocket-hídhoz nem szükséges.
 
 ## GitHubos, alkalmazáson belüli frissítés
 
@@ -57,7 +57,7 @@ A közös `CraftLive-Updates` tárolóban az Android-projekt az `android/` mapp�
 
 ## Biztonság és korlátok
 
-- A kisegítő lehetőség csak a Minecraft csomagnevét figyeli, nem olvassa a chatet vagy más alkalmazások tartalmát.
-- A parancsküldés csak akkor indul el, ha a Minecraft az előtérben van.
+- A WebSocket-kiszolgáló kizárólag a telefon helyi `127.0.0.1` címén figyel; más hálózati eszköz nem éri el.
+- A parancs csak aktív Minecraft WebSocket-kapcsolatnál kerül elküldésre.
 - A PLUS romboló parancsai világvesztést okozhatnak, ezért készíts biztonsági másolatot.
 - A TikTok-kapcsolat nem hivatalos, visszafejtett protokollt használ; TikTok-változáskor a csatlakozót frissíteni kellhet.

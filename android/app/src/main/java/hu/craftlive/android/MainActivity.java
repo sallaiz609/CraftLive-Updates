@@ -1,10 +1,10 @@
 package hu.craftlive.android;
 
 import android.Manifest;
-import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,12 +17,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
 import android.view.Gravity;
 import android.view.View;
-import android.view.accessibility.AccessibilityManager;
-import android.view.inputmethod.InputMethodInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -42,19 +38,15 @@ public final class MainActivity extends Activity {
     private UpdateManager updateManager;
     private EditText usernameInput;
     private TextView statusText;
+    private TextView bridgeStatusText;
+    private TextView commandResultText;
     private TextView plusProgress;
     private LinearLayout slotContainer;
     private Button liveButton;
     private Button standardTab;
     private Button plusTab;
-    private LinearLayout setupContainer;
-    private Button accessibilitySetupButton;
-    private Button keyboardSetupButton;
-    private Button keyboardPickerButton;
-    private Button batterySetupButton;
     private boolean showingPlus;
     private boolean receiverRegistered;
-    private boolean calibrationPermissionPending;
 
     private final BroadcastReceiver statusReceiver = new BroadcastReceiver() {
         @Override
@@ -71,6 +63,7 @@ public final class MainActivity extends Activity {
         updateManager = new UpdateManager(this);
         requestNotificationPermission();
         buildUi();
+        ensureBridgeService();
         handler.postDelayed(() -> updateManager.check(false), 1_200L);
     }
 
@@ -89,22 +82,9 @@ public final class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        CraftLiveAccessibilityService.markForegroundPackage(getPackageName());
         if (updateManager != null) updateManager.resumePendingInstallIfAllowed();
-        if (calibrationPermissionPending) {
-            calibrationPermissionPending = false;
-            if (Settings.canDrawOverlays(this)) {
-                handler.postDelayed(this::launchCalibrationEditor, 300L);
-            } else {
-                toast(R.string.calibration_overlay_permission_required);
-            }
-        }
         if (statusText != null) {
             refreshStatus();
-            refreshSetupVisibility();
-            // Android may reconnect accessibility and IME services shortly after an
-            // application update. Recheck without asking the user to toggle anything.
-            handler.postDelayed(this::refreshSetupVisibility, 900L);
         }
     }
 
@@ -145,8 +125,23 @@ public final class MainActivity extends Activity {
         header.addView(version);
         root.addView(header, marginBottom(18));
 
-        Button calibrationMenu = fullButton(R.string.calibration, v -> showCalibrationMenu());
-        root.addView(calibrationMenu);
+        bridgeStatusText = panelText(getString(R.string.bridge_starting), R.color.craft_muted);
+        root.addView(bridgeStatusText, marginBottom(7));
+
+        TextView bridgeHelp = panelText(getString(R.string.bridge_setup_note,
+                BedrockWebSocketServer.CONNECT_COMMAND), R.color.craft_text);
+        root.addView(bridgeHelp, marginBottom(7));
+
+        LinearLayout bridgeRow = horizontal();
+        bridgeRow.addView(actionButtonWithClick(R.string.copy_connect_command,
+                v -> copyConnectCommand()), weightedButton());
+        bridgeRow.addView(actionButtonWithClick(R.string.open_minecraft,
+                v -> openMinecraft()), weightedButton());
+        root.addView(bridgeRow, marginBottom(12));
+
+        commandResultText = panelText("", R.color.craft_muted);
+        commandResultText.setVisibility(View.GONE);
+        root.addView(commandResultText, marginBottom(7));
 
         LinearLayout tabRow = horizontal();
         standardTab = actionButton(getString(R.string.standard), true);
@@ -186,33 +181,8 @@ public final class MainActivity extends Activity {
         statusText = panelText(getString(R.string.status_idle), R.color.craft_muted);
         root.addView(statusText, marginBottom(14));
 
-        setupContainer = vertical();
-        setupContainer.addView(sectionTitle(getString(R.string.setup_note)));
-        accessibilitySetupButton = fullButton(R.string.enable_accessibility,
-                v -> openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-        keyboardSetupButton = fullButton(R.string.enable_keyboard,
-                v -> openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS));
-        keyboardPickerButton = fullButton(R.string.choose_keyboard, v -> {
-            InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            if (manager != null) manager.showInputMethodPicker();
-        });
-        batterySetupButton = fullButton(R.string.battery_settings, v -> {
-            Intent details = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.parse("package:" + getPackageName()));
-            startActivity(details);
-            toast(R.string.setup_incomplete);
-        });
-        setupContainer.addView(accessibilitySetupButton);
-        setupContainer.addView(keyboardSetupButton);
-        setupContainer.addView(keyboardPickerButton);
-        setupContainer.addView(batterySetupButton);
-        root.addView(setupContainer, matchWrap());
-
-        LinearLayout toolRow = horizontal();
-        toolRow.addView(actionButtonWithClick(R.string.open_minecraft, v -> openMinecraft()), weightedButton());
-        toolRow.addView(actionButtonWithClick(R.string.test_bedrock,
-                v -> testCommand("/summon zombie ~ ~1 ~")), weightedButton());
-        root.addView(toolRow, marginBottom(8));
+        root.addView(fullButton(R.string.test_bedrock,
+                v -> testCommand("/summon zombie ~ ~1 ~")));
 
         root.addView(fullButton(R.string.check_update, v -> updateManager.check(true)));
 
@@ -230,7 +200,6 @@ public final class MainActivity extends Activity {
         root.addView(slotContainer, matchWrap());
         setContentView(scroll);
         refreshStatus();
-        refreshSetupVisibility();
         rebuildSlots();
     }
 
@@ -351,7 +320,7 @@ public final class MainActivity extends Activity {
             updateManager.check(true);
             return;
         }
-        if (InteractionForegroundService.isRunning()) {
+        if (InteractionForegroundService.isLiveActive()) {
             Intent stop = new Intent(this, InteractionForegroundService.class).setAction(
                     InteractionForegroundService.ACTION_STOP);
             startService(stop);
@@ -376,31 +345,25 @@ public final class MainActivity extends Activity {
             return;
         }
         if (command == null || command.trim().isEmpty()) return;
-        if (!isAccessibilityEnabled()) {
-            toast(R.string.accessibility_missing);
-            openSettings(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            return;
-        }
-        if (!isCraftLiveImeEnabled()) {
-            toast(R.string.keyboard_missing);
-            openSettings(Settings.ACTION_INPUT_METHOD_SETTINGS);
-            return;
-        }
-        if (!isCraftLiveImeSelected()) {
-            toast(R.string.keyboard_not_selected);
-            InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            if (manager != null) manager.showInputMethodPicker();
+        if (!InteractionForegroundService.isBedrockConnected()) {
+            putConnectCommandOnClipboard();
+            toast(R.string.bridge_not_connected_test);
             return;
         }
         if (getPackageManager().getLaunchIntentForPackage("com.mojang.minecraftpe") == null) {
             toast(R.string.minecraft_missing);
             return;
         }
+        store.preferences().edit()
+                .remove("last_bedrock_command_success")
+                .remove("last_bedrock_command_response")
+                .remove("last_bedrock_response_time")
+                .apply();
+        if (commandResultText != null) commandResultText.setVisibility(View.GONE);
         Intent test = new Intent(this, InteractionForegroundService.class)
                 .setAction(InteractionForegroundService.ACTION_TEST)
                 .putExtra(InteractionForegroundService.EXTRA_COMMAND, command);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(test); else startService(test);
-        handler.postDelayed(this::openMinecraft, 180L);
         toast(R.string.test_queued);
     }
 
@@ -436,8 +399,45 @@ public final class MainActivity extends Activity {
         statusText.setText(text + " · " + getString(R.string.queued_count,
                 InteractionForegroundService.queuedCount()));
         statusText.setTextColor(color(textColor));
-        liveButton.setText(InteractionForegroundService.isRunning()
+        liveButton.setText(InteractionForegroundService.isLiveActive()
                 ? R.string.stop_live : R.string.start_live);
+
+        if (bridgeStatusText != null) {
+            String bridgeState = store.preferences().getString("bedrock_bridge_status", "starting");
+            String bridgeDetail = store.preferences().getString("bedrock_bridge_detail", "");
+            if (InteractionForegroundService.isBedrockConnected()) {
+                bridgeStatusText.setText(R.string.bridge_connected);
+                bridgeStatusText.setTextColor(color(R.color.craft_green));
+            } else if ("error".equals(bridgeState)) {
+                bridgeStatusText.setText(getString(R.string.bridge_error, bridgeDetail));
+                bridgeStatusText.setTextColor(color(R.color.craft_red));
+            } else if ("listening".equals(bridgeState)) {
+                bridgeStatusText.setText(R.string.bridge_listening);
+                bridgeStatusText.setTextColor(color(R.color.craft_muted));
+            } else {
+                bridgeStatusText.setText(R.string.bridge_starting);
+                bridgeStatusText.setTextColor(color(R.color.craft_muted));
+            }
+        }
+
+        if (commandResultText != null) {
+            long commandTime = store.preferences().getLong("last_command_time", 0L);
+            long responseTime = store.preferences().getLong("last_bedrock_response_time", 0L);
+            if (commandTime > 0L && responseTime >= commandTime) {
+                boolean successful = store.preferences().getBoolean(
+                        "last_bedrock_command_success", false);
+                String response = store.preferences().getString(
+                        "last_bedrock_command_response", "");
+                commandResultText.setText(successful
+                        ? getString(R.string.command_accepted)
+                        : getString(R.string.command_rejected, response));
+                commandResultText.setTextColor(color(successful
+                        ? R.color.craft_green : R.color.craft_red));
+                commandResultText.setVisibility(View.VISIBLE);
+            } else {
+                commandResultText.setVisibility(View.GONE);
+            }
+        }
         double hours = store.getVerifiedLiveMillis() / 3_600_000d;
         if (store.isPlusUnlocked()) {
             plusProgress.setText(R.string.plus_unlocked);
@@ -445,112 +445,30 @@ public final class MainActivity extends Activity {
             plusProgress.setText(getString(R.string.plus_locked, hours));
         }
         if (!store.isPlusUnlocked() && showingPlus) switchTab(false);
-        refreshSetupVisibility();
     }
 
-    private void refreshSetupVisibility() {
-        if (setupContainer == null) return;
-        boolean accessibilityReady = isAccessibilityEnabled();
-        boolean keyboardEnabled = isCraftLiveImeEnabled();
-        boolean keyboardSelected = isCraftLiveImeSelected();
-
-        accessibilitySetupButton.setVisibility(accessibilityReady ? View.GONE : View.VISIBLE);
-        keyboardSetupButton.setVisibility(keyboardEnabled ? View.GONE : View.VISIBLE);
-        keyboardPickerButton.setVisibility(
-                keyboardEnabled && !keyboardSelected ? View.VISIBLE : View.GONE);
-
-        // The battery page is guidance, not a permission that should block use.
-        // Keep it available only during the first incomplete setup; never force it
-        // back on an already configured user after an application update.
-        boolean actualSetupMissing = !accessibilityReady || !keyboardEnabled || !keyboardSelected;
-        batterySetupButton.setVisibility(actualSetupMissing ? View.VISIBLE : View.GONE);
-        setupContainer.setVisibility(actualSetupMissing ? View.VISIBLE : View.GONE);
-    }
-
-    private boolean isAccessibilityEnabled() {
-        AccessibilityManager manager = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
-        ComponentName expected = new ComponentName(this, CraftLiveAccessibilityService.class);
-        if (manager != null && manager.isEnabled()) {
-            List<AccessibilityServiceInfo> enabled = manager.getEnabledAccessibilityServiceList(
-                    AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
-            for (AccessibilityServiceInfo info : enabled) {
-                if (info.getResolveInfo() == null || info.getResolveInfo().serviceInfo == null) continue;
-                ComponentName actual = new ComponentName(
-                        info.getResolveInfo().serviceInfo.packageName,
-                        info.getResolveInfo().serviceInfo.name);
-                if (expected.equals(actual)) return true;
-            }
+    private void ensureBridgeService() {
+        Intent bridge = new Intent(this, InteractionForegroundService.class)
+                .setAction(InteractionForegroundService.ACTION_START_BRIDGE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(bridge);
+        } else {
+            startService(bridge);
         }
-        // The service connection may still be restarting after an APK update while
-        // Android's persisted setting is already correct.
-        if (secureComponentListContains(Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, expected)) return true;
-        return CraftLiveAccessibilityService.isReady();
+        handler.postDelayed(this::refreshStatus, 350L);
     }
 
-    private boolean isCraftLiveImeEnabled() {
-        InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        ComponentName expected = new ComponentName(this, CraftLiveImeService.class);
-        if (manager != null) {
-            for (InputMethodInfo info : manager.getEnabledInputMethodList()) {
-                ComponentName actual = ComponentName.unflattenFromString(info.getId());
-                if (expected.equals(actual)) return true;
-            }
+    private void copyConnectCommand() {
+        putConnectCommandOnClipboard();
+        toast(R.string.connect_command_copied);
+    }
+
+    private void putConnectCommandOnClipboard() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(ClipData.newPlainText(
+                    getString(R.string.app_name), BedrockWebSocketServer.CONNECT_COMMAND));
         }
-        return secureComponentListContains(Settings.Secure.ENABLED_INPUT_METHODS, expected);
-    }
-
-    private boolean isCraftLiveImeSelected() {
-        String selected = Settings.Secure.getString(
-                getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
-        ComponentName actual = selected == null ? null : ComponentName.unflattenFromString(selected);
-        return new ComponentName(this, CraftLiveImeService.class).equals(actual);
-    }
-
-    private boolean secureComponentListContains(String settingName, ComponentName expected) {
-        String value = Settings.Secure.getString(getContentResolver(), settingName);
-        if (value == null || value.trim().isEmpty()) return false;
-        for (String item : value.split(":")) {
-            String componentValue = item.trim();
-            int subtypeSeparator = componentValue.indexOf(';');
-            if (subtypeSeparator >= 0) componentValue = componentValue.substring(0, subtypeSeparator);
-            ComponentName actual = ComponentName.unflattenFromString(componentValue);
-            if (expected.equals(actual)) return true;
-        }
-        return false;
-    }
-
-    private void showCalibrationMenu() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.calibration)
-                .setMessage(R.string.calibration_drag_help)
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.edit, (dialog, which) -> requestCalibrationEditor())
-                .show();
-    }
-
-    private void requestCalibrationEditor() {
-        if (!Settings.canDrawOverlays(this)) {
-            calibrationPermissionPending = true;
-            Intent permission = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
-            startActivity(permission);
-            toast(R.string.calibration_overlay_permission_required);
-            return;
-        }
-        launchCalibrationEditor();
-    }
-
-    private void launchCalibrationEditor() {
-        Intent overlay = new Intent(this, CalibrationOverlayService.class)
-                .setAction(CalibrationOverlayService.ACTION_SHOW);
-        startService(overlay);
-        handler.postDelayed(this::openMinecraft, 180L);
-        toast(R.string.calibration_opening_minecraft);
-    }
-
-    private void openSettings(String action) {
-        startActivity(new Intent(action));
-        toast(R.string.setup_incomplete);
     }
 
     private void requestNotificationPermission() {

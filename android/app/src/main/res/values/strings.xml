@@ -12,6 +12,16 @@
     <string name="plus_locked">PLUS lezárva – %1$.1f / 5 LIVE óra</string>
     <string name="plus_unlocked">PLUS feloldva – extrém interakciók elérhetők</string>
     <string name="fixed_delay">Fix védelem: minden Minecraft-interakció között 5 másodperc telik el.</string>
+    <string name="bridge_starting">Bedrock-híd: indul…</string>
+    <string name="bridge_listening">Bedrock-híd: várakozás a Minecraftra · 127.0.0.1:19134</string>
+    <string name="bridge_connected">Bedrock-híd: Minecraft kapcsolódva · háttérvezérlés aktív</string>
+    <string name="bridge_error">Bedrock-híd hiba: %1$s</string>
+    <string name="bridge_setup_note">Kapcsolódás: a Minecraft világban küldd el ezt a parancsot:\n%1$s\nEzután a CraftLive chatablak nélkül vezérli a játékot. A Minecraft teljes bezárása után újra kell kapcsolódni.</string>
+    <string name="copy_connect_command">Kapcsolási parancs másolása</string>
+    <string name="connect_command_copied">A kapcsolási parancs a vágólapra került.</string>
+    <string name="bridge_not_connected_test">A Minecraft még nem kapcsolódott. Illeszd be a kimásolt /wsserver parancsot a játék chatjébe.</string>
+    <string name="command_accepted">A Minecraft elfogadta a legutóbbi parancsot.</string>
+    <string name="command_rejected">A Minecraft elutasította a parancsot: %1$s</string>
     <string name="tiktok_username">TikTok-felhasználónév (@ nélkül)</string>
     <string name="save">Mentés</string>
     <string name="start_live">LIVE figyelés indítása</string>
@@ -56,8 +66,8 @@
     <string name="keyboard_missing">Előbb engedélyezd a CraftLive parancsküldő billentyűzetet.</string>
     <string name="keyboard_not_selected">Válaszd ki aktív billentyűzetként a CraftLive parancsküldőt.</string>
     <string name="notification_channel">CraftLive interakciók</string>
-    <string name="notification_title">CraftLive figyelés aktív</string>
-    <string name="notification_text">Fix 5 mp-es védelem · várakozó parancsok: %1$d</string>
+    <string name="notification_title">CraftLive Bedrock-híd aktív</string>
+    <string name="notification_text">Helyi háttérvezérlés · fix 5 mp-es védelem · várakozó: %1$d</string>
     <string name="update_checking">Frissítés keresése…</string>
     <string name="update_none">A legfrissebb verzió van telepítve.</string>
     <string name="update_available">Új CraftLive %1$s érhető el</string>
