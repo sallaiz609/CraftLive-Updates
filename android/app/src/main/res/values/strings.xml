@@ -20,7 +20,8 @@
     <string name="test_bedrock">Bedrock teszt</string>
     <string name="test_opening_chat">CraftLive teszt: a Minecraft chat megnyitása…</string>
     <string name="test_chat_not_opened">A Minecraft chat nem nyílt meg. Nyisd meg a világot, majd próbáld újra vagy kalibráld a chatgombot.</string>
-    <string name="test_command_submitted">A Minecraft chat megnyílt, a zombiidéző parancs és az Enter elküldve.</string>
+    <string name="test_command_submitted">A parancs bekerült és elküldésre került. A chat csak röviden villan fel.</string>
+    <string name="test_command_input_failed">A Bedrock nem fogadta a parancs beírását, ezért a CraftLive bezárta a chatet.</string>
     <string name="enable_accessibility">1. Minecraft-vezérlés engedélyezése</string>
     <string name="enable_keyboard">2. CraftLive billentyűzet engedélyezése</string>
     <string name="choose_keyboard">3. CraftLive billentyűzet kiválasztása</string>
