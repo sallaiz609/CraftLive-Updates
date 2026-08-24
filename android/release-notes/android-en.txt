@@ -1,1 +1,10 @@
-Fixed Bedrock tests and interaction delivery to Minecraft. The command queue now starts before Minecraft opens, foreground detection is more accurate, the mobile chat-button default is updated, and the setup section hides automatically when all required controls are active.
+CraftLive Android 0.1.2
+
+Fixed update detection: Android version codes now always increase, so the app can reliably offer every newer release.
+
+Also includes the 0.1.1 fixes:
+- More reliable Bedrock testing and Minecraft command delivery.
+- The command queue starts before Minecraft opens.
+- More accurate foreground detection and multiple delivery attempts.
+- Required keyboard and control permissions are verified.
+- The setup section hides automatically when everything is active.

@@ -38,8 +38,13 @@ jobs:
             VERSION="${GITHUB_REF_NAME#android-v}"
             MANDATORY="true"
           fi
+          if [[ ! "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "Invalid Android version: $VERSION (expected MAJOR.MINOR.PATCH)"
+            exit 1
+          fi
+          VERSION_CODE=$((10000 + 10#${BASH_REMATCH[1]} * 1000000 + 10#${BASH_REMATCH[2]} * 1000 + 10#${BASH_REMATCH[3]}))
           echo "ANDROID_VERSION_NAME=$VERSION" >> "$GITHUB_ENV"
-          echo "ANDROID_VERSION_CODE=$((1000 + GITHUB_RUN_NUMBER))" >> "$GITHUB_ENV"
+          echo "ANDROID_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
           echo "ANDROID_TAG=android-v$VERSION" >> "$GITHUB_ENV"
           echo "ANDROID_MANDATORY=$MANDATORY" >> "$GITHUB_ENV"
           echo "ANDROID_APK_NAME=CraftLive-Android-$VERSION.apk" >> "$GITHUB_ENV"
