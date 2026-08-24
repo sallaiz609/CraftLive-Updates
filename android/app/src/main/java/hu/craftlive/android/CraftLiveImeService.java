@@ -9,15 +9,22 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public final class CraftLiveImeService extends InputMethodService {
     private static volatile CraftLiveImeService instance;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean delivering;
+    private volatile boolean inputActive;
 
     public static void tryDeliverPendingCommand() {
         CraftLiveImeService service = instance;
         if (service != null) service.handler.postDelayed(service::deliverPendingCommand, 180L);
+    }
+
+    public static boolean isInputActive() {
+        CraftLiveImeService service = instance;
+        return service != null && service.inputActive;
     }
 
     @Override
@@ -41,13 +48,21 @@ public final class CraftLiveImeService extends InputMethodService {
     @Override
     public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
+        inputActive = true;
         handler.postDelayed(this::deliverPendingCommand, 140L);
     }
 
     @Override
     public void onStartInputView(EditorInfo info, boolean restarting) {
         super.onStartInputView(info, restarting);
+        inputActive = true;
         handler.postDelayed(this::deliverPendingCommand, 140L);
+    }
+
+    @Override
+    public void onFinishInput() {
+        inputActive = false;
+        super.onFinishInput();
     }
 
     @Override
@@ -70,6 +85,7 @@ public final class CraftLiveImeService extends InputMethodService {
         InputConnection connection = getCurrentInputConnection();
         if (connection == null) return;
         if (!connection.commitText(command, 1)) return;
+        boolean diagnostic = store.preferences().getBoolean("pending_command_diagnostic", false);
         delivering = true;
         handler.postDelayed(() -> {
             InputConnection current = getCurrentInputConnection();
@@ -81,8 +97,19 @@ public final class CraftLiveImeService extends InputMethodService {
                     new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
             boolean up = current.sendKeyEvent(
                     new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER));
-            if (!down && !up) current.performEditorAction(EditorInfo.IME_ACTION_DONE);
+            // A Bedrock verziótól és a gyártó Android-billentyűzet-kezelésétől függően
+            // Entert, SEND vagy DONE szerkesztőműveletet fogad el. Mindhármat megkíséreljük;
+            // a már bezárt chatablak a további próbálkozásokat figyelmen kívül hagyja.
+            current.performEditorAction(EditorInfo.IME_ACTION_SEND);
+            current.performEditorAction(EditorInfo.IME_ACTION_DONE);
+            if (!down && !up) {
+                current.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_NUMPAD_ENTER));
+                current.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_NUMPAD_ENTER));
+            }
             clearPending(store);
+            if (diagnostic) {
+                Toast.makeText(this, R.string.test_command_submitted, Toast.LENGTH_LONG).show();
+            }
             delivering = false;
         }, 180L);
     }
@@ -91,6 +118,7 @@ public final class CraftLiveImeService extends InputMethodService {
         store.preferences().edit()
                 .remove("pending_command")
                 .remove("pending_command_time")
+                .remove("pending_command_diagnostic")
                 .apply();
     }
 }
