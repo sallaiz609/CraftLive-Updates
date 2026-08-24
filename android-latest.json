@@ -1,9 +1,9 @@
 {
-  "versionCode": 1001,
-  "versionName": "0.1.1",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.1/CraftLive-Android-0.1.1.apk",
-  "sha256": "cb0a8e4fe50ab10932600922e735e672fe6bc60d8062e6a7ad8fab0804b130bd",
-  "notesHu": "Javítva a Bedrock teszt és az interakciók Minecraftba küldése. A parancssor már a Minecraft megnyitása előtt biztonságosan elindul, pontosabb az előtér-érzékelés, új telefonos chatgomb-alapérték került be, és az engedélyezési rész automatikusan eltűnik, amikor minden szükséges vezérlés aktív.",
-  "notesEn": "Fixed Bedrock tests and interaction delivery to Minecraft. The command queue now starts before Minecraft opens, foreground detection is more accurate, the mobile chat-button default is updated, and the setup section hides automatically when all required controls are active.",
+  "versionCode": 11002,
+  "versionName": "0.1.2",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.2/CraftLive-Android-0.1.2.apk",
+  "sha256": "3a1ecefac4b91fa7242af917e3b4b0c34da178cdb95afb1aedf1efcea981b15f",
+  "notesHu": "CraftLive Android 0.1.2\n\nJavítva a frissítés felismerése: a verziókód most mindig növekvő, ezért az alkalmazás biztosan felajánlja az új kiadást.\n\nTartalmazza a 0.1.1 javításait is:\n- Megbízhatóbb Bedrock teszt és Minecraft-parancsküldés.\n- A parancssor már a Minecraft megnyitása előtt elindul.\n- Pontosabb előtér-érzékelés és többszöri kézbesítési próbálkozás.\n- A szükséges billentyűzet és vezérlési engedélyek ellenőrzése.\n- Az engedélyezési rész automatikusan eltűnik, amikor minden aktív.",
+  "notesEn": "CraftLive Android 0.1.2\n\nFixed update detection: Android version codes now always increase, so the app can reliably offer every newer release.\n\nAlso includes the 0.1.1 fixes:\n- More reliable Bedrock testing and Minecraft command delivery.\n- The command queue starts before Minecraft opens.\n- More accurate foreground detection and multiple delivery attempts.\n- Required keyboard and control permissions are verified.\n- The setup section hides automatically when everything is active.",
   "mandatory": true
 }
