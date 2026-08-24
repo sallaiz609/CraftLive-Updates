@@ -1,9 +1,9 @@
 {
-  "versionCode": 11005,
-  "versionName": "0.1.5",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.5/CraftLive-Android-0.1.5.apk",
-  "sha256": "a1847e177bedbdab1ef6fa658caa881afc85399f6b34b6c669525033316c20e0",
-  "notesHu": "Javítva az automatikus Bedrock-chatmegnyitás. A CraftLive megvárja, amíg a Minecraft fekvő ablaka ténylegesen fogadja az érintéseket, a valós ablakméret és a gyártói tájolás alapján több biztonságos képernyőgeometriát próbál, a megszakított érintést pedig automatikusan újrapróbálja.",
-  "notesEn": "Fixed automatic Bedrock chat opening. CraftLive now waits until the resumed landscape Minecraft window can receive touches, tries safe screen geometries based on the real window size and vendor orientation reporting, and automatically retries cancelled gestures.",
+  "versionCode": 11006,
+  "versionName": "0.1.6",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.6/CraftLive-Android-0.1.6.apk",
+  "sha256": "76d003f68571edb982fb9b6b986850102253980b4cc396ba2887d656ef69624b",
+  "notesHu": "Új automatikus forgatás kapcsoló került a főképernyőre. Bekapcsolva a CraftLive automatikusan vált a két fekvő irány között, kikapcsolva az aktuális fekvő helyzetet rögzíti. Tartalmazza az automatikus Bedrock-chatmegnyitás javításait és újrapróbálkozását is.",
+  "notesEn": "Added an automatic rotation switch to the main screen. When enabled, CraftLive follows the phone between both landscape orientations; when disabled, it locks the current landscape orientation. This release also includes the automatic Bedrock chat opening and retry fixes.",
   "mandatory": true
 }
