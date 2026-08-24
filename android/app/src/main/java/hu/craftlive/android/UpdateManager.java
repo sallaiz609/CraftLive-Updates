@@ -31,6 +31,7 @@ public final class UpdateManager {
             "https://raw.githubusercontent.com/sallaiz609/CraftLive-Updates/main/android-latest.json";
     private final Activity activity;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private UpdateInfo pendingPermissionInfo;
 
     public UpdateManager(Activity activity) {
         this.activity = activity;
@@ -74,6 +75,15 @@ public final class UpdateManager {
         executor.shutdownNow();
     }
 
+    public void resumePendingInstallIfAllowed() {
+        if (pendingPermissionInfo == null) return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && !activity.getPackageManager().canRequestPackageInstalls()) return;
+        UpdateInfo info = pendingPermissionInfo;
+        pendingPermissionInfo = null;
+        downloadAndInstall(info);
+    }
+
     public boolean hasMandatoryUpdate() {
         int pending = activity.getSharedPreferences("craftlive_settings", Activity.MODE_PRIVATE)
                 .getInt("mandatory_update_code", 0);
@@ -103,6 +113,7 @@ public final class UpdateManager {
     private void downloadAndInstall(UpdateInfo info) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 && !activity.getPackageManager().canRequestPackageInstalls()) {
+            pendingPermissionInfo = info;
             Intent permission = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                     Uri.parse("package:" + activity.getPackageName()));
             activity.startActivity(permission);
