@@ -189,7 +189,7 @@ public final class MainActivity extends Activity {
         LinearLayout toolRow = horizontal();
         toolRow.addView(actionButtonWithClick(R.string.open_minecraft, v -> openMinecraft()), weightedButton());
         toolRow.addView(actionButtonWithClick(R.string.test_bedrock,
-                v -> testCommand("/say CraftLive Android OK")), weightedButton());
+                v -> testCommand("/summon zombie ~ ~1 ~")), weightedButton());
         root.addView(toolRow, marginBottom(8));
 
         LinearLayout updateRow = horizontal();
