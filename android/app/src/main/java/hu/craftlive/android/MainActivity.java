@@ -80,6 +80,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (updateManager != null) updateManager.resumePendingInstallIfAllowed();
         if (statusText != null) refreshStatus();
     }
 
@@ -388,7 +389,8 @@ public final class MainActivity extends Activity {
         } else {
             text = getString(R.string.status_idle);
         }
-        statusText.setText(text + " · " + InteractionForegroundService.queuedCount() + " queued");
+        statusText.setText(text + " · " + getString(R.string.queued_count,
+                InteractionForegroundService.queuedCount()));
         statusText.setTextColor(color(textColor));
         liveButton.setText(InteractionForegroundService.isRunning()
                 ? R.string.stop_live : R.string.start_live);
