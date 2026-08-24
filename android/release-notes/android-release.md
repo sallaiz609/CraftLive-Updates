@@ -1,15 +1,8 @@
-# CraftLive Android 0.1.1
+# CraftLive Android 0.1.2
 
-- Javítva a Bedrock teszt és a Minecraft-interakciók parancsküldése.
-- A parancssor már a Minecraft megnyitása előtt biztonságosan elindul.
-- Pontosabb az előtérben lévő alkalmazás érzékelése.
-- Frissült a telefonos, fekvő módú Bedrock chatgomb alaphelye.
-- Az engedélyezési rész automatikusan eltűnik, ha minden szükséges vezérlés aktív.
-
----
-
-- Fixed Bedrock test and Minecraft interaction command delivery.
-- The command queue now starts safely before Minecraft opens.
-- Foreground-app detection is more accurate.
-- Updated the default Bedrock chat-button location for landscape phone play.
-- The setup section hides automatically when all required controls are active.
+- Fixed Android update detection with a permanently increasing semantic version code.
+- Includes the Bedrock interaction-delivery fixes from 0.1.1.
+- Test commands are queued before Minecraft opens.
+- Foreground detection and command retries are more reliable.
+- Required CraftLive keyboard/control state is verified.
+- The setup section is hidden when every required permission is active.
