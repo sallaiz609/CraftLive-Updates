@@ -1,9 +1,9 @@
 {
-  "versionCode": 11002,
-  "versionName": "0.1.2",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.2/CraftLive-Android-0.1.2.apk",
-  "sha256": "3a1ecefac4b91fa7242af917e3b4b0c34da178cdb95afb1aedf1efcea981b15f",
-  "notesHu": "CraftLive Android 0.1.2\n\nJavítva a frissítés felismerése: a verziókód most mindig növekvő, ezért az alkalmazás biztosan felajánlja az új kiadást.\n\nTartalmazza a 0.1.1 javításait is:\n- Megbízhatóbb Bedrock teszt és Minecraft-parancsküldés.\n- A parancssor már a Minecraft megnyitása előtt elindul.\n- Pontosabb előtér-érzékelés és többszöri kézbesítési próbálkozás.\n- A szükséges billentyűzet és vezérlési engedélyek ellenőrzése.\n- Az engedélyezési rész automatikusan eltűnik, amikor minden aktív.",
-  "notesEn": "CraftLive Android 0.1.2\n\nFixed update detection: Android version codes now always increase, so the app can reliably offer every newer release.\n\nAlso includes the 0.1.1 fixes:\n- More reliable Bedrock testing and Minecraft command delivery.\n- The command queue starts before Minecraft opens.\n- More accurate foreground detection and multiple delivery attempts.\n- Required keyboard and control permissions are verified.\n- The setup section hides automatically when everything is active.",
+  "versionCode": 11003,
+  "versionName": "0.1.3",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.3/CraftLive-Android-0.1.3.apk",
+  "sha256": "b624c08c87c01b99bc71b9273a5b127a763c130564b4d4ad4dcfd39880cf7843",
+  "notesHu": "Javítva a Bedrock teszt, amikor a Minecraft chat egyáltalán nem nyílt meg. A CraftLive kötelező fekvő módban fut, a Minecraft tényleges fekvő kijelzőméretével számol, automatikusan felismeri a két gyakori mobil HUD chatgombhelyét, és több kompatibilis Android-küldési móddal hajtja végre a parancsot. A Bedrock teszt most valóban zombit idéz, és rövid állapotüzenetek mutatják, meddig jutott a vezérlés.",
+  "notesEn": "Fixed Bedrock tests where Minecraft chat did not open at all. CraftLive now runs in mandatory landscape mode, uses Minecraft's actual landscape display size, automatically tries both common mobile HUD chat-button locations, and submits commands through multiple compatible Android input actions. The Bedrock test now actually summons a zombie, and short status messages show how far delivery progressed.",
   "mandatory": true
 }
