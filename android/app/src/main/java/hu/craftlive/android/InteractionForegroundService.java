@@ -19,7 +19,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class InteractionForegroundService extends Service implements TikTokConnector.Listener {
+public final class InteractionForegroundService extends Service implements
+        TikTokConnector.Listener, BedrockWebSocketServer.Listener {
+    public static final String ACTION_START_BRIDGE = "hu.craftlive.android.START_BRIDGE";
     public static final String ACTION_START = "hu.craftlive.android.START";
     public static final String ACTION_STOP = "hu.craftlive.android.STOP";
     public static final String ACTION_TEST = "hu.craftlive.android.TEST";
@@ -36,7 +38,9 @@ public final class InteractionForegroundService extends Service implements TikTo
     private final ScheduledExecutorService ticker = Executors.newSingleThreadScheduledExecutor();
     private InteractionStore store;
     private TikTokConnector connector;
+    private BedrockWebSocketServer bedrockServer;
     private volatile boolean liveConnected;
+    private volatile boolean liveRequested;
     private volatile long lastLiveTick;
     private volatile String currentUsername = "";
 
@@ -49,13 +53,30 @@ public final class InteractionForegroundService extends Service implements TikTo
         return service == null ? 0 : service.queue.size();
     }
 
+    public static boolean isLiveActive() {
+        InteractionForegroundService service = instance;
+        return service != null && service.connector != null;
+    }
+
+    public static boolean isBedrockConnected() {
+        InteractionForegroundService service = instance;
+        return service != null && service.bedrockServer != null
+                && service.bedrockServer.isMinecraftConnected();
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
         store = new InteractionStore(this);
+        store.preferences().edit()
+                .putString("bedrock_bridge_status", "starting")
+                .putString("bedrock_bridge_detail", "")
+                .apply();
         createNotificationChannel();
         startForeground(NOTIFICATION_ID, buildNotification());
+        bedrockServer = new BedrockWebSocketServer(this);
+        bedrockServer.startSafely();
         startWorker();
         ticker.scheduleAtFixedRate(this::tickLiveTime, 1L, 1L, TimeUnit.SECONDS);
     }
@@ -65,8 +86,14 @@ public final class InteractionForegroundService extends Service implements TikTo
         if (intent == null) return START_STICKY;
         String action = intent.getAction();
         if (ACTION_STOP.equals(action)) {
-            stopSelf();
-            return START_NOT_STICKY;
+            liveRequested = false;
+            accumulateLiveTime();
+            liveConnected = false;
+            currentUsername = "";
+            if (connector != null) connector.disconnect();
+            connector = null;
+            writeStatus("idle", "");
+            return START_STICKY;
         }
         if (ACTION_TEST.equals(action)) {
             String command = intent.getStringExtra(EXTRA_COMMAND);
@@ -79,6 +106,7 @@ public final class InteractionForegroundService extends Service implements TikTo
             String username = store.preferences().getString("tiktok_username", "");
             if (username != null && !username.trim().isEmpty()
                     && (!username.equals(currentUsername) || connector == null)) {
+                liveRequested = true;
                 connect(username.trim().replace("@", ""));
             }
         }
@@ -93,9 +121,16 @@ public final class InteractionForegroundService extends Service implements TikTo
     @Override
     public void onDestroy() {
         accumulateLiveTime();
+        liveRequested = false;
         liveConnected = false;
         if (connector != null) connector.disconnect();
         connector = null;
+        if (bedrockServer != null) bedrockServer.stopSafely();
+        bedrockServer = null;
+        store.preferences().edit()
+                .putString("bedrock_bridge_status", "stopped")
+                .putString("bedrock_bridge_detail", "")
+                .apply();
         workerRunning.set(false);
         ticker.shutdownNow();
         queue.clear();
@@ -106,6 +141,7 @@ public final class InteractionForegroundService extends Service implements TikTo
 
     @Override
     public void onConnected() {
+        if (!liveRequested) return;
         lastLiveTick = System.currentTimeMillis();
         liveConnected = true;
         writeStatus("connected", "");
@@ -113,6 +149,7 @@ public final class InteractionForegroundService extends Service implements TikTo
 
     @Override
     public void onWaiting() {
+        if (!liveRequested) return;
         accumulateLiveTime();
         liveConnected = false;
         writeStatus("waiting", "");
@@ -152,9 +189,40 @@ public final class InteractionForegroundService extends Service implements TikTo
 
     @Override
     public void onError(String message) {
+        if (!liveRequested) return;
         accumulateLiveTime();
         liveConnected = false;
         writeStatus("error", message == null ? "" : message);
+    }
+
+    @Override
+    public void onBedrockListening() {
+        writeBedrockStatus("listening", "");
+    }
+
+    @Override
+    public void onBedrockConnected() {
+        writeBedrockStatus("connected", "");
+    }
+
+    @Override
+    public void onBedrockDisconnected() {
+        writeBedrockStatus("listening", "");
+    }
+
+    @Override
+    public void onBedrockCommandResponse(String requestId, boolean successful, String message) {
+        store.preferences().edit()
+                .putBoolean("last_bedrock_command_success", successful)
+                .putString("last_bedrock_command_response", message == null ? "" : message)
+                .putLong("last_bedrock_response_time", System.currentTimeMillis())
+                .apply();
+        sendStatusBroadcast();
+    }
+
+    @Override
+    public void onBedrockError(String message) {
+        writeBedrockStatus("error", message == null ? "" : message);
     }
 
     private synchronized void connect(String username) {
@@ -183,10 +251,11 @@ public final class InteractionForegroundService extends Service implements TikTo
             while (workerRunning.get()) {
                 try {
                     QueuedCommand item = queue.takeFirst();
-                    boolean sent = CraftLiveAccessibilityService.sendCommand(item.command, item.diagnostic);
+                    BedrockWebSocketServer server = bedrockServer;
+                    boolean sent = server != null && server.sendCommand(item.command);
                     if (!sent) {
                         store.preferences().edit()
-                                .putString("last_dispatch_error", "minecraft_not_foreground")
+                                .putString("last_dispatch_error", "bedrock_not_connected")
                                 .apply();
                         queue.offerFirst(item);
                         updateNotification();
@@ -235,6 +304,15 @@ public final class InteractionForegroundService extends Service implements TikTo
         store.preferences().edit()
                 .putString("live_status", state)
                 .putString("live_status_detail", detail)
+                .apply();
+        sendStatusBroadcast();
+        updateNotification();
+    }
+
+    private void writeBedrockStatus(String state, String detail) {
+        store.preferences().edit()
+                .putString("bedrock_bridge_status", state)
+                .putString("bedrock_bridge_detail", detail)
                 .apply();
         sendStatusBroadcast();
         updateNotification();
