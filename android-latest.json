@@ -1,0 +1,9 @@
+{
+  "versionCode": 1003,
+  "versionName": "0.1.0",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.1.0/CraftLive-Android-0.1.0.apk",
+  "sha256": "7ef16978513f9bdc9e0f9525984237f19c98ccf967b879b7e0afbb0942d3cfbe",
+  "notesHu": "Helyi Minecraft Bedrock-vezérlés Androidon, 20 Standard interakciós hellyel, 5 LIVE óra után feloldható PLUS résszel, fix 5 másodperces védelemmel és alkalmazáson belüli frissítéssel.",
+  "notesEn": "Local Minecraft Bedrock control on Android with 20 Standard interaction slots, PLUS unlocked after 5 verified LIVE hours, a fixed 5-second safety queue, and in-app updates.",
+  "mandatory": true
+}
