@@ -111,6 +111,7 @@ public final class UpdateManager {
     }
 
     private void downloadAndInstall(UpdateInfo info) {
+        rememberReleaseNotes(info);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 && !activity.getPackageManager().canRequestPackageInstalls()) {
             pendingPermissionInfo = info;
@@ -139,6 +140,15 @@ public final class UpdateManager {
                 toast(activity.getString(R.string.update_error, readable(error)));
             }
         });
+    }
+
+    private void rememberReleaseNotes(UpdateInfo info) {
+        activity.getSharedPreferences("craftlive_settings", Activity.MODE_PRIVATE)
+                .edit()
+                .putInt("pending_update_version_code", info.versionCode)
+                .putString("pending_update_version_name", info.versionName)
+                .putString("pending_update_notes", info.notes)
+                .apply();
     }
 
     private void install(File apk) {

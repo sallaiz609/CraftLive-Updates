@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -69,7 +70,9 @@ public final class MainActivity extends Activity {
         requestNotificationPermission();
         buildUi();
         ensureBridgeService();
-        handler.postDelayed(() -> updateManager.check(false), 1_200L);
+        handler.postDelayed(() -> {
+            if (!showReleaseNotesIfNeeded()) updateManager.check(false);
+        }, 900L);
     }
 
     @Override
@@ -143,6 +146,9 @@ public final class MainActivity extends Activity {
         bridgeRow.addView(actionButtonWithClick(R.string.open_minecraft,
                 v -> openMinecraft()), weightedButton());
         root.addView(bridgeRow, marginBottom(12));
+
+        root.addView(fullButton(R.string.websocket_setup_guide,
+                v -> showWebSocketSetupGuide()));
 
         commandResultText = panelText("", R.color.craft_muted);
         commandResultText.setVisibility(View.GONE);
@@ -545,12 +551,12 @@ public final class MainActivity extends Activity {
     }
 
     private void copyConnectCommand() {
+        putConnectCommandOnClipboard(preferredConnectCommand());
+        toast(R.string.connect_command_copied);
+    }
+
+    private void showAlternativeAddressPicker() {
         List<String> addresses = BedrockConnectionAddresses.addresses();
-        if (addresses.size() <= 1) {
-            putConnectCommandOnClipboard(preferredConnectCommand());
-            toast(R.string.connect_command_copied);
-            return;
-        }
         String[] commands = new String[addresses.size()];
         for (int index = 0; index < addresses.size(); index++) {
             commands[index] = BedrockConnectionAddresses.command(addresses.get(index));
@@ -563,6 +569,55 @@ public final class MainActivity extends Activity {
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private void showWebSocketSetupGuide() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.websocket_setup_guide)
+                .setMessage(getString(R.string.websocket_setup_steps, preferredConnectCommand()))
+                .setPositiveButton(R.string.copy_connect_command, (dialog, which) -> {
+                    copyConnectCommand();
+                    openMinecraft();
+                })
+                .setNeutralButton(R.string.other_address, (dialog, which) ->
+                        showAlternativeAddressPicker())
+                .setNegativeButton(R.string.close, null)
+                .show();
+    }
+
+    private boolean showReleaseNotesIfNeeded() {
+        int currentCode = versionCode();
+        SharedPreferences preferences = getSharedPreferences(
+                "craftlive_settings", MODE_PRIVATE);
+        if (preferences.getInt("release_notes_seen_code", 0) == currentCode) return false;
+
+        int pendingCode = preferences.getInt("pending_update_version_code", 0);
+        String releaseName = pendingCode == currentCode
+                ? preferences.getString("pending_update_version_name", versionName())
+                : versionName();
+        String notes = pendingCode == currentCode
+                ? preferences.getString("pending_update_notes", "") : "";
+        if (notes == null || notes.trim().isEmpty()) {
+            notes = getString(R.string.current_release_notes);
+        }
+
+        preferences.edit()
+                .putInt("release_notes_seen_code", currentCode)
+                .remove("pending_update_version_code")
+                .remove("pending_update_version_name")
+                .remove("pending_update_notes")
+                .apply();
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.whats_new_title, releaseName))
+                .setMessage(notes.trim())
+                .setPositiveButton(R.string.ok, null)
+                .setNeutralButton(R.string.open_setup_guide, (view, which) ->
+                        showWebSocketSetupGuide())
+                .create();
+        dialog.setOnDismissListener(view -> updateManager.check(false));
+        dialog.show();
+        return true;
     }
 
     private void putConnectCommandOnClipboard() {

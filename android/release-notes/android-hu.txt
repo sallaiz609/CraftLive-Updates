@@ -1,1 +1,4 @@
-Javítva a Bedrock háttérkapcsolat olyan telefonokon is, ahol a Minecraft elutasította a 127.0.0.1 címet. Az interakciós szerkesztőben képekkel és érmeárral választhatók ki a TikTok-ajándékok. A LIVE csatlakozásakor automatikusan betöltődik az adott fiók teljes aktuális ajándékkatalógusa. Minden aktuális Bedrock mob külön listából választható, kézi parancsírás nélkül. Előre elkészített Minecraft-műveletek: mob, villám, gyémánt, gyógyítás, nappal és vihar. A fix 5 másodperces védelem változatlanul kötelező.
+• Javítva lett a Minecraft csatlakozási kódja (WebSocket).
+• A működő kapcsolódási parancs most egy gombnyomással kimásolható.
+• Új útmutató mutatja meg, mit kell bekapcsolni a Minecraft beállításaiban.
+• Minden frissítés után automatikusan megjelenik, mi változott.
