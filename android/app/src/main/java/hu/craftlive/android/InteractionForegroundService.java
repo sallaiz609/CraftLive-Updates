@@ -373,8 +373,7 @@ public final class InteractionForegroundService extends Service implements
         for (int index = 0; index < visible; index++) {
             InteractionSlot slot = enabled.get(index);
             String trigger = overlayTrigger(slot);
-            String action = slot.name == null || slot.name.trim().isEmpty()
-                    ? slot.command : slot.name;
+            String action = overlayAction(slot);
             TextView row = overlayText("• " + trigger + "  →  " + action,
                     13f, Color.WHITE, index < 3);
             row.setPadding(0, dp(3), 0, dp(3));
@@ -394,9 +393,13 @@ public final class InteractionForegroundService extends Service implements
         hint.setPadding(0, dp(7), 0, 0);
         panel.addView(hint);
 
-        int width = Math.min(dp(310), (int) (getResources().getDisplayMetrics().widthPixels * 0.28f));
+        // The panel must never hide more than 28% of the current screen. Keep the
+        // value in pixels so high-density phones do not accidentally get a much
+        // wider overlay because of a large dp minimum.
+        int width = Math.max(1, Math.min(dp(310),
+                (int) (getResources().getDisplayMetrics().widthPixels * 0.28f)));
         liveOverlayParams = new WindowManager.LayoutParams(
-                Math.max(dp(220), width), WindowManager.LayoutParams.WRAP_CONTENT,
+                width, WindowManager.LayoutParams.WRAP_CONTENT,
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                         ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
                         : WindowManager.LayoutParams.TYPE_PHONE,
@@ -488,6 +491,17 @@ public final class InteractionForegroundService extends Service implements
             case SHARE -> getString(R.string.trigger_share);
             case COMMENT -> slot.triggerKey;
         };
+    }
+
+    private String overlayAction(InteractionSlot slot) {
+        String name = slot.name == null ? "" : slot.name.trim();
+        int arrow = name.lastIndexOf('→');
+        if (arrow >= 0 && arrow + 1 < name.length()) {
+            String action = name.substring(arrow + 1).trim();
+            if (!action.isEmpty()) return action;
+        }
+        if (!name.isEmpty()) return name;
+        return slot.command == null ? "" : slot.command;
     }
 
     private int dp(int value) {
