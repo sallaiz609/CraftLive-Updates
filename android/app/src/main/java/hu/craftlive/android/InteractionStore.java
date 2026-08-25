@@ -42,6 +42,13 @@ public final class InteractionStore {
         return load(KEY_PLUS, PLUS_SLOT_COUNT, true);
     }
 
+    public List<InteractionSlot> loadEnabled() {
+        ArrayList<InteractionSlot> result = new ArrayList<>();
+        appendEnabled(result, loadStandard());
+        if (isPlusUnlocked()) appendEnabled(result, loadPlus());
+        return result;
+    }
+
     public void saveStandard(List<InteractionSlot> slots) {
         save(KEY_STANDARD, slots);
     }
@@ -93,6 +100,14 @@ public final class InteractionStore {
                     && !slot.triggerKey.trim().isEmpty()
                     && !normalize(slot.triggerKey).equals(normalizedKey)) continue;
             result.add(slot);
+        }
+    }
+
+    private static void appendEnabled(List<InteractionSlot> result, List<InteractionSlot> slots) {
+        for (InteractionSlot slot : slots) {
+            if (slot.enabled && slot.command != null && !slot.command.trim().isEmpty()) {
+                result.add(slot);
+            }
         }
     }
 

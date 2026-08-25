@@ -1,13 +1,17 @@
-# CraftLive Android 0.3.1
+# CraftLive Android 0.3.2
 
-- Javítva lett a Minecraft csatlakozási kódja (WebSocket).
-- A működő kapcsolódási parancs most egy gombnyomással kimásolható.
-- Új, lépésről lépésre követhető útmutató mutatja meg a szükséges Minecraft-beállításokat.
-- Minden frissítés után automatikusan megjelenik, mi változott.
+- A CraftLive automatikusan felismeri a TikTok LIVE indulását, és Aktív LIVE állapotra vált.
+- Ha az adás még nem fut vagy megszakad a kapcsolat, az app magától újrapróbálkozik.
+- Az ajándékok, like-ok, követések és más bekapcsolt interakciók megbízhatóbban jutnak el a Minecraftba.
+- Aktív LIVE alatt automatikusan elkészül az engedélyezett interakciók megosztható PNG-képe.
+- A LIVE-kép az alkalmazásból egy gombbal megosztható.
+- A mozgatható, átlátszó LIVE-lista a játék bármely részére húzható, és bármikor elrejthető.
 
 ## English
 
-- Fixed the Minecraft connection code (WebSocket).
-- The working connection command can now be copied with one tap.
-- A new step-by-step guide shows the required Minecraft settings.
-- CraftLive now automatically shows what changed after every update.
+- CraftLive automatically detects when TikTok LIVE starts and switches to Active LIVE.
+- If the stream is offline or the connection drops, the app retries automatically.
+- Gifts, likes, follows and other enabled interactions reach Minecraft more reliably.
+- During an active LIVE, CraftLive automatically creates a shareable PNG of enabled interactions.
+- Share the LIVE image with one button inside the app.
+- Move the transparent LIVE list anywhere over the game, or hide it at any time.

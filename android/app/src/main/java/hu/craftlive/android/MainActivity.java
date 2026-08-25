@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,6 +33,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
+
+import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -48,10 +52,13 @@ public final class MainActivity extends Activity {
     private TextView plusProgress;
     private LinearLayout slotContainer;
     private Button liveButton;
+    private Button posterButton;
+    private Button overlayButton;
     private Button standardTab;
     private Button plusTab;
     private boolean showingPlus;
     private boolean receiverRegistered;
+    private boolean pendingOverlayEnable;
 
     private final BroadcastReceiver statusReceiver = new BroadcastReceiver() {
         @Override
@@ -91,6 +98,10 @@ public final class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (updateManager != null) updateManager.resumePendingInstallIfAllowed();
+        if (pendingOverlayEnable && Settings.canDrawOverlays(this)) {
+            pendingOverlayEnable = false;
+            toggleLiveOverlay();
+        }
         if (statusText != null) {
             refreshStatus();
         }
@@ -191,6 +202,13 @@ public final class MainActivity extends Activity {
 
         statusText = panelText(getString(R.string.status_idle), R.color.craft_muted);
         root.addView(statusText, marginBottom(14));
+
+        posterButton = fullButton(R.string.live_poster_waiting, v -> shareLivePoster());
+        posterButton.setEnabled(false);
+        root.addView(posterButton);
+
+        overlayButton = fullButton(R.string.live_overlay_show, v -> requestLiveOverlay());
+        root.addView(overlayButton);
 
         root.addView(fullButton(R.string.test_bedrock,
                 v -> testCommand("/summon zombie ~ ~1 ~")));
@@ -409,7 +427,7 @@ public final class MainActivity extends Activity {
             updateManager.check(true);
             return;
         }
-        if (InteractionForegroundService.isLiveActive()) {
+        if (InteractionForegroundService.isLiveMonitoring()) {
             Intent stop = new Intent(this, InteractionForegroundService.class).setAction(
                     InteractionForegroundService.ACTION_STOP);
             startService(stop);
@@ -472,7 +490,7 @@ public final class MainActivity extends Activity {
         String detail = store.preferences().getString("live_status_detail", "");
         int textColor = R.color.craft_muted;
         String text;
-        if ("connected".equals(state)) {
+        if ("active".equals(state) || "connected".equals(state)) {
             text = getString(R.string.status_connected);
             textColor = R.color.craft_green;
         } else if ("starting".equals(state)) {
@@ -488,8 +506,20 @@ public final class MainActivity extends Activity {
         statusText.setText(text + " · " + getString(R.string.queued_count,
                 InteractionForegroundService.queuedCount()));
         statusText.setTextColor(color(textColor));
-        liveButton.setText(InteractionForegroundService.isLiveActive()
+        liveButton.setText(InteractionForegroundService.isLiveMonitoring()
                 ? R.string.stop_live : R.string.start_live);
+        if (posterButton != null) {
+            boolean active = InteractionForegroundService.isLiveActive();
+            int activeCount = store.loadEnabled().size();
+            posterButton.setText(active
+                    ? getString(R.string.live_poster_share, activeCount)
+                    : getString(R.string.live_poster_waiting));
+            posterButton.setEnabled(active);
+        }
+        if (overlayButton != null) {
+            overlayButton.setText(InteractionForegroundService.isLiveOverlayVisible()
+                    ? R.string.live_overlay_hide : R.string.live_overlay_show);
+        }
 
         if (bridgeStatusText != null) {
             String bridgeState = store.preferences().getString("bedrock_bridge_status", "starting");
@@ -548,6 +578,54 @@ public final class MainActivity extends Activity {
             startService(bridge);
         }
         handler.postDelayed(this::refreshStatus, 350L);
+    }
+
+    private void shareLivePoster() {
+        if (!InteractionForegroundService.isLiveActive()) {
+            toast(R.string.live_poster_waiting);
+            return;
+        }
+        try {
+            String username = store.preferences().getString("tiktok_username", "");
+            LiveInteractionPoster.Result result = LiveInteractionPoster.generate(
+                    this, store, username == null ? "" : username);
+            File file = result.file;
+            Uri uri = FileProvider.getUriForFile(
+                    this, getPackageName() + ".updates", file);
+            Intent share = new Intent(Intent.ACTION_SEND)
+                    .setType("image/png")
+                    .putExtra(Intent.EXTRA_STREAM, uri)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(share, getString(R.string.live_poster_chooser)));
+            toast(R.string.live_poster_ready);
+        } catch (Exception error) {
+            toast(getString(R.string.live_poster_error,
+                    error.getMessage() == null ? error.getClass().getSimpleName()
+                            : error.getMessage()));
+        }
+    }
+
+    private void requestLiveOverlay() {
+        if (!Settings.canDrawOverlays(this)) {
+            pendingOverlayEnable = true;
+            Intent permission = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivity(permission);
+            toast(R.string.live_overlay_permission);
+            return;
+        }
+        toggleLiveOverlay();
+    }
+
+    private void toggleLiveOverlay() {
+        Intent toggle = new Intent(this, InteractionForegroundService.class)
+                .setAction(InteractionForegroundService.ACTION_TOGGLE_LIVE_OVERLAY);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(toggle);
+        } else {
+            startService(toggle);
+        }
+        handler.postDelayed(this::refreshStatus, 250L);
     }
 
     private void copyConnectCommand() {
