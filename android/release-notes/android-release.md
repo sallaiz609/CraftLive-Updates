@@ -1,15 +1,15 @@
-# CraftLive Android 0.4.0
+# CraftLive Android 0.4.1
 
-- Új, egytelefonos LIVE-közvetítő mód: a Minecraft és az aktív interakciók együtt küldhetők a TikTok adásba.
-- A jobb oldali nézői sáv ajándékképet vagy egyértelmű ikont mutat, mellette csak a Minecraft-esemény látható.
-- A nézői sáv nem takarja a játékos saját Minecraft-képernyőjét; csak a továbbított adásra kerül rá.
-- A TikTok közvetítési kulcs csak az indítás idejére marad a memóriában, a CraftLive nem menti el.
-- A közvetítő mód béta, ezért az első éles adás előtt rövid próba ajánlott.
+- A főoldal áttekinthető vezérlőpult lett, amely csak a fontos állapotokat és kategóriákat mutatja.
+- Külön lapot kapott a Minecraft-kapcsolat, a Minecraft-interakciók, a TikTok LIVE, a LIVE-közvetítés és az alkalmazás.
+- A másolható Minecraft-kapcsolódási parancs, a beállítási útmutató és a kapcsolat tesztje egy helyre került.
+- A Standard/Plus helyek, ajándékok, mobok és események saját interakciós lapon kezelhetők.
+- A nézői sáv az ajándék képét vagy ikonját és a Minecraft-hatást mutatja.
 
 ## English
 
-- New one-phone LIVE broadcasting mode: Minecraft and the enabled interactions can be sent together to TikTok.
-- The right-side viewer panel shows gift artwork or a clear icon with only the Minecraft event beside it.
-- The viewer panel does not cover the player’s own Minecraft screen; it is added only to the outgoing broadcast.
-- The TikTok stream key remains in memory only while starting and is never saved by CraftLive.
-- Broadcasting is beta, so a short test is recommended before the first real LIVE.
+- The home screen is now a clean dashboard showing only essential statuses and categories.
+- Minecraft connection, Minecraft interactions, TikTok LIVE, LIVE broadcasting and application settings now have separate pages.
+- The copyable Minecraft connection command, setup guide and connection test are grouped together.
+- Standard/Plus slots, gifts, mobs and events are managed on their own interaction page.
+- The viewer panel shows the gift artwork or icon together with its Minecraft effect.
