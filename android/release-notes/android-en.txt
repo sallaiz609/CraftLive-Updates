@@ -1,5 +1,5 @@
-• A new one-phone LIVE broadcasting mode can send Minecraft and the enabled interactions together to TikTok.
-• The right-side viewer panel shows the gift artwork and only its Minecraft event, for example “→ zombie”.
-• The player does not see this panel while playing; it is added only to the outgoing broadcast.
-• CraftLive never saves the stream key.
-• The broadcasting feature is currently beta. A short test is recommended before the first LIVE.
+• The home screen is now a clean dashboard showing only essential statuses and categories.
+• Minecraft connection, Minecraft interactions, TikTok LIVE, LIVE broadcasting and application settings now have separate pages.
+• The copyable Minecraft connection command, guide and connection test are grouped together.
+• Standard/Plus slots, gifts, mobs and events are managed on their own interaction page.
+• The viewer panel shows the gift artwork or icon together with its Minecraft effect.
