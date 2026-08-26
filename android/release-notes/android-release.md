@@ -1,4 +1,4 @@
-# CraftLive Android 0.3.3
+# CraftLive Android 0.3.4
 
 - Javítva lett az 5 LIVE órás PLUS-számláló: az aktív adás minden eltelt másodpercét rögzíti.
 - A haladás már másodperc pontossággal látható az alkalmazásban.
