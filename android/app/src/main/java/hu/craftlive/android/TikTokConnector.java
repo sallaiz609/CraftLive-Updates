@@ -20,6 +20,7 @@ public final class TikTokConnector {
     public interface Listener {
         void onConnected();
         void onWaiting();
+        void onLiveEnded();
         void onGiftCatalog(List<GiftCatalogItem> gifts);
         void onEvent(InteractionSlot.TriggerType type, String key, int amount, String user);
         void onError(String message);
@@ -43,8 +44,10 @@ public final class TikTokConnector {
     public void disconnect() {
         stopped.set(true);
         Object target = builderOrClient;
-        if (target instanceof CompletableFuture<?>) {
-            target = ((CompletableFuture<?>) target).getNow(null);
+        if (target instanceof CompletableFuture<?> future) {
+            Object connectedClient = future.getNow(null);
+            if (connectedClient == null) future.cancel(true);
+            target = connectedClient;
         }
         invokeIfPresent(target, "disconnect");
         invokeIfPresent(target, "close");
@@ -62,6 +65,11 @@ public final class TikTokConnector {
             });
             builder = register(builder, "onReconnecting", args -> listener.onWaiting());
             builder = register(builder, "onDisconnected", args -> listener.onWaiting());
+            builder = register(builder, "onLiveEnded", args -> listener.onLiveEnded());
+            builder = register(builder, "onLiveUnpaused", args -> listener.onConnected());
+            // A szobainformáció csak működő LIVE kapcsolatnál érkezik, ezért
+            // tartalék jelzésként is aktívra állíthatja az állapotot.
+            builder = register(builder, "onRoomInfo", args -> listener.onConnected());
             builder = register(builder, "onGift", args -> {
                 Object event = eventFrom(args);
                 Object giftObject = invokeIfPresent(event, "getGift");
@@ -71,7 +79,8 @@ public final class TikTokConnector {
                     listener.onGiftCatalog(Collections.singletonList(catalogItem));
                 }
                 String user = userName(event);
-                listener.onEvent(InteractionSlot.TriggerType.GIFT, gift, 1, user);
+                int combo = number(event, "getCombo", 1);
+                listener.onEvent(InteractionSlot.TriggerType.GIFT, gift, Math.max(1, combo), user);
             });
             builder = register(builder, "onLike", args -> {
                 Object event = eventFrom(args);
@@ -105,13 +114,32 @@ public final class TikTokConnector {
             Method build = findMethod(builder.getClass(), "buildAndConnectAsync", 0);
             if (build == null) build = findMethod(builder.getClass(), "buildAndConnect", 0);
             if (build == null) throw new IllegalStateException("TikTok connect method is unavailable");
-            builderOrClient = build.invoke(builder);
+            Object connection = build.invoke(builder);
+            builderOrClient = connection;
+            if (connection instanceof CompletableFuture<?> future) {
+                future.whenComplete((client, error) -> {
+                    if (error != null && !stopped.get()) {
+                        listener.onError(errorMessage(error));
+                    } else if (client != null && !stopped.get()) {
+                        builderOrClient = client;
+                    }
+                });
+            }
         } catch (Throwable error) {
             if (!stopped.get()) {
-                String message = error.getCause() != null ? error.getCause().getMessage() : error.getMessage();
-                listener.onError(message == null ? error.getClass().getSimpleName() : message);
+                listener.onError(errorMessage(error));
             }
         }
+    }
+
+    private static String errorMessage(Throwable error) {
+        Throwable current = error;
+        while (current.getCause() != null && current.getCause() != current) {
+            current = current.getCause();
+        }
+        String message = current.getMessage();
+        return message == null || message.trim().isEmpty()
+                ? current.getClass().getSimpleName() : message;
     }
 
     private Object configureRetry(Object builder) {
@@ -125,6 +153,7 @@ public final class TikTokConnector {
                             Object settings = args[0];
                             invokeIfPresent(settings, "setRetryOnConnectionFailure", true);
                             invokeIfPresent(settings, "setRetryConnectionTimeout", Duration.ofSeconds(5));
+                            invokeIfPresent(settings, "setFetchGifts", true);
                         }
                         return defaultValue(method.getReturnType());
                     });
@@ -154,7 +183,7 @@ public final class TikTokConnector {
     }
 
     private static Object clientFrom(Object[] args) {
-        return args != null && args.length > 1 ? args[0] : null;
+        return args != null && args.length > 0 ? args[0] : null;
     }
 
     private static List<GiftCatalogItem> extractGiftCatalog(Object client) {

@@ -1,4 +1,6 @@
-• Javítva lett a Minecraft csatlakozási kódja (WebSocket).
-• A működő kapcsolódási parancs most egy gombnyomással kimásolható.
-• Új útmutató mutatja meg, mit kell bekapcsolni a Minecraft beállításaiban.
-• Minden frissítés után automatikusan megjelenik, mi változott.
+• A CraftLive automatikusan felismeri a TikTok LIVE indulását, és Aktív LIVE állapotra vált.
+• Ha az adás még nem fut vagy megszakad a kapcsolat, az app magától újrapróbálkozik.
+• Az ajándékok, like-ok, követések és más bekapcsolt interakciók megbízhatóbban jutnak el a Minecraftba.
+• Aktív LIVE alatt automatikusan elkészül az engedélyezett interakciók megosztható PNG-képe.
+• A LIVE-kép az alkalmazásból egy gombbal megosztható.
+• A mozgatható, átlátszó LIVE-lista a játék bármely részére húzható, és bármikor elrejthető.
