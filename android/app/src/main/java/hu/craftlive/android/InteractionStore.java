@@ -61,7 +61,7 @@ public final class InteractionStore {
         return preferences.getLong(KEY_LIVE_MILLIS, 0L);
     }
 
-    public void addVerifiedLiveMillis(long millis) {
+    public synchronized void addVerifiedLiveMillis(long millis) {
         if (millis <= 0L) return;
         long next = Math.min(Long.MAX_VALUE, getVerifiedLiveMillis() + millis);
         preferences.edit().putLong(KEY_LIVE_MILLIS, next).apply();

@@ -56,6 +56,19 @@ public final class GiftCatalogStore {
         return sorted;
     }
 
+    public synchronized GiftCatalogItem findByName(String name) {
+        String wanted = key(name);
+        if (wanted.isEmpty()) return null;
+        GiftCatalogItem match = null;
+        for (GiftCatalogItem item : builtIns()) {
+            if (wanted.equals(key(item.name))) match = item;
+        }
+        for (GiftCatalogItem item : loadSaved()) {
+            if (wanted.equals(key(item.name))) match = item;
+        }
+        return match;
+    }
+
     private List<GiftCatalogItem> loadSaved() {
         ArrayList<GiftCatalogItem> result = new ArrayList<>();
         try {

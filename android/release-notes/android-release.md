@@ -1,17 +1,15 @@
-# CraftLive Android 0.3.2
+# CraftLive Android 0.3.4
 
-- A CraftLive automatikusan felismeri a TikTok LIVE indulását, és Aktív LIVE állapotra vált.
-- Ha az adás még nem fut vagy megszakad a kapcsolat, az app magától újrapróbálkozik.
-- Az ajándékok, like-ok, követések és más bekapcsolt interakciók megbízhatóbban jutnak el a Minecraftba.
-- Aktív LIVE alatt automatikusan elkészül az engedélyezett interakciók megosztható PNG-képe.
-- A LIVE-kép az alkalmazásból egy gombbal megosztható.
-- A mozgatható, átlátszó LIVE-lista a játék bármely részére húzható, és bármikor elrejthető.
+- Javítva lett az 5 LIVE órás PLUS-számláló: az aktív adás minden eltelt másodpercét rögzíti.
+- A haladás már másodperc pontossággal látható az alkalmazásban.
+- Az aktív interakciók PNG-jén megjelenik a TikTok-ajándék képe, neve és a hozzá tartozó Minecraft-esemény.
+- A LIVE során érkező aktuális ajándékképek automatikusan frissítik a képet.
+- Ha egy kép nem tölthető be, jól felismerhető emoji vagy ikon helyettesíti.
 
 ## English
 
-- CraftLive automatically detects when TikTok LIVE starts and switches to Active LIVE.
-- If the stream is offline or the connection drops, the app retries automatically.
-- Gifts, likes, follows and other enabled interactions reach Minecraft more reliably.
-- During an active LIVE, CraftLive automatically creates a shareable PNG of enabled interactions.
-- Share the LIVE image with one button inside the app.
-- Move the transparent LIVE list anywhere over the game, or hide it at any time.
+- Fixed the 5-hour PLUS counter: every elapsed second of an active LIVE is now recorded.
+- Progress is now visible in the app with second-level precision.
+- The active-interactions PNG now shows the TikTok gift image, name, and its Minecraft event.
+- Current gift artwork received during the LIVE automatically refreshes the image.
+- A recognizable emoji or icon is used when artwork cannot be loaded.

@@ -9,7 +9,7 @@
     <string name="version_format">Alkalmazásverzió: %1$s</string>
     <string name="standard">Standard</string>
     <string name="plus">Plus</string>
-    <string name="plus_locked">PLUS lezárva – %1$.1f / 5 LIVE óra</string>
+    <string name="plus_locked">PLUS lezárva – %1$d óra %2$d perc %3$d mp / 5 óra</string>
     <string name="plus_unlocked">PLUS feloldva – extrém interakciók elérhetők</string>
     <string name="fixed_delay">Fix védelem: minden Minecraft-interakció között 5 másodperc telik el.</string>
     <string name="bridge_starting">Bedrock-híd: indul…</string>
@@ -28,7 +28,7 @@
     <string name="open_setup_guide">Útmutató</string>
     <string name="ok">Rendben</string>
     <string name="whats_new_title">Mi változott? · %1$s</string>
-    <string name="current_release_notes">• A CraftLive most automatikusan felismeri, amikor elindul a TikTok LIVE, és Aktív LIVE állapotra vált.\n• Ha az adás még nem fut vagy megszakad a kapcsolat, az app magától újrapróbálkozik.\n• Az ajándékok, like-ok, követések és más bekapcsolt interakciók megbízhatóbban jutnak el a Minecraftba.\n• Aktív LIVE alatt automatikusan elkészül egy megosztható PNG az éppen bekapcsolt interakciókról.\n• Új, átlátszó LIVE-lista helyezhető a játék fölé, és a fejlécénél fogva bárhová húzható.</string>
+    <string name="current_release_notes">• Javítva lett az 5 LIVE órás PLUS-számláló, és már másodpercenként látható a haladás.\n• Az aktív interakciók PNG-jén megjelenik a TikTok-ajándék képe, neve és a hozzá tartozó Minecraft-esemény.\n• A LIVE során érkező aktuális ajándékképek automatikusan frissítik a képet.\n• Ha egy ajándékkép nem érhető el, érthető emoji vagy ikon jelenik meg helyette.</string>
     <string name="command_accepted">A Minecraft elfogadta a legutóbbi parancsot.</string>
     <string name="command_rejected">A Minecraft elutasította a parancsot: %1$s</string>
     <string name="tiktok_username">TikTok-felhasználónév (@ nélkül)</string>
@@ -87,6 +87,7 @@
     <string name="notification_live_active">TikTok LIVE aktív · interakciók: %1$d · várakozó: %2$d</string>
     <string name="notification_live_waiting">LIVE figyelés aktív · várakozás az adásra · sor: %1$d</string>
     <string name="live_poster_waiting">LIVE-kép – az aktív adás után elérhető</string>
+    <string name="live_poster_creating">LIVE-kép készítése…</string>
     <string name="live_poster_share">Aktív interakciók PNG-je · %1$d db</string>
     <string name="live_poster_ready">A LIVE-kép elkészült. Most megoszthatod.</string>
     <string name="live_poster_error">A LIVE-kép nem készíthető el: %1$s</string>

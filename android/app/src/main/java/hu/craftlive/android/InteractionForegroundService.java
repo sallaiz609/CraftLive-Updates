@@ -12,6 +12,7 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
@@ -36,6 +38,7 @@ public final class InteractionForegroundService extends Service implements
     public static final String ACTION_STOP = "hu.craftlive.android.STOP";
     public static final String ACTION_TEST = "hu.craftlive.android.TEST";
     public static final String ACTION_TOGGLE_LIVE_OVERLAY = "hu.craftlive.android.TOGGLE_LIVE_OVERLAY";
+    public static final String ACTION_REFRESH_POSTER = "hu.craftlive.android.REFRESH_POSTER";
     public static final String ACTION_STATUS_CHANGED = "hu.craftlive.android.STATUS_CHANGED";
     public static final String EXTRA_COMMAND = "command";
 
@@ -48,7 +51,11 @@ public final class InteractionForegroundService extends Service implements
     private final Map<String, Integer> likeCounters = new HashMap<>();
     private final AtomicBoolean workerRunning = new AtomicBoolean(false);
     private final AtomicBoolean reconnectScheduled = new AtomicBoolean(false);
+    private final Object liveTimeLock = new Object();
     private final ScheduledExecutorService ticker = Executors.newSingleThreadScheduledExecutor();
+    private final ExecutorService posterExecutor = Executors.newSingleThreadExecutor();
+    private final AtomicBoolean posterGenerationQueued = new AtomicBoolean(false);
+    private final AtomicBoolean posterGenerationRequested = new AtomicBoolean(false);
     private InteractionStore store;
     private GiftCatalogStore giftCatalog;
     private TikTokConnector connector;
@@ -141,6 +148,10 @@ public final class InteractionForegroundService extends Service implements
             toggleLiveOverlay();
             return START_STICKY;
         }
+        if (ACTION_REFRESH_POSTER.equals(action)) {
+            if (liveConnected) scheduleLivePosterGeneration();
+            return START_STICKY;
+        }
         if (ACTION_START.equals(action)) {
             String username = store.preferences().getString("tiktok_username", "");
             if (username != null && !username.trim().isEmpty()) {
@@ -176,6 +187,7 @@ public final class InteractionForegroundService extends Service implements
                 .apply();
         workerRunning.set(false);
         ticker.shutdownNow();
+        posterExecutor.shutdownNow();
         queue.clear();
         instance = null;
         writeStatus("idle", "");
@@ -208,6 +220,7 @@ public final class InteractionForegroundService extends Service implements
     @Override
     public void onGiftCatalog(List<GiftCatalogItem> gifts) {
         if (giftCatalog != null) giftCatalog.merge(gifts);
+        if (liveConnected) scheduleLivePosterGeneration();
         sendStatusBroadcast();
     }
 
@@ -319,10 +332,28 @@ public final class InteractionForegroundService extends Service implements
         boolean becameActive = !liveConnected;
         if (becameActive) {
             liveConnected = true;
-            lastLiveTick = System.currentTimeMillis();
+            synchronized (liveTimeLock) {
+                lastLiveTick = SystemClock.elapsedRealtime();
+            }
             writeStatus("active", "");
-            generateLivePoster();
+            scheduleLivePosterGeneration();
         }
+    }
+
+    private void scheduleLivePosterGeneration() {
+        posterGenerationRequested.set(true);
+        if (posterExecutor.isShutdown() || !posterGenerationQueued.compareAndSet(false, true)) return;
+        posterExecutor.execute(() -> {
+            try {
+                do {
+                    posterGenerationRequested.set(false);
+                    generateLivePoster();
+                } while (posterGenerationRequested.get() && !posterExecutor.isShutdown());
+            } finally {
+                posterGenerationQueued.set(false);
+                if (posterGenerationRequested.get()) scheduleLivePosterGeneration();
+            }
+        });
     }
 
     private void generateLivePoster() {
@@ -557,22 +588,37 @@ public final class InteractionForegroundService extends Service implements
 
     private void tickLiveTime() {
         if (!liveConnected) return;
-        long now = System.currentTimeMillis();
-        long elapsed = now - lastLiveTick;
-        if (elapsed >= 1_000L && elapsed <= 10_000L) {
-            store.addVerifiedLiveMillis(elapsed);
-            lastLiveTick = now;
-            sendStatusBroadcast();
-        } else {
-            lastLiveTick = now;
+        boolean changed = false;
+        synchronized (liveTimeLock) {
+            long now = SystemClock.elapsedRealtime();
+            if (lastLiveTick <= 0L) {
+                lastLiveTick = now;
+            } else {
+                long elapsed = now - lastLiveTick;
+                // A ScheduledExecutor futása gyakran néhány ezredmásodperccel
+                // korábban érkezik. Az előző >= 1000 ms feltétel emiatt szinte
+                // minden másodpercet eldobhatott, ezért minden pozitív, monoton
+                // időtartamot rögzítünk.
+                if (elapsed > 0L) {
+                    store.addVerifiedLiveMillis(elapsed);
+                    lastLiveTick = now;
+                    changed = true;
+                }
+            }
         }
+        if (changed) sendStatusBroadcast();
     }
 
     private void accumulateLiveTime() {
-        if (!liveConnected || lastLiveTick <= 0L) return;
-        long elapsed = System.currentTimeMillis() - lastLiveTick;
-        if (elapsed > 0L && elapsed <= 10_000L) store.addVerifiedLiveMillis(elapsed);
-        lastLiveTick = System.currentTimeMillis();
+        if (!liveConnected) return;
+        synchronized (liveTimeLock) {
+            long now = SystemClock.elapsedRealtime();
+            if (lastLiveTick > 0L) {
+                long elapsed = now - lastLiveTick;
+                if (elapsed > 0L) store.addVerifiedLiveMillis(elapsed);
+            }
+            lastLiveTick = 0L;
+        }
     }
 
     private void writeStatus(String state, String detail) {
