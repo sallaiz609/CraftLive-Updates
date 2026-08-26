@@ -28,7 +28,7 @@
     <string name="open_setup_guide">Guide</string>
     <string name="ok">OK</string>
     <string name="whats_new_title">What changed? · %1$s</string>
-    <string name="current_release_notes">• Fixed the 5-hour PLUS counter and made progress visible every second.\n• The active-interactions PNG now shows the TikTok gift image, gift name, and its Minecraft event.\n• Current gift artwork received during the LIVE automatically refreshes the image.\n• A clear emoji or icon is shown whenever gift artwork is unavailable.</string>
+    <string name="current_release_notes">• A new one-phone LIVE broadcasting mode is available. It can send Minecraft and the enabled interactions together to TikTok.\n• The viewer panel shows the gift artwork and only its Minecraft event, for example “→ zombie”.\n• The player does not see this panel while playing; it is added only to the outgoing broadcast.\n• CraftLive never saves the stream key. This feature is currently beta, so a short test is recommended before the first LIVE.</string>
     <string name="command_accepted">Minecraft accepted the latest command.</string>
     <string name="command_rejected">Minecraft rejected the command: %1$s</string>
     <string name="tiktok_username">TikTok username (without @)</string>
@@ -125,4 +125,27 @@
     <string name="setup_incomplete">Android settings opened. Return to CraftLive after enabling it.</string>
     <string name="update_bad_signature">The APK signature must match the installed CraftLive. Always use the same release key for GitHub releases.</string>
     <string name="queued_count">queued: %1$d</string>
+    <string name="broadcast_title">One-phone LIVE broadcasting · BETA</string>
+    <string name="broadcast_note">CraftLive broadcasts Minecraft and adds the gift artwork with its event on the right only for viewers. This panel is not shown on your game screen. A streaming server address and key supplied by TikTok are required. CraftLive does not save the key.</string>
+    <string name="broadcast_server_hint">TikTok streaming server (rtmp:// or rtmps://)</string>
+    <string name="broadcast_key_hint">TikTok stream key</string>
+    <string name="broadcast_start">Start broadcasting</string>
+    <string name="broadcast_stop">Stop broadcasting</string>
+    <string name="broadcast_idle">CraftLive broadcasting is not running.</string>
+    <string name="broadcast_preparing">Preparing the broadcast…</string>
+    <string name="broadcast_connecting">Connecting to the TikTok LIVE…</string>
+    <string name="broadcast_active">CraftLive broadcasting is active. The viewer panel is visible only in the LIVE.</string>
+    <string name="broadcast_error">Broadcast could not start: %1$s</string>
+    <string name="broadcast_server_invalid">Enter the rtmp:// or rtmps:// server address supplied by TikTok.</string>
+    <string name="broadcast_key_required">Enter the stream key supplied by TikTok.</string>
+    <string name="broadcast_capture_denied">Screen broadcasting permission was not granted.</string>
+    <string name="broadcast_audio_required">Allow microphone access for game and microphone audio.</string>
+    <string name="broadcast_starting">Broadcasting is starting, then Minecraft will open.</string>
+    <string name="broadcast_prepare_failed">This phone could not prepare the broadcast.</string>
+    <string name="broadcast_capture_missing">Screen broadcasting permission is missing. Start the broadcast again.</string>
+    <string name="broadcast_disconnected">The connection to the streaming service was interrupted.</string>
+    <string name="broadcast_auth_error">TikTok did not accept the stream key.</string>
+    <string name="broadcast_notification_channel">CraftLive LIVE broadcasting</string>
+    <string name="broadcast_notification_title">CraftLive broadcasting</string>
+    <string name="broadcast_notification_active">Minecraft and the viewer interaction panel are being broadcast.</string>
 </resources>

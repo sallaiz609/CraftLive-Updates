@@ -1,0 +1,7 @@
+CraftLive Android 0.4.0
+
+- Új, egytelefonos LIVE-közvetítő mód (béta).
+- A jobb oldali nézői sáv az ajándék képét és csak a Minecraft-eseményt mutatja.
+- A játékos saját Minecraft-képernyőjén nem látszik a nézői sáv.
+- A közvetítési kulcsot a CraftLive nem menti el és nem naplózza.
+- A funkcióhoz TikTok által kiadott RTMP/RTMPS szervercím és közvetítési kulcs kell.

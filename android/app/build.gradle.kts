@@ -66,6 +66,8 @@ android {
 dependencies {
     implementation("androidx.core:core:1.15.0")
     implementation("org.java-websocket:Java-WebSocket:1.5.7")
+    // Screen capture, in-memory viewer overlay and RTMP/RTMPS publishing.
+    implementation("com.github.pedroSG94.RootEncoder:library:2.8.0")
     // Nem hivatalos, hitelesítés nélküli TikTok LIVE kliens. A CraftLive reflexión
     // keresztül használja, így a csatlakozó később az UI átírása nélkül cserélhető.
     implementation("com.github.jwdeveloper.TikTok-Live-Java:Client:1.10.0-Release")

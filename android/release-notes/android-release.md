@@ -1,15 +1,15 @@
-# CraftLive Android 0.3.4
+# CraftLive Android 0.4.0
 
-- Javítva lett az 5 LIVE órás PLUS-számláló: az aktív adás minden eltelt másodpercét rögzíti.
-- A haladás már másodperc pontossággal látható az alkalmazásban.
-- Az aktív interakciók PNG-jén megjelenik a TikTok-ajándék képe, neve és a hozzá tartozó Minecraft-esemény.
-- A LIVE során érkező aktuális ajándékképek automatikusan frissítik a képet.
-- Ha egy kép nem tölthető be, jól felismerhető emoji vagy ikon helyettesíti.
+- Új, egytelefonos LIVE-közvetítő mód: a Minecraft és az aktív interakciók együtt küldhetők a TikTok adásba.
+- A jobb oldali nézői sáv ajándékképet vagy egyértelmű ikont mutat, mellette csak a Minecraft-esemény látható.
+- A nézői sáv nem takarja a játékos saját Minecraft-képernyőjét; csak a továbbított adásra kerül rá.
+- A TikTok közvetítési kulcs csak az indítás idejére marad a memóriában, a CraftLive nem menti el.
+- A közvetítő mód béta, ezért az első éles adás előtt rövid próba ajánlott.
 
 ## English
 
-- Fixed the 5-hour PLUS counter: every elapsed second of an active LIVE is now recorded.
-- Progress is now visible in the app with second-level precision.
-- The active-interactions PNG now shows the TikTok gift image, name, and its Minecraft event.
-- Current gift artwork received during the LIVE automatically refreshes the image.
-- A recognizable emoji or icon is used when artwork cannot be loaded.
+- New one-phone LIVE broadcasting mode: Minecraft and the enabled interactions can be sent together to TikTok.
+- The right-side viewer panel shows gift artwork or a clear icon with only the Minecraft event beside it.
+- The viewer panel does not cover the player’s own Minecraft screen; it is added only to the outgoing broadcast.
+- The TikTok stream key remains in memory only while starting and is never saved by CraftLive.
+- Broadcasting is beta, so a short test is recommended before the first real LIVE.

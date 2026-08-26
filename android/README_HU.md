@@ -15,6 +15,19 @@ A Minecraft teljes bezárása vagy a CraftLive-híd újraindítása után a kapc
 
 A kisegítő lehetőség, a külön CraftLive-billentyűzet és a chatgomb kalibrálása az új WebSocket-hídhoz nem szükséges.
 
+## Egytelefonos TikTok LIVE-közvetítés (béta)
+
+A 0.4.0-s verzióban a CraftLive a telefonon futó Minecraft képét közvetítheti, és csak a továbbított adás jobb oldalára rajzolja rá az aktív interakciókat. A játékos a saját kijelzőjén nem látja ezt a sávot. Az ajándékos soroknál az ajándék képe jelenik meg, mellette csak a Minecraft-esemény, például `→ zombi`.
+
+Ehhez olyan TikTok-fiók szükséges, amelynél a TikTok megad közvetítési szervercímet és közvetítési kulcsot. A CraftLive-ban:
+
+1. Írd be a TikToktól kapott `rtmp://` vagy `rtmps://` szervercímet.
+2. Írd be a közvetítési kulcsot.
+3. Nyomd meg a **Közvetítés indítása** gombot, és engedélyezd a képernyő, illetve a hang továbbítását.
+4. A Minecraft automatikusan megnyílik. Az adás leállításához térj vissza a CraftLive-ba.
+
+A CraftLive a közvetítési kulcsot nem menti el és nem írja naplóba. A funkció béta: az első éles LIVE előtt rövid, nem nyilvános próba ajánlott. A TikTok-fiókhoz tartozó közvetítési kulcsot soha ne töltsd fel GitHubra, és ne küldd el másnak.
+
 ## GitHubos, alkalmazáson belüli frissítés
 
 Az alkalmazás induláskor ellenőrzi ezt a fájlt:
@@ -61,3 +74,4 @@ A közös `CraftLive-Updates` tárolóban az Android-projekt az `android/` mapp�
 - A parancs csak aktív Minecraft WebSocket-kapcsolatnál kerül elküldésre.
 - A PLUS romboló parancsai világvesztést okozhatnak, ezért készíts biztonsági másolatot.
 - A TikTok-kapcsolat nem hivatalos, visszafejtett protokollt használ; TikTok-változáskor a csatlakozót frissíteni kellhet.
+- Az egytelefonos közvetítő módhoz a TikTok által kiadott RTMP/RTMPS szervercím és kulcs szükséges; ez nem minden TikTok-fiókban érhető el.

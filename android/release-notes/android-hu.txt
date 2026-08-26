@@ -1,4 +1,5 @@
-• Javítva lett az 5 LIVE órás PLUS-számláló, és a haladás már másodpercenként látható.
-• Az aktív interakciók PNG-jén megjelenik a TikTok-ajándék képe, neve és Minecraft-eseménye.
-• A LIVE során érkező aktuális ajándékképek automatikusan frissítik a képet.
-• Ha egy kép nem érhető el, jól felismerhető emoji vagy ikon helyettesíti.
+• Új, egytelefonos LIVE-közvetítő mód készült. A Minecraft képe és az aktív interakciók együtt küldhetők a TikTok adásba.
+• A jobb oldali nézői sávon az ajándék képe és csak a hozzá tartozó Minecraft-esemény látható, például „→ zombi”.
+• A sávot a játékos nem látja játék közben; csak a továbbított adás képére kerül rá.
+• A közvetítési kulcsot a CraftLive nem menti el.
+• Ez a közvetítő funkció jelenleg béta. Az első LIVE előtt rövid próba ajánlott.

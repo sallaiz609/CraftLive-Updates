@@ -15,6 +15,7 @@ Android-first CraftLive client for controlling a local Minecraft Bedrock world o
 - Visible app version and startup update check.
 - In-app APK download, SHA-256 verification, and Android installer hand-off.
 - GitHub Actions workflow for signed APK releases.
+- Beta one-phone RTMP/RTMPS broadcasting with an in-memory right-side viewer panel. Gift rows show the gift artwork and only the Minecraft effect beside it; the player does not see this panel on the device screen.
 
 Read [README_HU.md](README_HU.md) for the Hungarian setup and release guide.
 
@@ -26,6 +27,7 @@ Read [README_HU.md](README_HU.md) for the Hungarian setup and release guide.
 - Android requires user confirmation for every APK installation. Silent updates are not available to normal sideloaded apps.
 - TikTok LIVE connectivity uses a reverse-engineered, unofficial API and can require connector updates when TikTok changes its protocol.
 - GitHub sideload distribution is the intended first release path.
+- One-phone broadcasting requires a TikTok-provided RTMP/RTMPS server address and stream key. CraftLive does not persist or log the key.
 
 ## Build
 

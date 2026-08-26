@@ -1,4 +1,5 @@
-• Fixed the 5-hour PLUS counter and made progress visible every second.
-• The active-interactions PNG now shows the TikTok gift image, name, and Minecraft event.
-• Current gift artwork received during the LIVE automatically refreshes the image.
-• A recognizable emoji or icon is used when artwork is unavailable.
+• A new one-phone LIVE broadcasting mode can send Minecraft and the enabled interactions together to TikTok.
+• The right-side viewer panel shows the gift artwork and only its Minecraft event, for example “→ zombie”.
+• The player does not see this panel while playing; it is added only to the outgoing broadcast.
+• CraftLive never saves the stream key.
+• The broadcasting feature is currently beta. A short test is recommended before the first LIVE.

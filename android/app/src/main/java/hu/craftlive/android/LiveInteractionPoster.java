@@ -156,16 +156,21 @@ public final class LiveInteractionPoster {
         int triggerLimit = columns == 3 ? 15 : 25;
         int actionLimit = columns == 3 ? 14 : 22;
 
-        paint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
-        paint.setColor(GREEN);
-        paint.setTextSize(triggerSize);
-        canvas.drawText(fit(trigger(slot, gift, hungarian), triggerLimit),
-                textX, triggerY, paint);
+        if (slot.triggerType != InteractionSlot.TriggerType.GIFT) {
+            paint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
+            paint.setColor(GREEN);
+            paint.setTextSize(triggerSize);
+            canvas.drawText(fit(trigger(slot, gift, hungarian), triggerLimit),
+                    textX, triggerY, paint);
+        } else {
+            // For gifts the artwork itself is the trigger. Do not repeat the gift name.
+            actionY = y + (height * 0.59f);
+        }
 
+        paint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
         paint.setColor(TEXT);
         paint.setTextSize(actionSize);
-        canvas.drawText(fit("→ " + action(slot), actionLimit),
-                textX, actionY, paint);
+        canvas.drawText(fit("→ " + action(slot), actionLimit), textX, actionY, paint);
     }
 
     private static void drawIcon(Context context, Canvas canvas, Paint paint, InteractionSlot slot,

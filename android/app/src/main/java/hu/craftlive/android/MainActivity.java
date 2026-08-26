@@ -3,6 +3,7 @@ package hu.craftlive.android;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.media.projection.MediaProjectionManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.BroadcastReceiver;
@@ -27,6 +28,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.text.InputType;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -43,6 +45,8 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public final class MainActivity extends Activity {
+    private static final int REQUEST_BROADCAST_AUDIO = 72;
+    private static final int REQUEST_BROADCAST_CAPTURE = 73;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final ExecutorService posterExecutor = Executors.newSingleThreadExecutor();
     private InteractionStore store;
@@ -59,6 +63,11 @@ public final class MainActivity extends Activity {
     private Button overlayButton;
     private Button standardTab;
     private Button plusTab;
+    private EditText rtmpServerInput;
+    private EditText streamKeyInput;
+    private TextView broadcastStatusText;
+    private Button broadcastButton;
+    private String pendingBroadcastEndpoint;
     private boolean showingPlus;
     private boolean receiverRegistered;
     private boolean pendingOverlayEnable;
@@ -90,6 +99,7 @@ public final class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
         IntentFilter filter = new IntentFilter(InteractionForegroundService.ACTION_STATUS_CHANGED);
+        filter.addAction(BroadcastForegroundService.ACTION_STATUS_CHANGED);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(statusReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
         } else {
@@ -214,6 +224,41 @@ public final class MainActivity extends Activity {
 
         overlayButton = fullButton(R.string.live_overlay_show, v -> requestLiveOverlay());
         root.addView(overlayButton);
+
+        TextView broadcastTitle = text(getString(R.string.broadcast_title),
+                22f, R.color.craft_text, true);
+        broadcastTitle.setPadding(0, dp(18), 0, dp(8));
+        root.addView(broadcastTitle);
+        root.addView(panelText(getString(R.string.broadcast_note),
+                R.color.craft_muted), marginBottom(8));
+
+        rtmpServerInput = new EditText(this);
+        rtmpServerInput.setHint(R.string.broadcast_server_hint);
+        rtmpServerInput.setHintTextColor(color(R.color.craft_muted));
+        rtmpServerInput.setTextColor(color(R.color.craft_text));
+        rtmpServerInput.setTextSize(18f);
+        rtmpServerInput.setSingleLine(true);
+        rtmpServerInput.setInputType(InputType.TYPE_CLASS_TEXT
+                | InputType.TYPE_TEXT_VARIATION_URI);
+        styleField(rtmpServerInput);
+        root.addView(rtmpServerInput, marginBottom(7));
+
+        streamKeyInput = new EditText(this);
+        streamKeyInput.setHint(R.string.broadcast_key_hint);
+        streamKeyInput.setHintTextColor(color(R.color.craft_muted));
+        streamKeyInput.setTextColor(color(R.color.craft_text));
+        streamKeyInput.setTextSize(18f);
+        streamKeyInput.setSingleLine(true);
+        streamKeyInput.setInputType(InputType.TYPE_CLASS_TEXT
+                | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        styleField(streamKeyInput);
+        root.addView(streamKeyInput, marginBottom(7));
+
+        broadcastButton = fullButton(R.string.broadcast_start, v -> toggleBroadcast());
+        root.addView(broadcastButton);
+        broadcastStatusText = panelText(getString(R.string.broadcast_idle),
+                R.color.craft_muted);
+        root.addView(broadcastStatusText, marginBottom(8));
 
         root.addView(fullButton(R.string.test_bedrock,
                 v -> testCommand("/summon zombie ~ ~1 ~")));
@@ -528,6 +573,7 @@ public final class MainActivity extends Activity {
             overlayButton.setText(InteractionForegroundService.isLiveOverlayVisible()
                     ? R.string.live_overlay_hide : R.string.live_overlay_show);
         }
+        refreshBroadcastStatus();
 
         if (bridgeStatusText != null) {
             String bridgeState = store.preferences().getString("bedrock_bridge_status", "starting");
@@ -628,14 +674,142 @@ public final class MainActivity extends Activity {
     }
 
     private void refreshLivePoster() {
-        if (!InteractionForegroundService.isLiveActive()) return;
-        Intent refresh = new Intent(this, InteractionForegroundService.class)
-                .setAction(InteractionForegroundService.ACTION_REFRESH_POSTER);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(refresh);
-        } else {
-            startService(refresh);
+        if (InteractionForegroundService.isLiveActive()) {
+            Intent refresh = new Intent(this, InteractionForegroundService.class)
+                    .setAction(InteractionForegroundService.ACTION_REFRESH_POSTER);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(refresh);
+            } else {
+                startService(refresh);
+            }
         }
+        if (BroadcastForegroundService.isBroadcasting()) {
+            Intent refreshStream = new Intent(this, BroadcastForegroundService.class)
+                    .setAction(BroadcastForegroundService.ACTION_REFRESH_OVERLAY);
+            startService(refreshStream);
+        }
+    }
+
+    private void toggleBroadcast() {
+        if (updateManager.hasMandatoryUpdate()) {
+            updateManager.check(true);
+            return;
+        }
+        String state = store.preferences().getString("broadcast_status", "idle");
+        boolean running = BroadcastForegroundService.isBroadcasting()
+                || "preparing".equals(state) || "connecting".equals(state);
+        if (running) {
+            Intent stop = new Intent(this, BroadcastForegroundService.class)
+                    .setAction(BroadcastForegroundService.ACTION_STOP);
+            startService(stop);
+            handler.postDelayed(this::refreshStatus, 300L);
+            return;
+        }
+
+        String server = rtmpServerInput.getText().toString().trim();
+        String key = streamKeyInput.getText().toString().trim();
+        String lower = server.toLowerCase(Locale.ROOT);
+        if (!lower.startsWith("rtmp://") && !lower.startsWith("rtmps://")) {
+            toast(R.string.broadcast_server_invalid);
+            return;
+        }
+        if (key.isEmpty()) {
+            toast(R.string.broadcast_key_required);
+            return;
+        }
+        pendingBroadcastEndpoint = joinEndpoint(server, key);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},
+                    REQUEST_BROADCAST_AUDIO);
+            return;
+        }
+        requestBroadcastCapture();
+    }
+
+    private void requestBroadcastCapture() {
+        MediaProjectionManager manager = (MediaProjectionManager)
+                getSystemService(MEDIA_PROJECTION_SERVICE);
+        startActivityForResult(manager.createScreenCaptureIntent(), REQUEST_BROADCAST_CAPTURE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_BROADCAST_CAPTURE) return;
+        if (resultCode != RESULT_OK || data == null || pendingBroadcastEndpoint == null) {
+            pendingBroadcastEndpoint = null;
+            toast(R.string.broadcast_capture_denied);
+            return;
+        }
+        Intent start = new Intent(this, BroadcastForegroundService.class)
+                .setAction(BroadcastForegroundService.ACTION_START)
+                .putExtra(BroadcastForegroundService.EXTRA_RESULT_CODE, resultCode)
+                .putExtra(BroadcastForegroundService.EXTRA_RESULT_DATA, data)
+                .putExtra(BroadcastForegroundService.EXTRA_ENDPOINT, pendingBroadcastEndpoint);
+        pendingBroadcastEndpoint = null;
+        streamKeyInput.setText("");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(start);
+        } else {
+            startService(start);
+        }
+        toast(R.string.broadcast_starting);
+        handler.postDelayed(() -> {
+            refreshStatus();
+            openMinecraft();
+        }, 650L);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQUEST_BROADCAST_AUDIO) return;
+        boolean granted = grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+        if (granted && pendingBroadcastEndpoint != null) {
+            requestBroadcastCapture();
+        } else {
+            pendingBroadcastEndpoint = null;
+            toast(R.string.broadcast_audio_required);
+        }
+    }
+
+    private void refreshBroadcastStatus() {
+        if (broadcastStatusText == null || broadcastButton == null) return;
+        String state = store.preferences().getString("broadcast_status", "idle");
+        String detail = store.preferences().getString("broadcast_status_detail", "");
+        int colorResource = R.color.craft_muted;
+        int label = R.string.broadcast_idle;
+        if ("preparing".equals(state)) {
+            label = R.string.broadcast_preparing;
+        } else if ("connecting".equals(state)) {
+            label = R.string.broadcast_connecting;
+        } else if ("active".equals(state)) {
+            label = R.string.broadcast_active;
+            colorResource = R.color.craft_green;
+        } else if ("error".equals(state)) {
+            broadcastStatusText.setText(getString(R.string.broadcast_error,
+                    detail == null ? "" : detail));
+            colorResource = R.color.craft_red;
+        }
+        if (!"error".equals(state)) broadcastStatusText.setText(label);
+        broadcastStatusText.setTextColor(color(colorResource));
+        boolean running = "preparing".equals(state) || "connecting".equals(state)
+                || "active".equals(state) || BroadcastForegroundService.isBroadcasting();
+        broadcastButton.setText(running
+                ? R.string.broadcast_stop : R.string.broadcast_start);
+        rtmpServerInput.setEnabled(!running);
+        streamKeyInput.setEnabled(!running);
+    }
+
+    private static String joinEndpoint(String server, String key) {
+        String cleanServer = server.trim();
+        String cleanKey = key.trim();
+        if (cleanServer.endsWith("/")) return cleanServer + cleanKey;
+        return cleanServer + "/" + cleanKey;
     }
 
     private String plusProgressText() {

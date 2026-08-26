@@ -28,7 +28,7 @@
     <string name="open_setup_guide">Útmutató</string>
     <string name="ok">Rendben</string>
     <string name="whats_new_title">Mi változott? · %1$s</string>
-    <string name="current_release_notes">• Javítva lett az 5 LIVE órás PLUS-számláló, és már másodpercenként látható a haladás.\n• Az aktív interakciók PNG-jén megjelenik a TikTok-ajándék képe, neve és a hozzá tartozó Minecraft-esemény.\n• A LIVE során érkező aktuális ajándékképek automatikusan frissítik a képet.\n• Ha egy ajándékkép nem érhető el, érthető emoji vagy ikon jelenik meg helyette.</string>
+    <string name="current_release_notes">• Új, egytelefonos LIVE-közvetítő mód készült. A Minecraft képe és az aktív interakciók együtt küldhetők a TikTok adásba.\n• A jobb oldali nézői sávon az ajándék képe és csak a hozzá tartozó Minecraft-esemény látható, például „→ zombi”.\n• A sávot a játékos nem látja játék közben; csak a továbbított adás képére kerül rá.\n• A közvetítési kulcsot a CraftLive nem menti el. A funkció jelenleg béta, ezért az első adás előtt rövid próbát javaslunk.</string>
     <string name="command_accepted">A Minecraft elfogadta a legutóbbi parancsot.</string>
     <string name="command_rejected">A Minecraft elutasította a parancsot: %1$s</string>
     <string name="tiktok_username">TikTok-felhasználónév (@ nélkül)</string>
@@ -125,4 +125,27 @@
     <string name="setup_incomplete">A rendszerbeállítások megnyíltak. Engedélyezés után térj vissza a CraftLive-ba.</string>
     <string name="update_bad_signature">Az APK aláírásának egyeznie kell a telepített CraftLive-éval. A GitHub-kiadásnál mindig ugyanazt a kiadási kulcsot használd.</string>
     <string name="queued_count">várakozó: %1$d</string>
+    <string name="broadcast_title">Egytelefonos LIVE-közvetítés · BÉTA</string>
+    <string name="broadcast_note">A CraftLive a Minecraft képét küldi tovább, és csak a nézőknek teszi rá jobb oldalra az ajándékképeket és a hozzájuk tartozó eseményeket. Neked játék közben nem jelenik meg ez a sáv. Ehhez a TikTok által megadott közvetítési szervercím és kulcs szükséges. A kulcsot az app nem menti el.</string>
+    <string name="broadcast_server_hint">TikTok közvetítési szervercím (rtmp:// vagy rtmps://)</string>
+    <string name="broadcast_key_hint">TikTok közvetítési kulcs</string>
+    <string name="broadcast_start">Közvetítés indítása</string>
+    <string name="broadcast_stop">Közvetítés leállítása</string>
+    <string name="broadcast_idle">A CraftLive-közvetítés nem fut.</string>
+    <string name="broadcast_preparing">A közvetítés előkészítése…</string>
+    <string name="broadcast_connecting">Kapcsolódás a TikTok adáshoz…</string>
+    <string name="broadcast_active">A CraftLive-közvetítés aktív. A nézői sáv csak az adásban látható.</string>
+    <string name="broadcast_error">A közvetítés nem indult el: %1$s</string>
+    <string name="broadcast_server_invalid">Írd be a TikToktól kapott rtmp:// vagy rtmps:// szervercímet.</string>
+    <string name="broadcast_key_required">Írd be a TikToktól kapott közvetítési kulcsot.</string>
+    <string name="broadcast_capture_denied">A képernyőkép továbbítása nem lett engedélyezve.</string>
+    <string name="broadcast_audio_required">A játék és a mikrofon hangjához engedélyezd a mikrofon használatát.</string>
+    <string name="broadcast_starting">A közvetítés indul, majd megnyílik a Minecraft.</string>
+    <string name="broadcast_prepare_failed">A telefonon nem készíthető elő a közvetítés.</string>
+    <string name="broadcast_capture_missing">A képernyőkép engedélye hiányzik. Indítsd el újra a közvetítést.</string>
+    <string name="broadcast_disconnected">Megszakadt a kapcsolat a közvetítési szolgáltatással.</string>
+    <string name="broadcast_auth_error">A TikTok nem fogadta el a közvetítési kulcsot.</string>
+    <string name="broadcast_notification_channel">CraftLive LIVE-közvetítés</string>
+    <string name="broadcast_notification_title">CraftLive közvetítés</string>
+    <string name="broadcast_notification_active">A Minecraft képe és a nézői interakciós sáv közvetítése aktív.</string>
 </resources>
