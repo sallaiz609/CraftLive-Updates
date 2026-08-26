@@ -1,0 +1,10 @@
+CraftLive Android 0.4.1
+
+- Áttekinthető, kategóriákra bontott vezérlőpult.
+- Külön Minecraft-kapcsolat lap másolható címmel, útmutatóval és teszttel.
+- Külön Minecraft-interakciók lap a Standard/Plus helyekhez, ajándékokhoz és mobokhoz.
+- Külön TikTok LIVE lap a figyeléshez, állapothoz, LIVE-időhöz és nézői képhez.
+- Külön LIVE-közvetítés lap az RTMP-adatokhoz és a nézői sávhoz.
+- Külön Alkalmazás lap a verzióhoz, frissítéshez és készítői profilhoz.
+
+A 0.4.1 kötelező frissítésként jelenik meg a CraftLive alkalmazásban.
