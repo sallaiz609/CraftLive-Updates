@@ -1,9 +1,9 @@
 {
-  "versionCode": 13004,
-  "versionName": "0.3.4",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.3.4/CraftLive-Android-0.3.4.apk",
-  "sha256": "f3c27c57b05e3c815b9e5291a88ce8175025fab233f36d4e1269a26fa389342d",
-  "notesHu": "• Javítva lett az 5 LIVE órás PLUS-számláló, és a haladás már másodpercenként látható.\n• Az aktív interakciók PNG-jén megjelenik a TikTok-ajándék képe, neve és Minecraft-eseménye.\n• A LIVE során érkező aktuális ajándékképek automatikusan frissítik a képet.\n• Ha egy kép nem érhető el, jól felismerhető emoji vagy ikon helyettesíti.",
-  "notesEn": "• Fixed the 5-hour PLUS counter and made progress visible every second.\n• The active-interactions PNG now shows the TikTok gift image, name, and Minecraft event.\n• Current gift artwork received during the LIVE automatically refreshes the image.\n• A recognizable emoji or icon is used when artwork is unavailable.",
+  "versionCode": 14000,
+  "versionName": "0.4.0",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.4.0/CraftLive-Android-0.4.0.apk",
+  "sha256": "e1d624c0ddfef113d286e7927a722f725d6952bc4fde70f8e0bfc13584dcf849",
+  "notesHu": "• Új, egytelefonos LIVE-közvetítő mód készült. A Minecraft képe és az aktív interakciók együtt küldhetők a TikTok adásba.\n• A jobb oldali nézői sávon az ajándék képe és csak a hozzá tartozó Minecraft-esemény látható, például „→ zombi”.\n• A sávot a játékos nem látja játék közben; csak a továbbított adás képére kerül rá.\n• A közvetítési kulcsot a CraftLive nem menti el.\n• Ez a közvetítő funkció jelenleg béta. Az első LIVE előtt rövid próba ajánlott.",
+  "notesEn": "• A new one-phone LIVE broadcasting mode can send Minecraft and the enabled interactions together to TikTok.\n• The right-side viewer panel shows the gift artwork and only its Minecraft event, for example “→ zombie”.\n• The player does not see this panel while playing; it is added only to the outgoing broadcast.\n• CraftLive never saves the stream key.\n• The broadcasting feature is currently beta. A short test is recommended before the first LIVE.",
   "mandatory": true
 }
