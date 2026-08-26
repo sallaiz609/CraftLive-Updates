@@ -45,6 +45,15 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public final class MainActivity extends Activity {
+    private enum Page {
+        HOME,
+        MINECRAFT_CONNECTION,
+        INTERACTIONS,
+        TIKTOK_LIVE,
+        BROADCAST,
+        APP
+    }
+
     private static final int REQUEST_BROADCAST_AUDIO = 72;
     private static final int REQUEST_BROADCAST_CAPTURE = 73;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -67,6 +76,13 @@ public final class MainActivity extends Activity {
     private EditText streamKeyInput;
     private TextView broadcastStatusText;
     private Button broadcastButton;
+    private ScrollView contentScroll;
+    private LinearLayout pageContainer;
+    private TextView pageTitle;
+    private Button backButton;
+    private Page currentPage = Page.HOME;
+    private String rtmpServerDraft = "";
+    private String streamKeyDraft = "";
     private String pendingBroadcastEndpoint;
     private boolean showingPlus;
     private boolean receiverRegistered;
@@ -116,9 +132,18 @@ public final class MainActivity extends Activity {
             pendingOverlayEnable = false;
             toggleLiveOverlay();
         }
-        if (statusText != null) {
+        if (pageContainer != null) {
             refreshStatus();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (currentPage != Page.HOME) {
+            showPage(Page.HOME);
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override
@@ -138,64 +163,154 @@ public final class MainActivity extends Activity {
     }
 
     private void buildUi() {
-        ScrollView scroll = new ScrollView(this);
-        scroll.setFillViewport(true);
-        scroll.setBackgroundColor(color(R.color.craft_background));
+        contentScroll = new ScrollView(this);
+        contentScroll.setFillViewport(true);
+        contentScroll.setBackgroundColor(color(R.color.craft_background));
 
         LinearLayout root = vertical();
         root.setPadding(dp(18), dp(18), dp(18), dp(40));
-        scroll.addView(root, matchWrap());
+        contentScroll.addView(root, matchWrap());
 
         LinearLayout header = horizontal();
         header.setGravity(Gravity.CENTER_VERTICAL);
+        backButton = actionButton(getString(R.string.navigation_back), false);
+        backButton.setMinWidth(dp(52));
+        backButton.setVisibility(View.GONE);
+        backButton.setOnClickListener(v -> showPage(Page.HOME));
+        header.addView(backButton, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+
         LinearLayout titleBlock = vertical();
-        TextView title = text(getString(R.string.title), 27f, R.color.craft_text, true);
+        pageTitle = text(getString(R.string.title), 25f, R.color.craft_text, true);
         TextView subtitle = text(getString(R.string.subtitle), 16f, R.color.craft_muted, false);
-        titleBlock.addView(title);
+        titleBlock.setPadding(dp(8), 0, dp(8), 0);
+        titleBlock.addView(pageTitle);
         titleBlock.addView(subtitle);
         header.addView(titleBlock, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        TextView version = text(getString(R.string.version_format, versionName()), 16f, R.color.craft_green, true);
+        TextView version = text(getString(R.string.version_short, versionName()), 16f, R.color.craft_green, true);
         version.setGravity(Gravity.END);
         header.addView(version);
         root.addView(header, marginBottom(18));
 
-        bridgeStatusText = panelText(getString(R.string.bridge_starting), R.color.craft_muted);
-        root.addView(bridgeStatusText, marginBottom(7));
+        pageContainer = vertical();
+        root.addView(pageContainer, matchWrap());
+        setContentView(contentScroll);
+        showPage(Page.HOME);
+    }
 
-        TextView bridgeHelp = panelText(getString(R.string.bridge_setup_note,
-                preferredConnectCommand()), R.color.craft_text);
-        root.addView(bridgeHelp, marginBottom(7));
+    private void showPage(Page page) {
+        rememberBroadcastDrafts();
+        currentPage = page;
+        resetPageReferences();
+        pageContainer.removeAllViews();
+        backButton.setVisibility(page == Page.HOME ? View.GONE : View.VISIBLE);
+        pageTitle.setText(pageTitle(page));
+        switch (page) {
+            case HOME -> buildHomePage();
+            case MINECRAFT_CONNECTION -> buildMinecraftConnectionPage();
+            case INTERACTIONS -> buildInteractionsPage();
+            case TIKTOK_LIVE -> buildTikTokLivePage();
+            case BROADCAST -> buildBroadcastPage();
+            case APP -> buildAppPage();
+        }
+        refreshStatus();
+        contentScroll.post(() -> contentScroll.scrollTo(0, 0));
+    }
+
+    private String pageTitle(Page page) {
+        return switch (page) {
+            case HOME -> getString(R.string.home_title);
+            case MINECRAFT_CONNECTION -> getString(R.string.minecraft_connection_title);
+            case INTERACTIONS -> getString(R.string.interactions_page_title);
+            case TIKTOK_LIVE -> getString(R.string.live_settings_title);
+            case BROADCAST -> getString(R.string.broadcast_page_title);
+            case APP -> getString(R.string.app_settings_title);
+        };
+    }
+
+    private void buildHomePage() {
+        pageContainer.addView(panelText(getString(R.string.home_intro),
+                R.color.craft_text), marginBottom(12));
+
+        TextView statusHeading = text(getString(R.string.home_status_title),
+                21f, R.color.craft_text, true);
+        statusHeading.setPadding(dp(2), dp(3), dp(2), dp(8));
+        pageContainer.addView(statusHeading);
+        bridgeStatusText = panelText(getString(R.string.bridge_starting), R.color.craft_muted);
+        pageContainer.addView(bridgeStatusText, marginBottom(7));
+        statusText = panelText(getString(R.string.status_idle), R.color.craft_muted);
+        pageContainer.addView(statusText, marginBottom(7));
+        broadcastStatusText = panelText(getString(R.string.broadcast_idle), R.color.craft_muted);
+        pageContainer.addView(broadcastStatusText, marginBottom(14));
+
+        pageContainer.addView(categoryButton(R.string.minecraft_connection_title,
+                R.string.minecraft_connection_summary,
+                v -> showPage(Page.MINECRAFT_CONNECTION)), marginBottom(8));
+        pageContainer.addView(categoryButton(R.string.interactions_page_title,
+                R.string.interactions_page_summary,
+                v -> showPage(Page.INTERACTIONS)), marginBottom(8));
+        pageContainer.addView(categoryButton(R.string.live_settings_title,
+                R.string.live_settings_summary,
+                v -> showPage(Page.TIKTOK_LIVE)), marginBottom(8));
+        pageContainer.addView(categoryButton(R.string.broadcast_page_title,
+                R.string.broadcast_page_summary,
+                v -> showPage(Page.BROADCAST)), marginBottom(8));
+        pageContainer.addView(categoryButton(R.string.app_settings_title,
+                R.string.app_settings_summary,
+                v -> showPage(Page.APP)), marginBottom(8));
+    }
+
+    private void buildMinecraftConnectionPage() {
+        bridgeStatusText = panelText(getString(R.string.bridge_starting), R.color.craft_muted);
+        pageContainer.addView(bridgeStatusText, marginBottom(7));
+        pageContainer.addView(panelText(getString(R.string.bridge_setup_note,
+                preferredConnectCommand()), R.color.craft_text), marginBottom(7));
 
         LinearLayout bridgeRow = horizontal();
         bridgeRow.addView(actionButtonWithClick(R.string.copy_connect_command,
                 v -> copyConnectCommand()), weightedButton());
         bridgeRow.addView(actionButtonWithClick(R.string.open_minecraft,
                 v -> openMinecraft()), weightedButton());
-        root.addView(bridgeRow, marginBottom(12));
-
-        root.addView(fullButton(R.string.websocket_setup_guide,
+        pageContainer.addView(bridgeRow, marginBottom(10));
+        pageContainer.addView(fullButton(R.string.websocket_setup_guide,
                 v -> showWebSocketSetupGuide()));
+        pageContainer.addView(fullButton(R.string.test_bedrock,
+                v -> testCommand("/summon zombie ~ ~1 ~")));
 
         commandResultText = panelText("", R.color.craft_muted);
         commandResultText.setVisibility(View.GONE);
-        root.addView(commandResultText, marginBottom(7));
+        pageContainer.addView(commandResultText, marginBottom(7));
+    }
 
+    private void buildInteractionsPage() {
         LinearLayout tabRow = horizontal();
-        standardTab = actionButton(getString(R.string.standard), true);
-        plusTab = actionButton(getString(R.string.plus), false);
+        standardTab = actionButton(getString(R.string.standard), !showingPlus);
+        plusTab = actionButton(getString(R.string.plus), showingPlus);
         tabRow.addView(standardTab, weightedButton());
         tabRow.addView(plusTab, weightedButton());
-        root.addView(tabRow, marginBottom(8));
+        pageContainer.addView(tabRow, marginBottom(8));
         standardTab.setOnClickListener(v -> switchTab(false));
         plusTab.setOnClickListener(v -> switchTab(true));
 
         plusProgress = text("", 17f, R.color.craft_green, true);
         plusProgress.setPadding(dp(4), dp(7), dp(4), dp(7));
-        root.addView(plusProgress, marginBottom(6));
+        pageContainer.addView(plusProgress, marginBottom(6));
+        pageContainer.addView(panelText(getString(R.string.fixed_delay),
+                R.color.craft_green), marginBottom(12));
 
-        TextView safety = panelText(getString(R.string.fixed_delay), R.color.craft_green);
-        root.addView(safety, marginBottom(12));
+        TextView slotsTitle = text(getString(R.string.interaction_slots),
+                22f, R.color.craft_text, true);
+        slotsTitle.setPadding(0, dp(8), 0, dp(8));
+        pageContainer.addView(slotsTitle);
+        slotContainer = vertical();
+        pageContainer.addView(slotContainer, matchWrap());
+        rebuildSlots();
+    }
 
+    private void buildTikTokLivePage() {
+        pageContainer.addView(panelText(getString(R.string.live_settings_note),
+                R.color.craft_text), marginBottom(10));
         usernameInput = new EditText(this);
         usernameInput.setHint(R.string.tiktok_username);
         usernameInput.setHintTextColor(color(R.color.craft_muted));
@@ -204,34 +319,32 @@ public final class MainActivity extends Activity {
         usernameInput.setSingleLine(true);
         usernameInput.setText(store.preferences().getString("tiktok_username", ""));
         styleField(usernameInput);
-        root.addView(usernameInput, marginBottom(8));
+        pageContainer.addView(usernameInput, marginBottom(8));
 
         LinearLayout liveRow = horizontal();
         Button save = actionButton(getString(R.string.save), false);
         liveButton = actionButton(getString(R.string.start_live), true);
         liveRow.addView(save, weightedButton());
         liveRow.addView(liveButton, weightedButton());
-        root.addView(liveRow, marginBottom(8));
+        pageContainer.addView(liveRow, marginBottom(8));
         save.setOnClickListener(v -> saveUsername());
         liveButton.setOnClickListener(v -> toggleLive());
 
         statusText = panelText(getString(R.string.status_idle), R.color.craft_muted);
-        root.addView(statusText, marginBottom(14));
+        pageContainer.addView(statusText, marginBottom(8));
+        plusProgress = panelText(plusProgressText(), R.color.craft_green);
+        pageContainer.addView(plusProgress, marginBottom(10));
 
         posterButton = fullButton(R.string.live_poster_waiting, v -> shareLivePoster());
         posterButton.setEnabled(false);
-        root.addView(posterButton);
-
+        pageContainer.addView(posterButton);
         overlayButton = fullButton(R.string.live_overlay_show, v -> requestLiveOverlay());
-        root.addView(overlayButton);
+        pageContainer.addView(overlayButton);
+    }
 
-        TextView broadcastTitle = text(getString(R.string.broadcast_title),
-                22f, R.color.craft_text, true);
-        broadcastTitle.setPadding(0, dp(18), 0, dp(8));
-        root.addView(broadcastTitle);
-        root.addView(panelText(getString(R.string.broadcast_note),
+    private void buildBroadcastPage() {
+        pageContainer.addView(panelText(getString(R.string.broadcast_note),
                 R.color.craft_muted), marginBottom(8));
-
         rtmpServerInput = new EditText(this);
         rtmpServerInput.setHint(R.string.broadcast_server_hint);
         rtmpServerInput.setHintTextColor(color(R.color.craft_muted));
@@ -240,8 +353,9 @@ public final class MainActivity extends Activity {
         rtmpServerInput.setSingleLine(true);
         rtmpServerInput.setInputType(InputType.TYPE_CLASS_TEXT
                 | InputType.TYPE_TEXT_VARIATION_URI);
+        rtmpServerInput.setText(rtmpServerDraft);
         styleField(rtmpServerInput);
-        root.addView(rtmpServerInput, marginBottom(7));
+        pageContainer.addView(rtmpServerInput, marginBottom(7));
 
         streamKeyInput = new EditText(this);
         streamKeyInput.setHint(R.string.broadcast_key_hint);
@@ -251,35 +365,65 @@ public final class MainActivity extends Activity {
         streamKeyInput.setSingleLine(true);
         streamKeyInput.setInputType(InputType.TYPE_CLASS_TEXT
                 | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        streamKeyInput.setText(streamKeyDraft);
         styleField(streamKeyInput);
-        root.addView(streamKeyInput, marginBottom(7));
+        pageContainer.addView(streamKeyInput, marginBottom(7));
 
         broadcastButton = fullButton(R.string.broadcast_start, v -> toggleBroadcast());
-        root.addView(broadcastButton);
+        pageContainer.addView(broadcastButton);
         broadcastStatusText = panelText(getString(R.string.broadcast_idle),
                 R.color.craft_muted);
-        root.addView(broadcastStatusText, marginBottom(8));
+        pageContainer.addView(broadcastStatusText, marginBottom(8));
+    }
 
-        root.addView(fullButton(R.string.test_bedrock,
-                v -> testCommand("/summon zombie ~ ~1 ~")));
-
-        root.addView(fullButton(R.string.check_update, v -> updateManager.check(true)));
-
+    private void buildAppPage() {
+        pageContainer.addView(panelText(getString(R.string.version_format, versionName()),
+                R.color.craft_green), marginBottom(8));
+        pageContainer.addView(fullButton(R.string.check_update,
+                v -> updateManager.check(true)));
         Button support = fullButton(R.string.support_creator, v -> {
             Intent profile = new Intent(Intent.ACTION_VIEW,
                     Uri.parse("https://www.tiktok.com/@venom_hun_"));
             startActivity(profile);
         });
-        root.addView(support);
+        pageContainer.addView(support);
+        pageContainer.addView(panelText(getString(R.string.current_release_notes),
+                R.color.craft_muted), marginBottom(8));
+    }
 
-        TextView slotsTitle = text(getString(R.string.interaction_slots), 22f, R.color.craft_text, true);
-        slotsTitle.setPadding(0, dp(18), 0, dp(8));
-        root.addView(slotsTitle);
-        slotContainer = vertical();
-        root.addView(slotContainer, matchWrap());
-        setContentView(scroll);
-        refreshStatus();
-        rebuildSlots();
+    private Button categoryButton(int titleResource, int summaryResource,
+                                  View.OnClickListener listener) {
+        Button button = actionButton(getString(titleResource) + "\n"
+                + getString(summaryResource), false);
+        button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        button.setTextSize(18f);
+        button.setMinHeight(dp(78));
+        button.setPadding(dp(16), dp(10), dp(16), dp(10));
+        button.setOnClickListener(listener);
+        return button;
+    }
+
+    private void rememberBroadcastDrafts() {
+        if (rtmpServerInput != null) rtmpServerDraft = rtmpServerInput.getText().toString();
+        if (streamKeyInput != null) streamKeyDraft = streamKeyInput.getText().toString();
+    }
+
+    private void resetPageReferences() {
+        usernameInput = null;
+        statusText = null;
+        bridgeStatusText = null;
+        commandResultText = null;
+        plusProgress = null;
+        slotContainer = null;
+        liveButton = null;
+        posterButton = null;
+        overlayButton = null;
+        standardTab = null;
+        plusTab = null;
+        rtmpServerInput = null;
+        streamKeyInput = null;
+        broadcastStatusText = null;
+        broadcastButton = null;
     }
 
     private void switchTab(boolean plus) {
@@ -288,12 +432,13 @@ public final class MainActivity extends Activity {
             return;
         }
         showingPlus = plus;
-        styleButton(standardTab, !plus);
-        styleButton(plusTab, plus);
+        if (standardTab != null) styleButton(standardTab, !plus);
+        if (plusTab != null) styleButton(plusTab, plus);
         rebuildSlots();
     }
 
     private void rebuildSlots() {
+        if (slotContainer == null) return;
         slotContainer.removeAllViews();
         List<InteractionSlot> slots = showingPlus ? store.loadPlus() : store.loadStandard();
         for (InteractionSlot slot : slots) slotContainer.addView(slotCard(slot), marginBottom(9));
@@ -554,11 +699,15 @@ public final class MainActivity extends Activity {
         } else {
             text = getString(R.string.status_idle);
         }
-        statusText.setText(text + " · " + getString(R.string.queued_count,
-                InteractionForegroundService.queuedCount()));
-        statusText.setTextColor(color(textColor));
-        liveButton.setText(InteractionForegroundService.isLiveMonitoring()
-                ? R.string.stop_live : R.string.start_live);
+        if (statusText != null) {
+            statusText.setText(text + " · " + getString(R.string.queued_count,
+                    InteractionForegroundService.queuedCount()));
+            statusText.setTextColor(color(textColor));
+        }
+        if (liveButton != null) {
+            liveButton.setText(InteractionForegroundService.isLiveMonitoring()
+                    ? R.string.stop_live : R.string.start_live);
+        }
         if (posterButton != null) {
             boolean active = InteractionForegroundService.isLiveActive();
             int activeCount = store.loadEnabled().size();
@@ -614,12 +763,15 @@ public final class MainActivity extends Activity {
                 commandResultText.setVisibility(View.GONE);
             }
         }
-        if (store.isPlusUnlocked()) {
-            plusProgress.setText(R.string.plus_unlocked);
-        } else {
-            plusProgress.setText(plusProgressText());
+        if (plusProgress != null) {
+            if (store.isPlusUnlocked()) {
+                plusProgress.setText(R.string.plus_unlocked);
+            } else {
+                plusProgress.setText(plusProgressText());
+            }
         }
-        if (!store.isPlusUnlocked() && showingPlus) switchTab(false);
+        if (!store.isPlusUnlocked() && showingPlus
+                && currentPage == Page.INTERACTIONS) switchTab(false);
     }
 
     private void ensureBridgeService() {
@@ -750,6 +902,7 @@ public final class MainActivity extends Activity {
                 .putExtra(BroadcastForegroundService.EXTRA_ENDPOINT, pendingBroadcastEndpoint);
         pendingBroadcastEndpoint = null;
         streamKeyInput.setText("");
+        streamKeyDraft = "";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(start);
         } else {
@@ -778,7 +931,7 @@ public final class MainActivity extends Activity {
     }
 
     private void refreshBroadcastStatus() {
-        if (broadcastStatusText == null || broadcastButton == null) return;
+        if (broadcastStatusText == null) return;
         String state = store.preferences().getString("broadcast_status", "idle");
         String detail = store.preferences().getString("broadcast_status_detail", "");
         int colorResource = R.color.craft_muted;
@@ -799,10 +952,12 @@ public final class MainActivity extends Activity {
         broadcastStatusText.setTextColor(color(colorResource));
         boolean running = "preparing".equals(state) || "connecting".equals(state)
                 || "active".equals(state) || BroadcastForegroundService.isBroadcasting();
-        broadcastButton.setText(running
-                ? R.string.broadcast_stop : R.string.broadcast_start);
-        rtmpServerInput.setEnabled(!running);
-        streamKeyInput.setEnabled(!running);
+        if (broadcastButton != null) {
+            broadcastButton.setText(running
+                    ? R.string.broadcast_stop : R.string.broadcast_start);
+        }
+        if (rtmpServerInput != null) rtmpServerInput.setEnabled(!running);
+        if (streamKeyInput != null) streamKeyInput.setEnabled(!running);
     }
 
     private static String joinEndpoint(String server, String key) {
