@@ -1,8 +1,8 @@
 {
-  "versionCode": 13002,
-  "versionName": "0.3.2",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.3.2/CraftLive-Android-0.3.2.apk",
-  "sha256": "98d958d4ecb6353456109f1f56c0fef6946668a502c0f06946ff64f802c3da88",
+  "versionCode": 13003,
+  "versionName": "0.3.3",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.3.3/CraftLive-Android-0.3.3.apk",
+  "sha256": "02c70f584e014a6a113319e620acc437a6e255ddb09a4392c57e38217dca6c97",
   "notesHu": "• A CraftLive automatikusan felismeri a TikTok LIVE indulását, és Aktív LIVE állapotra vált.\n• Ha az adás még nem fut vagy megszakad a kapcsolat, az app magától újrapróbálkozik.\n• Az ajándékok, like-ok, követések és más bekapcsolt interakciók megbízhatóbban jutnak el a Minecraftba.\n• Aktív LIVE alatt automatikusan elkészül az engedélyezett interakciók megosztható PNG-képe.\n• A LIVE-kép az alkalmazásból egy gombbal megosztható.\n• A mozgatható, átlátszó LIVE-lista a játék bármely részére húzható, és bármikor elrejthető.",
   "notesEn": "• CraftLive automatically detects when TikTok LIVE starts and switches to Active LIVE.\n• If the stream is offline or the connection drops, the app retries automatically.\n• Gifts, likes, follows and other enabled interactions reach Minecraft more reliably.\n• During an active LIVE, CraftLive automatically creates a shareable PNG of enabled interactions.\n• Share the LIVE image with one button inside the app.\n• Move the transparent LIVE list anywhere over the game, or hide it at any time.",
   "mandatory": true
