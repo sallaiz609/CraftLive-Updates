@@ -1,9 +1,9 @@
 {
-  "versionCode": 13001,
-  "versionName": "0.3.1",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.3.1/CraftLive-Android-0.3.1.apk",
-  "sha256": "af246e5883d1465631dc968b266002186cdcb3fdb641abd6f3ba8b243fdfb15d",
-  "notesHu": "• Javítva lett a Minecraft csatlakozási kódja (WebSocket).\n• A működő kapcsolódási parancs most egy gombnyomással kimásolható.\n• Új útmutató mutatja meg, mit kell bekapcsolni a Minecraft beállításaiban.\n• Minden frissítés után automatikusan megjelenik, mi változott.",
-  "notesEn": "• Fixed the Minecraft connection code (WebSocket).\n• The working connection command can now be copied with one tap.\n• A new guide shows which Minecraft settings must be enabled.\n• CraftLive now automatically shows what changed after every update.",
+  "versionCode": 13002,
+  "versionName": "0.3.2",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.3.2/CraftLive-Android-0.3.2.apk",
+  "sha256": "98d958d4ecb6353456109f1f56c0fef6946668a502c0f06946ff64f802c3da88",
+  "notesHu": "• A CraftLive automatikusan felismeri a TikTok LIVE indulását, és Aktív LIVE állapotra vált.\n• Ha az adás még nem fut vagy megszakad a kapcsolat, az app magától újrapróbálkozik.\n• Az ajándékok, like-ok, követések és más bekapcsolt interakciók megbízhatóbban jutnak el a Minecraftba.\n• Aktív LIVE alatt automatikusan elkészül az engedélyezett interakciók megosztható PNG-képe.\n• A LIVE-kép az alkalmazásból egy gombbal megosztható.\n• A mozgatható, átlátszó LIVE-lista a játék bármely részére húzható, és bármikor elrejthető.",
+  "notesEn": "• CraftLive automatically detects when TikTok LIVE starts and switches to Active LIVE.\n• If the stream is offline or the connection drops, the app retries automatically.\n• Gifts, likes, follows and other enabled interactions reach Minecraft more reliably.\n• During an active LIVE, CraftLive automatically creates a shareable PNG of enabled interactions.\n• Share the LIVE image with one button inside the app.\n• Move the transparent LIVE list anywhere over the game, or hide it at any time.",
   "mandatory": true
 }
