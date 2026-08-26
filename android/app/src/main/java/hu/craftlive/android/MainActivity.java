@@ -38,10 +38,13 @@ import androidx.core.content.FileProvider;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public final class MainActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final ExecutorService posterExecutor = Executors.newSingleThreadExecutor();
     private InteractionStore store;
     private GiftCatalogStore giftCatalog;
     private UpdateManager updateManager;
@@ -59,6 +62,7 @@ public final class MainActivity extends Activity {
     private boolean showingPlus;
     private boolean receiverRegistered;
     private boolean pendingOverlayEnable;
+    private volatile boolean posterCreating;
 
     private final BroadcastReceiver statusReceiver = new BroadcastReceiver() {
         @Override
@@ -119,6 +123,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         updateManager.shutdown();
+        posterExecutor.shutdownNow();
         super.onDestroy();
     }
 
@@ -234,7 +239,7 @@ public final class MainActivity extends Activity {
 
     private void switchTab(boolean plus) {
         if (plus && !store.isPlusUnlocked()) {
-            toast(getString(R.string.plus_locked, store.getVerifiedLiveMillis() / 3_600_000d));
+            toast(plusProgressText());
             return;
         }
         showingPlus = plus;
@@ -410,6 +415,7 @@ public final class MainActivity extends Activity {
                     List<InteractionSlot> slots = slot.plus ? store.loadPlus() : store.loadStandard();
                     slots.set(slot.index, slot);
                     if (slot.plus) store.savePlus(slots); else store.saveStandard(slots);
+                    refreshLivePoster();
                     rebuildSlots();
                     toast(R.string.saved);
                 })
@@ -511,10 +517,12 @@ public final class MainActivity extends Activity {
         if (posterButton != null) {
             boolean active = InteractionForegroundService.isLiveActive();
             int activeCount = store.loadEnabled().size();
-            posterButton.setText(active
+            posterButton.setText(posterCreating
+                    ? getString(R.string.live_poster_creating)
+                    : active
                     ? getString(R.string.live_poster_share, activeCount)
                     : getString(R.string.live_poster_waiting));
-            posterButton.setEnabled(active);
+            posterButton.setEnabled(active && !posterCreating);
         }
         if (overlayButton != null) {
             overlayButton.setText(InteractionForegroundService.isLiveOverlayVisible()
@@ -560,11 +568,10 @@ public final class MainActivity extends Activity {
                 commandResultText.setVisibility(View.GONE);
             }
         }
-        double hours = store.getVerifiedLiveMillis() / 3_600_000d;
         if (store.isPlusUnlocked()) {
             plusProgress.setText(R.string.plus_unlocked);
         } else {
-            plusProgress.setText(getString(R.string.plus_locked, hours));
+            plusProgress.setText(plusProgressText());
         }
         if (!store.isPlusUnlocked() && showingPlus) switchTab(false);
     }
@@ -585,24 +592,58 @@ public final class MainActivity extends Activity {
             toast(R.string.live_poster_waiting);
             return;
         }
-        try {
-            String username = store.preferences().getString("tiktok_username", "");
-            LiveInteractionPoster.Result result = LiveInteractionPoster.generate(
-                    this, store, username == null ? "" : username);
-            File file = result.file;
-            Uri uri = FileProvider.getUriForFile(
-                    this, getPackageName() + ".updates", file);
-            Intent share = new Intent(Intent.ACTION_SEND)
-                    .setType("image/png")
-                    .putExtra(Intent.EXTRA_STREAM, uri)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(share, getString(R.string.live_poster_chooser)));
-            toast(R.string.live_poster_ready);
-        } catch (Exception error) {
-            toast(getString(R.string.live_poster_error,
-                    error.getMessage() == null ? error.getClass().getSimpleName()
-                            : error.getMessage()));
+        if (posterCreating) return;
+        posterCreating = true;
+        refreshStatus();
+        String username = store.preferences().getString("tiktok_username", "");
+        posterExecutor.execute(() -> {
+            try {
+                LiveInteractionPoster.Result result = LiveInteractionPoster.generate(
+                        this, store, username == null ? "" : username);
+                handler.post(() -> sharePosterResult(result));
+            } catch (Exception error) {
+                handler.post(() -> {
+                    posterCreating = false;
+                    refreshStatus();
+                    toast(getString(R.string.live_poster_error,
+                            error.getMessage() == null ? error.getClass().getSimpleName()
+                                    : error.getMessage()));
+                });
+            }
+        });
+    }
+
+    private void sharePosterResult(LiveInteractionPoster.Result result) {
+        posterCreating = false;
+        refreshStatus();
+        File file = result.file;
+        Uri uri = FileProvider.getUriForFile(
+                this, getPackageName() + ".updates", file);
+        Intent share = new Intent(Intent.ACTION_SEND)
+                .setType("image/png")
+                .putExtra(Intent.EXTRA_STREAM, uri)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(share, getString(R.string.live_poster_chooser)));
+        toast(R.string.live_poster_ready);
+    }
+
+    private void refreshLivePoster() {
+        if (!InteractionForegroundService.isLiveActive()) return;
+        Intent refresh = new Intent(this, InteractionForegroundService.class)
+                .setAction(InteractionForegroundService.ACTION_REFRESH_POSTER);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(refresh);
+        } else {
+            startService(refresh);
         }
+    }
+
+    private String plusProgressText() {
+        long totalSeconds = Math.max(0L, store.getVerifiedLiveMillis() / 1_000L);
+        long hours = totalSeconds / 3_600L;
+        long minutes = (totalSeconds % 3_600L) / 60L;
+        long seconds = totalSeconds % 60L;
+        return getString(R.string.plus_locked, hours, minutes, seconds);
     }
 
     private void requestLiveOverlay() {

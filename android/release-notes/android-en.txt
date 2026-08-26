@@ -1,6 +1,4 @@
-• CraftLive automatically detects when TikTok LIVE starts and switches to Active LIVE.
-• If the stream is offline or the connection drops, the app retries automatically.
-• Gifts, likes, follows and other enabled interactions reach Minecraft more reliably.
-• During an active LIVE, CraftLive automatically creates a shareable PNG of enabled interactions.
-• Share the LIVE image with one button inside the app.
-• Move the transparent LIVE list anywhere over the game, or hide it at any time.
+• Fixed the 5-hour PLUS counter and made progress visible every second.
+• The active-interactions PNG now shows the TikTok gift image, name, and Minecraft event.
+• Current gift artwork received during the LIVE automatically refreshes the image.
+• A recognizable emoji or icon is used when artwork is unavailable.

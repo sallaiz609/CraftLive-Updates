@@ -9,7 +9,7 @@
     <string name="version_format">App version: %1$s</string>
     <string name="standard">Standard</string>
     <string name="plus">Plus</string>
-    <string name="plus_locked">PLUS locked – %1$.1f / 5 LIVE hours</string>
+    <string name="plus_locked">PLUS locked – %1$d h %2$d min %3$d sec / 5 h</string>
     <string name="plus_unlocked">PLUS unlocked – extreme interactions available</string>
     <string name="fixed_delay">Fixed protection: every Minecraft interaction is separated by 5 seconds.</string>
     <string name="bridge_starting">Bedrock bridge: starting…</string>
@@ -28,7 +28,7 @@
     <string name="open_setup_guide">Guide</string>
     <string name="ok">OK</string>
     <string name="whats_new_title">What changed? · %1$s</string>
-    <string name="current_release_notes">• CraftLive now automatically detects when your TikTok LIVE starts and switches to Active LIVE.\n• If the stream is offline or the connection drops, the app retries automatically.\n• Gifts, likes, follows and other enabled interactions are delivered to Minecraft more reliably.\n• During an active LIVE, CraftLive automatically creates a shareable PNG showing the enabled interactions.\n• A new transparent LIVE list can be placed over the game and dragged anywhere by its header.</string>
+    <string name="current_release_notes">• Fixed the 5-hour PLUS counter and made progress visible every second.\n• The active-interactions PNG now shows the TikTok gift image, gift name, and its Minecraft event.\n• Current gift artwork received during the LIVE automatically refreshes the image.\n• A clear emoji or icon is shown whenever gift artwork is unavailable.</string>
     <string name="command_accepted">Minecraft accepted the latest command.</string>
     <string name="command_rejected">Minecraft rejected the command: %1$s</string>
     <string name="tiktok_username">TikTok username (without @)</string>
@@ -87,6 +87,7 @@
     <string name="notification_live_active">TikTok LIVE active · interactions: %1$d · queued: %2$d</string>
     <string name="notification_live_waiting">LIVE monitoring active · waiting for the stream · queued: %1$d</string>
     <string name="live_poster_waiting">LIVE image – available after the stream is active</string>
+    <string name="live_poster_creating">Creating LIVE image…</string>
     <string name="live_poster_share">Enabled interactions PNG · %1$d active</string>
     <string name="live_poster_ready">The LIVE image is ready to share.</string>
     <string name="live_poster_error">Could not create the LIVE image: %1$s</string>
