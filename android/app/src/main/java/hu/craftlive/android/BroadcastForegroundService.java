@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.pedro.common.ConnectChecker;
-import com.pedro.encoder.input.gl.render.filters.object.ImageFilterRender;
+import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.sources.audio.MicrophoneSource;
 import com.pedro.encoder.input.sources.video.NoVideoSource;
 import com.pedro.encoder.input.sources.video.ScreenSource;
@@ -46,7 +46,7 @@ public final class BroadcastForegroundService extends Service implements Connect
     private final ExecutorService overlayExecutor = Executors.newSingleThreadExecutor();
     private GenericStream stream;
     private MediaProjection projection;
-    private ImageFilterRender overlayFilter;
+    private ImageObjectFilterRender overlayFilter;
     private InteractionStore store;
     private boolean prepared;
     private boolean shuttingDown;
@@ -154,7 +154,7 @@ public final class BroadcastForegroundService extends Service implements Connect
             bitmap.recycle();
             return;
         }
-        ImageFilterRender filter = new ImageFilterRender();
+        ImageObjectFilterRender filter = new ImageObjectFilterRender();
         stream.getGlInterface().setFilter(filter);
         filter.setImage(bitmap);
         filter.setScale(100f, 100f);
