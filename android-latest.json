@@ -1,9 +1,9 @@
 {
-  "versionCode": 14000,
-  "versionName": "0.4.0",
-  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.4.0/CraftLive-Android-0.4.0.apk",
-  "sha256": "e1d624c0ddfef113d286e7927a722f725d6952bc4fde70f8e0bfc13584dcf849",
-  "notesHu": "• Új, egytelefonos LIVE-közvetítő mód készült. A Minecraft képe és az aktív interakciók együtt küldhetők a TikTok adásba.\n• A jobb oldali nézői sávon az ajándék képe és csak a hozzá tartozó Minecraft-esemény látható, például „→ zombi”.\n• A sávot a játékos nem látja játék közben; csak a továbbított adás képére kerül rá.\n• A közvetítési kulcsot a CraftLive nem menti el.\n• Ez a közvetítő funkció jelenleg béta. Az első LIVE előtt rövid próba ajánlott.",
-  "notesEn": "• A new one-phone LIVE broadcasting mode can send Minecraft and the enabled interactions together to TikTok.\n• The right-side viewer panel shows the gift artwork and only its Minecraft event, for example “→ zombie”.\n• The player does not see this panel while playing; it is added only to the outgoing broadcast.\n• CraftLive never saves the stream key.\n• The broadcasting feature is currently beta. A short test is recommended before the first LIVE.",
+  "versionCode": 14001,
+  "versionName": "0.4.1",
+  "apkUrl": "https://github.com/sallaiz609/CraftLive-Updates/releases/download/android-v0.4.1/CraftLive-Android-0.4.1.apk",
+  "sha256": "123e0a4748ea9892e0b1787cf39736bc6e90ee35d7300487bca94e3207f2e3af",
+  "notesHu": "• A főoldal áttekinthető vezérlőpult lett, amely csak a fontos állapotokat és kategóriákat mutatja.\n• Külön lapot kapott a Minecraft-kapcsolat, a Minecraft-interakciók, a TikTok LIVE, a LIVE-közvetítés és az alkalmazás.\n• A másolható Minecraft-kapcsolódási parancs, az útmutató és a kapcsolat tesztje egy helyre került.\n• A Standard/Plus helyek, ajándékok, mobok és események saját interakciós lapon kezelhetők.\n• A nézői sáv az ajándék képét vagy ikonját és a Minecraft-hatást mutatja.",
+  "notesEn": "• The home screen is now a clean dashboard showing only essential statuses and categories.\n• Minecraft connection, Minecraft interactions, TikTok LIVE, LIVE broadcasting and application settings now have separate pages.\n• The copyable Minecraft connection command, guide and connection test are grouped together.\n• Standard/Plus slots, gifts, mobs and events are managed on their own interaction page.\n• The viewer panel shows the gift artwork or icon together with its Minecraft effect.",
   "mandatory": true
 }
