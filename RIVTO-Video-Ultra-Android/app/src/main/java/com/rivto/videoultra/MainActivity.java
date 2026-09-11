@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private Button cancelButton;
     private Button shareButton;
     private Switch ultraSwitch;
+    private Switch asphaltSwitch;
     private SeekBar strengthSeekBar;
     private ProgressBar progressBar;
     private TextView progressText;
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             try {
-                @Transformer.ProgressState int state = transformer.getProgress(progressHolder);
+                int state = transformer.getProgress(progressHolder);
                 if (state == Transformer.PROGRESS_STATE_AVAILABLE) {
                     int value = Math.max(0, Math.min(100, progressHolder.progress));
                     progressBar.setIndeterminate(false);
@@ -144,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
         cancelButton = findViewById(R.id.cancelButton);
         shareButton = findViewById(R.id.shareButton);
         ultraSwitch = findViewById(R.id.ultraSwitch);
+        asphaltSwitch = findViewById(R.id.asphaltSwitch);
         strengthSeekBar = findViewById(R.id.strengthSeekBar);
         progressBar = findViewById(R.id.progressBar);
         progressText = findViewById(R.id.progressText);
@@ -159,7 +161,12 @@ public class MainActivity extends AppCompatActivity {
             updateStrengthLabel();
         });
 
-        strengthSeekBar.setProgress(82);
+        asphaltSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            safeFallbackMode = false;
+            applyPreviewEffects();
+        });
+
+        strengthSeekBar.setProgress(88);
         strengthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -176,8 +183,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        naturalButton.setOnClickListener(v -> setStrengthPreset(45));
-        ultraButton.setOnClickListener(v -> setStrengthPreset(82));
+        naturalButton.setOnClickListener(v -> setStrengthPreset(50));
+        ultraButton.setOnClickListener(v -> setStrengthPreset(88));
         brutalButton.setOnClickListener(v -> setStrengthPreset(100));
 
         exportButton.setOnClickListener(v -> startExport(false));
@@ -214,7 +221,8 @@ public class MainActivity extends AppCompatActivity {
         if (safeFallbackMode) {
             return UltraPreset.buildFallback(ultraSwitch.isChecked(), strength01());
         }
-        return UltraPreset.build(ultraSwitch.isChecked(), strength01());
+        return UltraPreset.build(
+                ultraSwitch.isChecked(), strength01(), asphaltSwitch.isChecked());
     }
 
     private void loadPreview(Uri uri) {
@@ -368,7 +376,6 @@ public class MainActivity extends AppCompatActivity {
                                     MainActivity.this,
                                     R.string.export_retry_fallback,
                                     Toast.LENGTH_LONG).show();
-                            exporting = false;
                             mainHandler.postDelayed(() -> startExport(true), 300);
                             return;
                         }
@@ -481,6 +488,7 @@ public class MainActivity extends AppCompatActivity {
         exportButton.setEnabled(!exportRunning && selectedVideoUri != null);
         pickVideoButton.setEnabled(!exportRunning);
         ultraSwitch.setEnabled(!exportRunning);
+        asphaltSwitch.setEnabled(!exportRunning);
         strengthSeekBar.setEnabled(!exportRunning);
         naturalButton.setEnabled(!exportRunning);
         ultraButton.setEnabled(!exportRunning);

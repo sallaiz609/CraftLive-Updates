@@ -71,6 +71,17 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
+            <Switch
+                android:id="@+id/asphaltSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:checked="true"
+                android:text="@string/asphalt_switch"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -93,7 +104,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
-                android:progress="82" />
+                android:progress="88" />
 
             <LinearLayout
                 android:layout_width="match_parent"

@@ -43,12 +43,12 @@ jobs:
       - name: Rename APK
         run: |
           mkdir -p apk-out
-          cp RIVTO-Video-Ultra-Android/app/build/outputs/apk/debug/app-debug.apk apk-out/RIVTO_Video_Ultra_v1.0.0.apk
+          cp RIVTO-Video-Ultra-Android/app/build/outputs/apk/debug/app-debug.apk apk-out/RIVTO_Video_Ultra_v1.1.0.apk
 
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: RIVTO-Video-Ultra-v1.0.0-APK
-          path: apk-out/RIVTO_Video_Ultra_v1.0.0.apk
+          name: RIVTO-Video-Ultra-v1.1.0-APK
+          path: apk-out/RIVTO_Video_Ultra_v1.1.0.apk
           if-no-files-found: error
           retention-days: 30

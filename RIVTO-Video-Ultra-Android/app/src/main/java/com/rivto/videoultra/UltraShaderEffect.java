@@ -10,15 +10,17 @@ import androidx.media3.effect.GlShaderProgram;
 @UnstableApi
 public final class UltraShaderEffect implements GlEffect {
     private final float strength;
+    private final boolean asphaltBoost;
 
-    public UltraShaderEffect(float strength) {
+    public UltraShaderEffect(float strength, boolean asphaltBoost) {
         this.strength = Math.max(0f, Math.min(1f, strength));
+        this.asphaltBoost = asphaltBoost;
     }
 
     @Override
     public GlShaderProgram toGlShaderProgram(Context context, boolean useHdr)
             throws VideoFrameProcessingException {
-        return new UltraShaderProgram(useHdr, strength);
+        return new UltraShaderProgram(useHdr, strength, asphaltBoost);
     }
 
     @Override

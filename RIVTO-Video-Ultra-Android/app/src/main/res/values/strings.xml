@@ -4,7 +4,8 @@
     <string name="subtitle">Videó import → élő előnézet → RIVTO ULTRA → MP4 export</string>
     <string name="pick_video">Videó importálása</string>
     <string name="ultra_switch">RIVTO ULTRA grafika</string>
-    <string name="ultra_description">Saját GPU shader: részletkiemelés, lokális kontraszt, vibrance, highlight-kezelés, enyhe bloom/wet-look és filmes fénytónus. Nem valódi DLSS és nem generál új objektumokat a videóba.</string>
+    <string name="asphalt_switch">Wet Asphalt BOOST</string>
+    <string name="ultra_description">Élénkebb, csillogósabb GPU shader részletkiemeléssel, lokális kontraszttal, erősebb vibrance-szal, highlight-kezeléssel és fényes wet-look hatással. A Wet Asphalt BOOST a kép alsó, sötétebb és kevésbé színes felületein próbál aszfalt-szerű mélyebb, fényesebb karaktert létrehozni. Nem valódi DLSS és nem generál új objektumokat.</string>
     <string name="export_video">RIVTO videó exportálása</string>
     <string name="cancel_export">Export megszakítása</string>
     <string name="share_video">Utolsó videó megosztása</string>
