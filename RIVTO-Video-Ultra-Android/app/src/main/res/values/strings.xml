@@ -5,14 +5,14 @@
     <string name="pick_video">Videó importálása</string>
     <string name="ultra_switch">RIVTO ULTRA grafika</string>
     <string name="asphalt_switch">Wet Asphalt BOOST</string>
-    <string name="ultra_description">Screen Capture Recovery + GrayKill + Color Restore + CityBloom + részletkiemelés. A shader először visszahúzza a képernyőfelvétel és YouTube által ellaposított feketéket/középtónusokat, kiszedi a GTA IV szürkés-cyan fátylát, melegebb és élőbb színeket ad, majd csak a fényes részekre húz bloomot. A Wet Asphalt BOOST mélyebb grafitszürke, enyhén tükröződő útkaraktert ad. Nem valódi DLSS és nem generál új objektumokat.</string>
+    <string name="ultra_description">Screen Capture Recovery + GrayKill + Color Restore + CityBloom + részletkiemelés. Natural és Ultra enyhébb marad; a Daylight Brutal 100%-on külön erős nappali de-gray/dehaze lépcsőt kapcsol be, hogy a GTA IV fakó, szürkés nappali képe látványosan élőbb legyen. A Wet Asphalt BOOST mélyebb grafitszürke, enyhén tükröződő útkaraktert ad. Nem valódi DLSS és nem generál új objektumokat.</string>
     <string name="export_video">RIVTO videó exportálása</string>
     <string name="cancel_export">Export megszakítása</string>
     <string name="share_video">Utolsó videó megosztása</string>
     <string name="share_title">RIVTO videó megosztása</string>
     <string name="preset_natural">Natural</string>
     <string name="preset_ultra">Ultra</string>
-    <string name="preset_brutal">Brutal</string>
+    <string name="preset_brutal">Daylight Brutal</string>
     <string name="no_video">Még nincs videó kiválasztva.</string>
     <string name="no_video_info">Nincs importált videó.</string>
     <string name="ready">Kész. Az előnézeten állítsd be az erősséget, majd exportálj.</string>
