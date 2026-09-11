@@ -15,26 +15,35 @@ import java.util.List;
 public final class UltraPreset {
     private UltraPreset() {}
 
-    public static List<Effect> build(boolean enabled) {
-        if (!enabled) {
+    public static List<Effect> build(boolean enabled, float strength) {
+        if (!enabled || strength <= 0f) {
             return Collections.emptyList();
         }
-
+        float clamped = Math.max(0f, Math.min(1f, strength));
         List<Effect> effects = new ArrayList<>();
-        effects.add(new Brightness(0.012f));
-        effects.add(new Contrast(0.18f));
+        effects.add(new UltraShaderEffect(clamped));
+        return effects;
+    }
+
+    public static List<Effect> buildFallback(boolean enabled, float strength) {
+        if (!enabled || strength <= 0f) {
+            return Collections.emptyList();
+        }
+        float s = Math.max(0f, Math.min(1f, strength));
+        List<Effect> effects = new ArrayList<>();
+        effects.add(new Brightness(0.006f + 0.014f * s));
+        effects.add(new Contrast(0.07f + 0.14f * s));
         effects.add(
                 new HslAdjustment.Builder()
-                        .adjustSaturation(14.0f)
-                        .adjustLightness(1.2f)
+                        .adjustSaturation(6.0f + 12.0f * s)
+                        .adjustLightness(0.5f + 1.5f * s)
                         .build());
         effects.add(
                 new RgbAdjustment.Builder()
-                        .setRedScale(1.025f)
-                        .setGreenScale(1.010f)
-                        .setBlueScale(0.985f)
+                        .setRedScale(1.006f + 0.020f * s)
+                        .setGreenScale(1.002f + 0.009f * s)
+                        .setBlueScale(0.997f - 0.010f * s)
                         .build());
-
         return effects;
     }
 }

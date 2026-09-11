@@ -35,34 +35,98 @@
             android:layout_marginTop="18dp"
             android:text="@string/pick_video" />
 
+        <TextView
+            android:id="@+id/videoInfoText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/no_video_info"
+            android:textColor="@color/muted"
+            android:textSize="13sp" />
+
         <androidx.media3.ui.PlayerView
             android:id="@+id/playerView"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="260dp"
             android:layout_marginTop="12dp"
             android:background="#000000"
             app:resize_mode="fit"
             app:show_buffering="when_playing" />
 
-        <Switch
-            android:id="@+id/ultraSwitch"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:checked="true"
-            android:padding="10dp"
-            android:text="@string/ultra_switch"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="14dp"
+            android:background="#161616"
+            android:orientation="vertical"
+            android:padding="12dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Az ULTRA mód kontrasztot, színt, fényességet és filmes tónust javít GPU-s Media3 effektekkel. Nem valódi DLSS és nem képes olyan részletet vagy tükröződést létrehozni, ami nincs benne az eredeti videóban."
-            android:textColor="@color/muted"
-            android:textSize="13sp" />
+            <Switch
+                android:id="@+id/ultraSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/ultra_switch"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/ultra_description"
+                android:textColor="@color/muted"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/strengthText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <SeekBar
+                android:id="@+id/strengthSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="82" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/naturalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/preset_natural"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/ultraButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/preset_ultra"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/brutalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/preset_brutal"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
 
         <Button
             android:id="@+id/exportButton"
@@ -72,6 +136,14 @@
             android:enabled="false"
             android:text="@string/export_video" />
 
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/cancel_export"
+            android:visibility="gone" />
+
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
@@ -79,14 +151,32 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:indeterminate="true"
+            android:max="100"
             android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/muted"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/shareButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:enabled="false"
+            android:text="@string/share_video" />
 
         <TextView
             android:id="@+id/statusText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:paddingBottom="18dp"
+            android:paddingBottom="20dp"
             android:text="@string/no_video"
             android:textColor="@color/white"
             android:textSize="14sp" />
