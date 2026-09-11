@@ -5,7 +5,7 @@
     <string name="pick_video">Videó importálása</string>
     <string name="ultra_switch">RIVTO ULTRA grafika</string>
     <string name="asphalt_switch">Wet Asphalt BOOST</string>
-    <string name="ultra_description">Élénkebb, csillogósabb GPU shader részletkiemeléssel, lokális kontraszttal, erősebb vibrance-szal, highlight-kezeléssel és fényes wet-look hatással. A Wet Asphalt BOOST a kép alsó, sötétebb és kevésbé színes felületein próbál aszfalt-szerű mélyebb, fényesebb karaktert létrehozni. Nem valódi DLSS és nem generál új objektumokat.</string>
+    <string name="ultra_description">Screen Capture Recovery + GrayKill + Color Restore + CityBloom + részletkiemelés. A shader először visszahúzza a képernyőfelvétel és YouTube által ellaposított feketéket/középtónusokat, kiszedi a GTA IV szürkés-cyan fátylát, melegebb és élőbb színeket ad, majd csak a fényes részekre húz bloomot. A Wet Asphalt BOOST mélyebb grafitszürke, enyhén tükröződő útkaraktert ad. Nem valódi DLSS és nem generál új objektumokat.</string>
     <string name="export_video">RIVTO videó exportálása</string>
     <string name="cancel_export">Export megszakítása</string>
     <string name="share_video">Utolsó videó megosztása</string>
