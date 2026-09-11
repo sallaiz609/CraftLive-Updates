@@ -31,18 +31,18 @@ public final class UltraPreset {
         }
         float s = Math.max(0f, Math.min(1f, strength));
         List<Effect> effects = new ArrayList<>();
-        effects.add(new Brightness(0.008f + 0.018f * s));
-        effects.add(new Contrast(0.08f + 0.16f * s));
+        effects.add(new Brightness(0.014f + 0.025f * s));
+        effects.add(new Contrast(0.14f + 0.22f * s));
         effects.add(
                 new HslAdjustment.Builder()
-                        .adjustSaturation(9.0f + 17.0f * s)
-                        .adjustLightness(0.8f + 1.8f * s)
+                        .adjustSaturation(24.0f + 36.0f * s)
+                        .adjustLightness(1.2f + 2.4f * s)
                         .build());
         effects.add(
                 new RgbAdjustment.Builder()
-                        .setRedScale(1.008f + 0.025f * s)
-                        .setGreenScale(1.004f + 0.012f * s)
-                        .setBlueScale(0.995f - 0.012f * s)
+                        .setRedScale(1.018f + 0.036f * s)
+                        .setGreenScale(1.008f + 0.020f * s)
+                        .setBlueScale(0.992f - 0.010f * s)
                         .build());
         return effects;
     }
