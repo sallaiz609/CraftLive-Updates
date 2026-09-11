@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">RIVTO Video Ultra</string>
+    <string name="title">RIVTO Video Ultra</string>
+    <string name="subtitle">Videó import → RIVTO ULTRA kapcsoló → MP4 export</string>
+    <string name="pick_video">Videó importálása</string>
+    <string name="ultra_switch">RIVTO ULTRA grafika</string>
+    <string name="export_video">Videó exportálása</string>
+    <string name="no_video">Még nincs videó kiválasztva.</string>
+    <string name="ready">Kész. Kapcsold be az ULTRA módot, majd exportálj.</string>
+    <string name="exporting">Export folyamatban…</string>
+</resources>
