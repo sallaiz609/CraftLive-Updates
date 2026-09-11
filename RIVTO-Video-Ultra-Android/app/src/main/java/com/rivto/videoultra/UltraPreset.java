@@ -31,18 +31,19 @@ public final class UltraPreset {
         }
         float s = Math.max(0f, Math.min(1f, strength));
         List<Effect> effects = new ArrayList<>();
-        effects.add(new Brightness(0.014f + 0.025f * s));
-        effects.add(new Contrast(0.14f + 0.22f * s));
+        // Compatible path: recover flat screen recordings even when the full custom shader is unavailable.
+        effects.add(new Brightness(0.010f + 0.018f * s));
+        effects.add(new Contrast(0.18f + 0.20f * s));
         effects.add(
                 new HslAdjustment.Builder()
-                        .adjustSaturation(24.0f + 36.0f * s)
-                        .adjustLightness(1.2f + 2.4f * s)
+                        .adjustSaturation(26.0f + 34.0f * s)
+                        .adjustLightness(0.6f + 1.5f * s)
                         .build());
         effects.add(
                 new RgbAdjustment.Builder()
-                        .setRedScale(1.018f + 0.036f * s)
-                        .setGreenScale(1.008f + 0.020f * s)
-                        .setBlueScale(0.992f - 0.010f * s)
+                        .setRedScale(1.030f + 0.035f * s)
+                        .setGreenScale(1.010f + 0.012f * s)
+                        .setBlueScale(0.975f - 0.010f * s)
                         .build());
         return effects;
     }
