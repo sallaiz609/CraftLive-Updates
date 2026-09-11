@@ -30,20 +30,20 @@ public final class UltraPreset {
             return Collections.emptyList();
         }
         float s = Math.max(0f, Math.min(1f, strength));
+        float daylightKick = Math.max(0f, Math.min(1f, (s - 0.90f) / 0.10f));
         List<Effect> effects = new ArrayList<>();
-        // Compatible path: recover flat screen recordings even when the full custom shader is unavailable.
-        effects.add(new Brightness(0.010f + 0.018f * s));
-        effects.add(new Contrast(0.18f + 0.20f * s));
+        effects.add(new Brightness(0.010f + 0.018f * s + 0.008f * daylightKick));
+        effects.add(new Contrast(0.18f + 0.20f * s + 0.12f * daylightKick));
         effects.add(
                 new HslAdjustment.Builder()
-                        .adjustSaturation(26.0f + 34.0f * s)
+                        .adjustSaturation(26.0f + 34.0f * s + 16.0f * daylightKick)
                         .adjustLightness(0.6f + 1.5f * s)
                         .build());
         effects.add(
                 new RgbAdjustment.Builder()
-                        .setRedScale(1.030f + 0.035f * s)
-                        .setGreenScale(1.010f + 0.012f * s)
-                        .setBlueScale(0.975f - 0.010f * s)
+                        .setRedScale(1.030f + 0.035f * s + 0.020f * daylightKick)
+                        .setGreenScale(1.010f + 0.012f * s + 0.006f * daylightKick)
+                        .setBlueScale(0.975f - 0.010f * s - 0.018f * daylightKick)
                         .build());
         return effects;
     }
